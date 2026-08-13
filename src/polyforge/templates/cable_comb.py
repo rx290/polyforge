@@ -1,4 +1,4 @@
-from .base import Param, Template, register
+from .base import Param, Template, freecad_macro, register
 
 
 def _generate(p: dict) -> str:
@@ -47,6 +47,35 @@ difference() {{
 """
 
 
+def _generate_freecad(p: dict) -> str:
+    param_lines = (
+        f"comb_width = {p['comb_width']}\n"
+        f"comb_depth = {p['comb_depth']}\n"
+        f"comb_height = {p['comb_height']}\n"
+        f"slot_count = {p['slot_count']}\n"
+        f"slot_width = {p['slot_width']}\n"
+        f"slot_depth = {p['slot_depth']}\n"
+        f"base_height = {p['base_height']}\n\n"
+        'assert slot_count >= 1, "slot_count must be at least 1"\n'
+        'assert 0 < base_height < comb_height, "base_height must be a positive fraction of comb_height"\n'
+        'assert slot_depth <= comb_height - base_height, "slot_depth cannot exceed the room above base_height"\n'
+        'assert slot_width > 0, "slot_width must be positive"'
+    )
+    body = """bar = Part.makeBox(comb_width, comb_depth, comb_height)
+
+margin = comb_width / (slot_count * 2)
+step = comb_width / slot_count
+for i in range(slot_count):
+    x = margin + i * step - slot_width / 2
+    slot = Part.makeBox(
+        slot_width, comb_depth + 2 * eps, slot_depth + eps,
+        FreeCAD.Vector(x, -eps, comb_height - slot_depth),
+    )
+    bar = bar.cut(slot)
+shape = bar"""
+    return freecad_macro("cable_comb", param_lines, body)
+
+
 TEMPLATE = register(
     Template(
         key="cable_comb",
@@ -62,6 +91,7 @@ TEMPLATE = register(
             Param("base_height", 6, description="solid strip left at the bottom"),
         ],
         generate=_generate,
+        generate_freecad=_generate_freecad,
         description="A slotted comb bar for routing and separating cable bundles.",
     )
 )

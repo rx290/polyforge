@@ -12,10 +12,17 @@ import sys
 from pathlib import Path
 
 from . import render, templates
+from .geometry import freecad_export
 from .geometry import inspect as mesh_inspect
 from .geometry import preview_export
 from .geometry import repair as mesh_repair
 from .nlu import template_matcher
+
+FREECAD_SUFFIXES = {".fcmacro", ".fcstd"}
+
+
+def _backend_for(path: Path) -> str:
+    return "freecad" if path.suffix.lower() in FREECAD_SUFFIXES else "openscad"
 
 
 def _cmd_list_templates(args) -> int:
@@ -52,9 +59,14 @@ def _cmd_design(args) -> int:
     override_params = {k: float(v) for k, v in override_params.items()}
     params = {**result.params, **override_params}
 
-    scad_source, merged_params = render.render(result.template_key, params)
-    out_path = args.out or Path(f"{result.template_key}.scad")
-    out_path.write_text(scad_source)
+    try:
+        source, merged_params = render.render(result.template_key, params, backend=args.backend)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    ext = render.BACKEND_EXTENSIONS[args.backend]
+    out_path = args.out or Path(f"{result.template_key}{ext}")
+    out_path.write_text(source)
 
     print(f"Template: {result.template_key} (confidence {result.confidence:.2f})")
     for note in result.notes:
@@ -67,8 +79,13 @@ def _cmd_design(args) -> int:
 
 
 def _cmd_preview(args) -> int:
+    if _backend_for(args.source) == "freecad":
+        print("error: preview (multi-view PNG) isn't available for the FreeCAD backend yet -- "
+              "it needs FreeCAD's GUI/OpenGL stack, not just freecadcmd. Use `export` to get a "
+              "validated STL/STEP instead.", file=sys.stderr)
+        return 1
     try:
-        views = preview_export.preview(args.scad, imgsize=args.imgsize, definitions=args.definitions)
+        views = preview_export.preview(args.source, imgsize=args.imgsize, definitions=args.definitions)
     except Exception as exc:  # noqa: BLE001
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -79,15 +96,22 @@ def _cmd_preview(args) -> int:
 
 
 def _cmd_export(args) -> int:
+    backend = _backend_for(args.source)
     try:
-        result = preview_export.export(args.scad, imgsize=args.imgsize, definitions=args.definitions)
+        if backend == "freecad":
+            result = freecad_export.export(args.source)
+        else:
+            result = preview_export.export(args.source, imgsize=args.imgsize, definitions=args.definitions)
     except Exception as exc:  # noqa: BLE001
         print(f"error: {exc}", file=sys.stderr)
         return 1
-    print("Generated views:")
-    for view in result["views"]:
-        print(f"  {view}")
+    if "views" in result:
+        print("Generated views:")
+        for view in result["views"]:
+            print(f"  {view}")
     print(f"STL: {result['stl']}")
+    if "step" in result:
+        print(f"STEP: {result['step']}")
     print(f"Mesh report: {result['mesh_report']}")
     print(f"Specification: {result['spec']}")
     return 0
@@ -120,23 +144,24 @@ def build_parser() -> argparse.ArgumentParser:
     list_p = sub.add_parser("list-templates", help="list known part templates and their parameters")
     list_p.set_defaults(func=_cmd_list_templates)
 
-    design_p = sub.add_parser("design", help="turn request text into a .scad file")
+    design_p = sub.add_parser("design", help="turn request text into a .scad or .FCMacro file")
     design_p.add_argument("text", help="what to build, e.g. 'a wall shelf 200x150x5mm with 2 M4 holes'")
     design_p.add_argument("--engine", choices=("templates", "llm"), default="templates")
+    design_p.add_argument("--backend", choices=("openscad", "freecad"), default="openscad")
     design_p.add_argument("--out", type=Path, default=None)
     design_p.add_argument("--set", action="append", metavar="name=value", help="override a specific parameter")
     design_p.add_argument("--llm-url", default=None, help="local model server URL (engine=llm only)")
     design_p.add_argument("--llm-model", default=None, help="local model name (engine=llm only)")
     design_p.set_defaults(func=_cmd_design)
 
-    preview_p = sub.add_parser("preview", help="render seven labeled views of a .scad model")
-    preview_p.add_argument("scad", type=Path)
+    preview_p = sub.add_parser("preview", help="render seven labeled views of a .scad model (OpenSCAD only)")
+    preview_p.add_argument("source", type=Path)
     preview_p.add_argument("-D", dest="definitions", action="append", default=[])
     preview_p.add_argument("--imgsize", default="1200,900")
     preview_p.set_defaults(func=_cmd_preview)
 
-    export_p = sub.add_parser("export", help="export + validate an STL and write MODEL_SPEC.md")
-    export_p.add_argument("scad", type=Path)
+    export_p = sub.add_parser("export", help="export + validate a model; backend is chosen by file extension (.scad vs .FCMacro)")
+    export_p.add_argument("source", type=Path)
     export_p.add_argument("-D", dest="definitions", action="append", default=[])
     export_p.add_argument("--imgsize", default="1200,900")
     export_p.set_defaults(func=_cmd_export)

@@ -1,12 +1,22 @@
-"""Turn a template key + params into final OpenSCAD source."""
+"""Turn a template key + params into final CAD source, for whichever backend."""
 
 from __future__ import annotations
 
 from . import templates
 
+# Default output extension per backend, used by the CLI when --out isn't given.
+BACKEND_EXTENSIONS = {"openscad": ".scad", "freecad": ".FCMacro"}
 
-def render(template_key: str, params: dict) -> tuple[str, dict]:
+
+def render(template_key: str, params: dict, backend: str = "openscad") -> tuple[str, dict]:
     template = templates.get(template_key)
     merged = template.defaults()
     merged.update(params)
-    return template.generate(merged), merged
+
+    if backend == "openscad":
+        return template.generate(merged), merged
+    if backend == "freecad":
+        if template.generate_freecad is None:
+            raise ValueError(f"template {template_key!r} has no freecad backend yet")
+        return template.generate_freecad(merged), merged
+    raise ValueError(f"unknown backend: {backend!r}. Known: {sorted(BACKEND_EXTENSIONS)}")

@@ -55,7 +55,9 @@ polyforge list-templates   # see every known template and its parameters
 
 This uses the zero-dependency `templates` engine by default (keyword + regex matching against a bounded template library — it only knows the shapes above, it will not invent novel geometry). Pass `--engine llm` to instead ask a local model (e.g. Ollama) to fill in the same templates from more casually phrased text; see the package README for setup.
 
-As an agent, prefer this path only for a quick, common shape the templates already cover. For anything bespoke — custom features, unusual constraints, mating parts, images to reconstruct from — write the `.scad` yourself following the authoring rules above; the CLI's vocabulary is intentionally bounded.
+Pass `--backend freecad` to get an editable FreeCAD `.FCMacro` (built on FreeCAD's Part API) instead of OpenSCAD source — useful when the destination workflow is FreeCAD-based. `polyforge export model.FCMacro` runs it headlessly via `freecadcmd` and validates the resulting mesh the same way as the OpenSCAD path; there's no multi-view PNG preview for FreeCAD yet (that needs its GUI/OpenGL stack).
+
+As an agent, prefer this path only for a quick, common shape the templates already cover. For anything bespoke — custom features, unusual constraints, mating parts, images to reconstruct from — write the `.scad` (or FreeCAD Python) yourself following the authoring rules above; the CLI's vocabulary is intentionally bounded.
 
 ## Dimension and fit discipline
 
@@ -137,7 +139,7 @@ Do not pretend mesh analysis can reliably discover every hole diameter. Take sem
 
 ## Roadmap: beyond OpenSCAD
 
-This skill currently only produces OpenSCAD/STL. Planned, not yet built: a FreeCAD export backend, a Blender export backend, and multi-photo-to-mesh reconstruction feeding the existing STL-reconstruct workflow. Don't claim any of those three exist until they land — check the repo README for current status.
+This skill produces OpenSCAD/STL and, for the five bounded templates, FreeCAD `.FCMacro`/STEP via the standalone CLI (`--backend freecad`). Still planned, not yet built: a Blender export backend and multi-photo-to-mesh reconstruction feeding the existing STL-reconstruct workflow. Don't claim either exists until it lands — check the repo README for current status.
 
 ## Completion standard
 

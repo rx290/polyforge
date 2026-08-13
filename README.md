@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-17%2F17%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-24%2F24%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
@@ -42,14 +42,16 @@ everything bespoke that a fixed template can't cover.
 
 **Standalone, no LLM required** — a small library of parametric part templates (box,
 wall shelf, corner bracket, cable comb, standoff mount plate), each rendered from plain
-text via keyword + dimension/screw-size/count extraction:
+text via keyword + dimension/screw-size/count extraction, to either of two CAD backends:
 
 ```bash
-polyforge design "a wall shelf 200x150x5mm with 2 M4 holes"
+polyforge design "a wall shelf 200x150x5mm with 2 M4 holes"                    # -> .scad (default)
+polyforge design "a wall shelf 200x150x5mm with 2 M4 holes" --backend freecad  # -> .FCMacro
 ```
 
-Every template is unit-tested and openscad-compile-tested in CI-style fashion — see
-[`tests/`](tests).
+Every template is unit-tested and compile-tested against both the real `openscad` and
+`freecadcmd` binaries, with the two backends' exported geometry asserted to match
+dimensionally — see [`tests/`](tests).
 
 **Agent-driven** — the full [`SKILL.md`](.claude/skills/polyforge/SKILL.md) workflow for
 anything a template doesn't cover: create, understand, modify, reconstruct-from-STL,
@@ -69,10 +71,11 @@ Being built one phase at a time, each on its own branch, tested before merging:
 
 - [x] **Phase 1 — Standalone offline CLI core.** Template library, zero-ML text
       matcher, optional local-LLM matcher, OpenSCAD preview/export, STL inspection,
-      mesh repair. *(this release)*
-- [ ] **Phase 2 — FreeCAD export backend.** A second parametric target via FreeCAD's
-      headless Python API, for workflows that want a feature-tree CAD file instead of
-      (or alongside) OpenSCAD source.
+      mesh repair.
+- [x] **Phase 2 — FreeCAD export backend.** A second parametric target via FreeCAD's
+      headless Python API (`freecadcmd`), producing an editable `.FCMacro` + STEP/STL
+      export. No multi-view preview yet — that needs FreeCAD's GUI/OpenGL stack, not
+      just the console CLI; use `export` for validated STL/STEP instead. *(this release)*
 - [ ] **Phase 3 — Blender export backend.** A mesh/organic-modeling target via `bpy`,
       for parts that don't fit a parametric feature tree.
 - [ ] **Phase 4 — Image-to-3D.** Multi-photo photogrammetry (offline, open-source
@@ -80,7 +83,8 @@ Being built one phase at a time, each on its own branch, tested before merging:
       reconstruct-from-STL workflow. Needs real photo coverage from multiple angles —
       it approximates a mesh, it doesn't recover exact parametric intent.
 
-Don't take FreeCAD/Blender/image-to-3D as already working — check the boxes above.
+Don't take Blender/image-to-3D as already working, or FreeCAD preview as available —
+check the boxes above.
 
 ## Install
 
@@ -107,6 +111,7 @@ cp -r polyforge/.claude/skills/polyforge ~/.claude/skills/   # or into <project>
 
 ```bash
 sudo apt install openscad   # or brew install openscad / openscad.org — required for preview/export
+sudo apt install freecad    # or brew install freecad / freecad.org — required for --backend freecad export
 python3 -m pip install trimesh   # optional, only for mesh_repair
 ```
 
@@ -124,16 +129,20 @@ polyforge design "something to hold my cables together, six slots" --engine llm
 # Override any specific parameter regardless of engine
 polyforge design "a box" --set width=100 --set wall=3
 
+# Generate a FreeCAD macro instead of OpenSCAD
+polyforge design "a corner bracket 100x30x30mm" --backend freecad --out bracket.FCMacro
+
 # See every known template and its parameters/defaults
 polyforge list-templates
 
-# Render seven labeled views (isometric, front, back, left, right, top, bottom)
+# Render seven labeled views (isometric, front, back, left, right, top, bottom) -- OpenSCAD only
 polyforge preview path/to/model.scad
 
-# Export STL, render views, validate the mesh, and write MODEL_SPEC.md
-polyforge export path/to/model.scad
+# Export + validate. Backend is chosen by file extension: .scad -> OpenSCAD, .FCMacro -> FreeCAD
+polyforge export path/to/model.scad       # -> STL, 7 views, MESH_REPORT.md, MODEL_SPEC.md
+polyforge export path/to/model.FCMacro    # -> STL, STEP, MESH_REPORT.md, MODEL_SPEC.md
 
-# Inspect an existing STL's geometry/topology
+# Inspect an existing STL's geometry/topology (works on an STL from either backend)
 polyforge inspect path/to/model.stl --markdown MESH_REPORT.md
 
 # Conservative mesh repair (duplicate/degenerate faces, bad normals, small holes)
@@ -155,31 +164,42 @@ polyforge design "text" ──▶ nlu.template_matcher (default, zero-ML)
                                 same template vocabulary, filled by a local model
                                        │
                                        ▼
-                              templates.<key>.generate(params)
+                              template key + params
                                        │
-                                       ▼
-                              validated parametric .scad text
-                                       │
-                                       ▼
-                    geometry.preview_export / inspect / repair
-                        (OpenSCAD CLI, dependency-free STL parsing, trimesh)
+                        ┌──────────────┴──────────────┐
+                        ▼                              ▼
+              templates.<key>.generate()    templates.<key>.generate_freecad()
+                        │                              │
+                        ▼                              ▼
+              validated parametric .scad    validated FreeCAD .FCMacro
+                        │                              │
+                        ▼                              ▼
+          geometry.preview_export / inspect      geometry.freecad_export / inspect
+              (openscad CLI + trimesh)              (freecadcmd + trimesh)
 ```
 
 Both NLU engines only ever pick a **template key + params** — neither one writes
-arbitrary OpenSCAD from scratch. That's what keeps the zero-ML path honest about what
-it can do, and keeps the local-LLM path from needing to reproduce all the authoring
-rules (units, `assert()`-guarded dimensions, fraction-based hole placement) baked into
-each template.
+arbitrary OpenSCAD or FreeCAD Python from scratch. That's what keeps the zero-ML path
+honest about what it can do, keeps the local-LLM path from needing to reproduce all the
+authoring rules (units, `assert()`-guarded dimensions, fraction-based hole placement)
+baked into each template, and is what makes both backends produce dimensionally
+identical geometry for the same template + params (asserted directly in
+[`tests/test_freecad_backend.py`](tests/test_freecad_backend.py)).
+
+One backend-specific gotcha worth knowing if you extend this: `freecadcmd` catches
+exceptions raised inside a macro internally and still exits `0` — the only signal is a
+line of text in its output, so `geometry/freecad_export.py` greps for
+`"Exception while processing file"` rather than trusting the return code.
 
 ## Layout
 
 ```
 src/polyforge/
 ├── cli.py                     # `polyforge` entry point
-├── render.py                  # template key + params -> .scad text
+├── render.py                  # template key + params -> source text, per backend
 ├── templates/                 # the bounded part vocabulary
-│   ├── base.py                 (Param/Template/registry)
-│   ├── box.py
+│   ├── base.py                 (Param/Template/registry, freecad_macro() boilerplate)
+│   ├── box.py                  each has generate() -> .scad and generate_freecad() -> .FCMacro
 │   ├── shelf_bracket.py
 │   ├── l_bracket.py
 │   ├── cable_comb.py
@@ -188,7 +208,9 @@ src/polyforge/
 │   ├── template_matcher.py    # zero-ML text -> (template, params)
 │   └── llm_backend.py         # optional local-model text -> (template, params)
 └── geometry/
-    ├── preview_export.py      # OpenSCAD preview/export/spec
+    ├── preview_export.py      # OpenSCAD preview/export
+    ├── freecad_export.py      # FreeCAD (freecadcmd) export
+    ├── spec.py                # MODEL_SPEC.md writer shared by both backends
     ├── inspect.py             # dependency-free STL geometry/topology
     └── repair.py              # trimesh-backed conservative repair
 
@@ -198,7 +220,7 @@ src/polyforge/
 ├── references/                # printer profiles, design & repair guidance
 └── assets/                    # starter .scad + manifest schema
 
-tests/                         # pytest: templates, matcher, render, CLI
+tests/                         # pytest: templates, freecad backend, matcher, render, CLI
 AGENTS.md                      # wiring PolyForge into any other LLM/agent
 ```
 
