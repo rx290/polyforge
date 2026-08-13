@@ -1,22 +1,23 @@
-#!/usr/bin/env python3
 """Conservative STL repair with before/after dimensional safeguards."""
 
 from __future__ import annotations
 
-import argparse
-import json
 from pathlib import Path
+
+
+class RepairAborted(Exception):
+    """Raised when a repair would change bounding-box size beyond the allowed limit."""
 
 
 def require_trimesh():
     try:
         import trimesh
     except ImportError as exc:
-        raise SystemExit("mesh_repair.py requires trimesh: python3 -m pip install trimesh") from exc
+        raise RuntimeError("mesh repair requires trimesh: python3 -m pip install trimesh") from exc
     return trimesh
 
 
-def facts(mesh):
+def facts(mesh) -> dict:
     return {
         "vertices": int(len(mesh.vertices)),
         "faces": int(len(mesh.faces)),
@@ -29,17 +30,11 @@ def facts(mesh):
     }
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("input", type=Path)
-    parser.add_argument("output", type=Path)
-    parser.add_argument("--mode", choices=("safe", "aggressive"), default="safe")
-    parser.add_argument("--max-size-change-mm", type=float, default=0.02)
-    args = parser.parse_args()
+def repair(input_path: Path, output_path: Path, mode: str = "safe", max_size_change_mm: float = 0.02) -> dict:
     trimesh = require_trimesh()
-    loaded = trimesh.load_mesh(args.input, process=False)
+    loaded = trimesh.load_mesh(input_path, process=False)
     if not isinstance(loaded, trimesh.Trimesh):
-        raise SystemExit("Input contains a scene or multiple unresolved meshes; inspect components before repair")
+        raise ValueError("Input contains a scene or multiple unresolved meshes; inspect components before repair")
     before = facts(loaded)
 
     mesh = loaded.copy()
@@ -51,28 +46,22 @@ def main():
     mesh.remove_unreferenced_vertices()
     trimesh.repair.fix_winding(mesh)
     trimesh.repair.fix_normals(mesh)
-    if args.mode == "aggressive":
+    if mode == "aggressive":
         trimesh.repair.fill_holes(mesh)
         mesh.process(validate=True)
 
     after = facts(mesh)
     deltas = [abs(a - b) for a, b in zip(before["extents_mm"], after["extents_mm"])]
-    if max(deltas, default=0.0) > args.max_size_change_mm:
-        raise SystemExit(f"Repair aborted: bounding-size change {deltas} mm exceeds limit")
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    mesh.export(args.output)
-    report = {
-        "mode": args.mode,
-        "input": str(args.input.resolve()),
-        "output": str(args.output.resolve()),
+    if max(deltas, default=0.0) > max_size_change_mm:
+        raise RepairAborted(f"Repair aborted: bounding-size change {deltas} mm exceeds limit {max_size_change_mm} mm")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    mesh.export(output_path)
+    return {
+        "mode": mode,
+        "input": str(input_path.resolve()),
+        "output": str(output_path.resolve()),
         "before": before,
         "after": after,
         "extent_delta_mm": deltas,
     }
-    report_path = args.output.with_suffix(".repair.json")
-    report_path.write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps(report, indent=2))
-
-
-if __name__ == "__main__":
-    main()

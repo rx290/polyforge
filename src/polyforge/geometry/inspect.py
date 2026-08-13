@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
 """Dependency-free STL geometry and topology inspection."""
 
 from __future__ import annotations
 
-import argparse
-import json
 import math
 import struct
 from collections import Counter
@@ -59,7 +56,7 @@ def dot(a, b):
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 
 
-def inspect(path: Path, tolerance: float):
+def inspect(path: Path, tolerance: float = 1e-5):
     triangles, encoding = load_triangles(path)
     points = [v for tri in triangles for v in tri]
     mins = [min(v[i] for v in points) for i in range(3)]
@@ -84,7 +81,7 @@ def inspect(path: Path, tolerance: float):
 
     boundary = sum(1 for uses in edges.values() if uses == 1)
     nonmanifold = sum(1 for uses in edges.values() if uses > 2)
-    result = {
+    return {
         "file": str(path.resolve()),
         "encoding": encoding,
         "bytes": path.stat().st_size,
@@ -99,10 +96,9 @@ def inspect(path: Path, tolerance: float):
         "watertight_by_edge_count": boundary == 0 and nonmanifold == 0,
         "vertex_merge_tolerance_mm": tolerance,
     }
-    return result
 
 
-def markdown(result):
+def markdown(result: dict) -> str:
     size = result["bounds_mm"]["size"]
     return "\n".join(
         [
@@ -119,28 +115,8 @@ def markdown(result):
             f"- Non-manifold edges: {result['nonmanifold_edges']}",
             f"- Watertight by edge count: {'yes' if result['watertight_by_edge_count'] else 'no'}",
             "",
-            "Topology counts use tolerance-rounded vertices. Hole diameters and semantic features must be verified from the parametric source or model manifest.",
+            "Topology counts use tolerance-rounded vertices. Hole diameters and semantic "
+            "features must be verified from the parametric source or model manifest.",
             "",
         ]
     )
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("stl", type=Path)
-    parser.add_argument("--tolerance", type=float, default=1e-5)
-    parser.add_argument("--json", type=Path)
-    parser.add_argument("--markdown", type=Path)
-    args = parser.parse_args()
-    if args.tolerance <= 0:
-        parser.error("--tolerance must be positive")
-    result = inspect(args.stl, args.tolerance)
-    print(json.dumps(result, indent=2))
-    if args.json:
-        args.json.write_text(json.dumps(result, indent=2) + "\n")
-    if args.markdown:
-        args.markdown.write_text(markdown(result))
-
-
-if __name__ == "__main__":
-    main()

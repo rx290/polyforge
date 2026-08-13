@@ -1,11 +1,13 @@
 ---
-name: openscad-print-modeler
+name: polyforge
 description: Create, understand, explain, modify, reconstruct, validate, document, render, and export 3D-printable OpenSCAD models. Use for .scad and .stl work, parametric CAD, dimensioned mechanical parts, brackets, mounts, enclosures, printer upgrades, STL-to-SCAD reconstruction, mesh diagnosis or repair, multi-angle model previews, and printer-specific fit or printability checks for the user's modified Ender 3 V2, QALAM Pro 400, or another FDM printer.
 ---
 
-# OpenSCAD Print Modeler
+# PolyForge
 
 Create an editable `.scad` source as the normal deliverable. Export STL, repair meshes, or make a publication pack only when requested or needed to verify geometry.
+
+Everything below describes the agent-driven workflow (this SKILL.md, used by Claude Code, ChatGPT/Codex, or any agent that can load it as instructions). For a quick common shape, or when no agent/LLM is available at all, the same underlying engine also runs completely standalone from the command line — see "Standalone CLI" below.
 
 ## Start safely
 
@@ -33,13 +35,27 @@ Create an editable `.scad` source as the normal deliverable. Export STL, repair 
 - Derive mating features from shared datums and parameters.
 - Put subtractive holes, slots, and pockets late in the feature tree.
 - Extend cutters beyond the target by a small epsilon to avoid coplanar boolean artifacts.
-- Use `assert()` for impossible dimensions, inadequate walls, or invalid clearances.
+- Use `assert()` for impossible dimensions, inadequate walls, or invalid clearances. Prefer expressing dependent positions (a hole row's height, an offset from a bend) as a *fraction* of the dimension they sit within rather than a fixed absolute — that keeps the model valid under arbitrary parameter overrides instead of only the author's original numbers. See `src/polyforge/templates/shelf_bracket.py` and `l_bracket.py` for the pattern.
 - Set preview and export facet quality separately. Avoid excessive `$fn` on non-critical geometry.
 - Make the preferred print face flat when practical and avoid trapped supports.
 - Do not silently scale an STL to solve a dimensional mismatch. Establish whether the cause is model dimensions, shrinkage, slicer scaling, extrusion calibration, or measurement error.
 - For imported STL edits, use `import()` only for simple add/subtract operations that do not need true parametric control. Reconstruct functional interfaces when editability or dimensional accuracy matters.
 
 Use `assets/parametric-part.scad` as a structural starting point and `assets/model-manifest.json` for documentation metadata.
+
+## Standalone CLI
+
+For common part shapes (box/enclosure, wall shelf, corner bracket, cable comb, standoff mount plate), the skill's actual generation logic lives in the `polyforge` Python package (`src/polyforge/`), not only in this document — so it also runs with **no agent and no LLM required**:
+
+```bash
+pip install -e .
+polyforge design "a wall shelf 200x150x5mm with 2 M4 holes"
+polyforge list-templates   # see every known template and its parameters
+```
+
+This uses the zero-dependency `templates` engine by default (keyword + regex matching against a bounded template library — it only knows the shapes above, it will not invent novel geometry). Pass `--engine llm` to instead ask a local model (e.g. Ollama) to fill in the same templates from more casually phrased text; see the package README for setup.
+
+As an agent, prefer this path only for a quick, common shape the templates already cover. For anything bespoke — custom features, unusual constraints, mating parts, images to reconstruct from — write the `.scad` yourself following the authoring rules above; the CLI's vocabulary is intentionally bounded.
 
 ## Dimension and fit discipline
 
@@ -67,7 +83,7 @@ Read `references/design-and-repair.md` for reconstruction, mesh-repair decisions
 When OpenSCAD is available, run:
 
 ```bash
-python3 scripts/openscad_pack.py preview path/to/model.scad
+polyforge preview path/to/model.scad
 ```
 
 Generate seven clearly named views: isometric, front, back, left, right, top, and bottom. Inspect every image. A successful command alone does not prove the model is correct. Look for missing features, inverted axes, occluded holes, disconnected bodies, unexpectedly thin walls, and incorrect orientation.
@@ -77,7 +93,7 @@ Generate seven clearly named views: isometric, front, back, left, right, top, an
 Export only when requested, or when an STL is necessary for validation:
 
 ```bash
-python3 scripts/openscad_pack.py export path/to/model.scad
+polyforge export path/to/model.scad
 ```
 
 The command exports STL, generates all views, inspects the mesh, and writes a model specification from the manifest plus measured mesh facts. Keep the `.scad` as the source of truth.
@@ -85,7 +101,7 @@ The command exports STL, generates all views, inspects the mesh, and writes a mo
 For an existing STL, inspect it with:
 
 ```bash
-python3 scripts/stl_inspect.py path/to/model.stl --markdown path/to/MESH_REPORT.md
+polyforge inspect path/to/model.stl --markdown path/to/MESH_REPORT.md
 ```
 
 ## Mesh repair decision
@@ -96,10 +112,10 @@ Choose among all three behaviors intelligently:
 - Ask before repair when closing gaps, filling large holes, removing components, smoothing, voxelizing, remeshing, or changing fit surfaces could alter function.
 - Reconstruct in OpenSCAD when the mesh is severely damaged, non-parametric modification would be fragile, or mounting geometry must be exact.
 
-If optional `trimesh` is installed, use:
+If optional `trimesh` is installed (`pip install -e .[repair]`), use:
 
 ```bash
-python3 scripts/mesh_repair.py input.stl repaired.stl --mode safe
+polyforge repair input.stl repaired.stl --mode safe
 ```
 
 Use `--mode aggressive` only with explicit approval after explaining likely geometry changes. Always inspect and compare input and output reports.
@@ -118,6 +134,10 @@ For any completed design, maintain a human-readable `MODEL_SPEC.md` or equivalen
 - validation performed, warnings, and any unverified assumptions.
 
 Do not pretend mesh analysis can reliably discover every hole diameter. Take semantic feature data from the parametric source/manifest and cross-check overall bounds against the exported mesh.
+
+## Roadmap: beyond OpenSCAD
+
+This skill currently only produces OpenSCAD/STL. Planned, not yet built: a FreeCAD export backend, a Blender export backend, and multi-photo-to-mesh reconstruction feeding the existing STL-reconstruct workflow. Don't claim any of those three exist until they land — check the repo README for current status.
 
 ## Completion standard
 

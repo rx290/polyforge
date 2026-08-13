@@ -1,0 +1,168 @@
+"""PolyForge command-line entry point.
+
+Runs fully standalone -- no agent, no LLM required for the default `templates`
+engine. See README.md for the full command reference.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+from . import render, templates
+from .geometry import inspect as mesh_inspect
+from .geometry import preview_export
+from .geometry import repair as mesh_repair
+from .nlu import template_matcher
+
+
+def _cmd_list_templates(args) -> int:
+    for t in templates.all_templates():
+        print(f"{t.key}: {t.title}")
+        print(f"  {t.description}")
+        for p in t.params:
+            print(f"    {p.name} = {p.default}{p.unit}  ({p.description})")
+    return 0
+
+
+def _load_engine(name: str):
+    if name == "templates":
+        return template_matcher
+    if name == "llm":
+        from .nlu import llm_backend
+
+        return llm_backend
+    raise ValueError(f"unknown engine: {name}")
+
+
+def _cmd_design(args) -> int:
+    engine = _load_engine(args.engine)
+    try:
+        if args.engine == "llm":
+            result = engine.match(args.text, base_url=args.llm_url, model=args.llm_model)
+        else:
+            result = engine.match(args.text)
+    except Exception as exc:  # noqa: BLE001 - surfaced to the user as a clean CLI error
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    override_params = dict(item.split("=", 1) for item in args.set or [])
+    override_params = {k: float(v) for k, v in override_params.items()}
+    params = {**result.params, **override_params}
+
+    scad_source, merged_params = render.render(result.template_key, params)
+    out_path = args.out or Path(f"{result.template_key}.scad")
+    out_path.write_text(scad_source)
+
+    print(f"Template: {result.template_key} (confidence {result.confidence:.2f})")
+    for note in result.notes:
+        print(f"  - {note}")
+    print("Parameters:")
+    for name, value in merged_params.items():
+        print(f"  {name} = {value}")
+    print(f"Wrote {out_path}")
+    return 0
+
+
+def _cmd_preview(args) -> int:
+    try:
+        views = preview_export.preview(args.scad, imgsize=args.imgsize, definitions=args.definitions)
+    except Exception as exc:  # noqa: BLE001
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print("Generated views:")
+    for view in views:
+        print(f"  {view}")
+    return 0
+
+
+def _cmd_export(args) -> int:
+    try:
+        result = preview_export.export(args.scad, imgsize=args.imgsize, definitions=args.definitions)
+    except Exception as exc:  # noqa: BLE001
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print("Generated views:")
+    for view in result["views"]:
+        print(f"  {view}")
+    print(f"STL: {result['stl']}")
+    print(f"Mesh report: {result['mesh_report']}")
+    print(f"Specification: {result['spec']}")
+    return 0
+
+
+def _cmd_inspect(args) -> int:
+    result = mesh_inspect.inspect(args.stl, tolerance=args.tolerance)
+    print(json.dumps(result, indent=2))
+    if args.json:
+        args.json.write_text(json.dumps(result, indent=2) + "\n")
+    if args.markdown:
+        args.markdown.write_text(mesh_inspect.markdown(result))
+    return 0
+
+
+def _cmd_repair(args) -> int:
+    try:
+        report = mesh_repair.repair(args.input, args.output, mode=args.mode, max_size_change_mm=args.max_size_change_mm)
+    except Exception as exc:  # noqa: BLE001
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(report, indent=2))
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="polyforge", description="Offline parametric CAD generation and validation.")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    list_p = sub.add_parser("list-templates", help="list known part templates and their parameters")
+    list_p.set_defaults(func=_cmd_list_templates)
+
+    design_p = sub.add_parser("design", help="turn request text into a .scad file")
+    design_p.add_argument("text", help="what to build, e.g. 'a wall shelf 200x150x5mm with 2 M4 holes'")
+    design_p.add_argument("--engine", choices=("templates", "llm"), default="templates")
+    design_p.add_argument("--out", type=Path, default=None)
+    design_p.add_argument("--set", action="append", metavar="name=value", help="override a specific parameter")
+    design_p.add_argument("--llm-url", default=None, help="local model server URL (engine=llm only)")
+    design_p.add_argument("--llm-model", default=None, help="local model name (engine=llm only)")
+    design_p.set_defaults(func=_cmd_design)
+
+    preview_p = sub.add_parser("preview", help="render seven labeled views of a .scad model")
+    preview_p.add_argument("scad", type=Path)
+    preview_p.add_argument("-D", dest="definitions", action="append", default=[])
+    preview_p.add_argument("--imgsize", default="1200,900")
+    preview_p.set_defaults(func=_cmd_preview)
+
+    export_p = sub.add_parser("export", help="export + validate an STL and write MODEL_SPEC.md")
+    export_p.add_argument("scad", type=Path)
+    export_p.add_argument("-D", dest="definitions", action="append", default=[])
+    export_p.add_argument("--imgsize", default="1200,900")
+    export_p.set_defaults(func=_cmd_export)
+
+    inspect_p = sub.add_parser("inspect", help="inspect an STL's geometry/topology")
+    inspect_p.add_argument("stl", type=Path)
+    inspect_p.add_argument("--tolerance", type=float, default=1e-5)
+    inspect_p.add_argument("--json", type=Path, default=None)
+    inspect_p.add_argument("--markdown", type=Path, default=None)
+    inspect_p.set_defaults(func=_cmd_inspect)
+
+    repair_p = sub.add_parser("repair", help="conservative STL repair (requires trimesh)")
+    repair_p.add_argument("input", type=Path)
+    repair_p.add_argument("output", type=Path)
+    repair_p.add_argument("--mode", choices=("safe", "aggressive"), default="safe")
+    repair_p.add_argument("--max-size-change-mm", type=float, default=0.02)
+    repair_p.set_defaults(func=_cmd_repair)
+
+    return parser
+
+
+def main(argv=None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

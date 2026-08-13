@@ -1,16 +1,14 @@
-#!/usr/bin/env python3
-"""Render seven views and optionally export/document an OpenSCAD model."""
+"""Render seven labeled views of an OpenSCAD model, and export+validate an STL from it."""
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
+from . import inspect as mesh_inspect
 
 VIEWS = {
     "isometric": "55,0,25",
@@ -23,30 +21,30 @@ VIEWS = {
 }
 
 
-def find_openscad():
+def find_openscad() -> str:
     configured = os.environ.get("OPENSCAD_BIN")
     candidate = configured or shutil.which("openscad") or shutil.which("openscad-nightly")
     if not candidate:
-        raise SystemExit("OpenSCAD CLI not found. Install OpenSCAD or set OPENSCAD_BIN.")
+        raise RuntimeError("OpenSCAD CLI not found. Install OpenSCAD or set OPENSCAD_BIN.")
     return candidate
 
 
-def run(command):
+def run(command: list[str]) -> str:
     completed = subprocess.run(command, text=True, capture_output=True)
     combined = (completed.stdout + "\n" + completed.stderr).strip()
     if completed.returncode:
-        raise SystemExit(f"Command failed ({completed.returncode}): {' '.join(command)}\n{combined}")
+        raise RuntimeError(f"Command failed ({completed.returncode}): {' '.join(command)}\n{combined}")
     if "ERROR:" in combined or "Parser error" in combined:
-        raise SystemExit(f"OpenSCAD reported an error:\n{combined}")
+        raise RuntimeError(f"OpenSCAD reported an error:\n{combined}")
     return combined
 
 
-def project_paths(scad):
+def project_paths(scad: Path):
     base = scad.parent.parent if scad.parent.name == "src" else scad.parent
     return base, base / "output", base / "previews"
 
 
-def render_views(openscad, scad, preview_dir, imgsize, definitions):
+def render_views(openscad: str, scad: Path, preview_dir: Path, imgsize: str, definitions: list[str]) -> list[Path]:
     preview_dir.mkdir(parents=True, exist_ok=True)
     outputs = []
     for name, rotation in VIEWS.items():
@@ -57,17 +55,17 @@ def render_views(openscad, scad, preview_dir, imgsize, definitions):
         cmd.extend(["-o", str(out), str(scad)])
         run(cmd)
         if not out.exists() or out.stat().st_size == 0:
-            raise SystemExit(f"OpenSCAD did not create a usable {name} image")
+            raise RuntimeError(f"OpenSCAD did not create a usable {name} image")
         outputs.append(out)
     return outputs
 
 
-def locate_manifest(scad, base):
+def locate_manifest(scad: Path, base: Path):
     candidates = [scad.with_suffix(".json"), base / "model-manifest.json", base / "MODEL_MANIFEST.json"]
     return next((p for p in candidates if p.exists()), None)
 
 
-def write_spec(base, scad, stl, manifest_path, mesh_data):
+def write_spec(base: Path, scad: Path, stl: Path, manifest_path, mesh_data: dict) -> Path:
     manifest = json.loads(manifest_path.read_text()) if manifest_path else {}
     size = mesh_data["bounds_mm"]["size"]
     lines = [
@@ -97,48 +95,56 @@ def write_spec(base, scad, stl, manifest_path, mesh_data):
     lines.extend(f"- {v}" for v in manifest.get("assumptions", []))
     lines.extend(["", "## Warnings", ""])
     lines.extend(f"- {v}" for v in manifest.get("warnings", []))
-    lines.extend(["", "## Validation", "", f"- Watertight by edge count: {'yes' if mesh_data['watertight_by_edge_count'] else 'no'}", f"- Boundary edges: {mesh_data['boundary_edges']}", f"- Non-manifold edges: {mesh_data['nonmanifold_edges']}", "- Seven orthographic/isometric images were generated; they still require visual inspection.", ""])
-    (base / "MODEL_SPEC.md").write_text("\n".join(lines))
+    lines.extend(
+        [
+            "",
+            "## Validation",
+            "",
+            f"- Watertight by edge count: {'yes' if mesh_data['watertight_by_edge_count'] else 'no'}",
+            f"- Boundary edges: {mesh_data['boundary_edges']}",
+            f"- Non-manifold edges: {mesh_data['nonmanifold_edges']}",
+            "- Seven orthographic/isometric images were generated; they still require visual inspection.",
+            "",
+        ]
+    )
+    spec_path = base / "MODEL_SPEC.md"
+    spec_path.write_text("\n".join(lines))
+    return spec_path
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("preview", "export"))
-    parser.add_argument("scad", type=Path)
-    parser.add_argument("-D", dest="definitions", action="append", default=[])
-    parser.add_argument("--imgsize", default="1200,900")
-    args = parser.parse_args()
-    scad = args.scad.resolve()
+def preview(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None = None) -> list[Path]:
+    scad = scad.resolve()
     if not scad.exists():
-        parser.error(f"file not found: {scad}")
+        raise FileNotFoundError(f"file not found: {scad}")
+    openscad = find_openscad()
+    _, _, preview_dir = project_paths(scad)
+    return render_views(openscad, scad, preview_dir, imgsize, definitions or [])
+
+
+def export(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None = None) -> dict:
+    scad = scad.resolve()
+    if not scad.exists():
+        raise FileNotFoundError(f"file not found: {scad}")
+    definitions = definitions or []
     openscad = find_openscad()
     base, output_dir, preview_dir = project_paths(scad)
-    views = render_views(openscad, scad, preview_dir, args.imgsize, args.definitions)
-    print("Generated views:")
-    for view in views:
-        print(view)
-    if args.command == "preview":
-        return
+    views = render_views(openscad, scad, preview_dir, imgsize, definitions)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     stl = output_dir / f"{scad.stem}.stl"
     cmd = [openscad, "--render"]
-    for definition in args.definitions:
+    for definition in definitions:
         cmd.extend(["-D", definition])
     cmd.extend(["-o", str(stl), str(scad)])
     run(cmd)
     if not stl.exists() or stl.stat().st_size == 0:
-        raise SystemExit("OpenSCAD did not create a usable STL")
+        raise RuntimeError("OpenSCAD did not create a usable STL")
 
-    script_dir = Path(__file__).resolve().parent
+    mesh_data = mesh_inspect.inspect(stl)
     mesh_json = output_dir / f"{scad.stem}.mesh.json"
+    mesh_json.write_text(json.dumps(mesh_data, indent=2) + "\n")
     mesh_md = base / "MESH_REPORT.md"
-    inspect_cmd = [sys.executable, str(script_dir / "stl_inspect.py"), str(stl), "--json", str(mesh_json), "--markdown", str(mesh_md)]
-    run(inspect_cmd)
-    mesh_data = json.loads(mesh_json.read_text())
-    write_spec(base, scad, stl, locate_manifest(scad, base), mesh_data)
-    print(f"STL: {stl}\nSpecification: {base / 'MODEL_SPEC.md'}\nMesh report: {mesh_md}")
+    mesh_md.write_text(mesh_inspect.markdown(mesh_data))
 
-
-if __name__ == "__main__":
-    main()
+    spec_path = write_spec(base, scad, stl, locate_manifest(scad, base), mesh_data)
+    return {"views": views, "stl": stl, "mesh_report": mesh_md, "spec": spec_path}
