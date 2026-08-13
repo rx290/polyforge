@@ -1,0 +1,4 @@
+# The template/matcher/CLI core has zero external dependencies (stdlib only).
+# Install below only for the features that need them:
+trimesh>=4.0     # geometry repair.py (mesh_repair)
+pytest>=8.0      # running tests

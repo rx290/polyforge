@@ -1,0 +1,12 @@
+interface:
+  display_name: PolyForge
+  short_description: Design and repair printable parametric CAD models
+  default_prompt: Create or modify this 3D-printable parametric model, verify its geometry,
+    and provide the editable source.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

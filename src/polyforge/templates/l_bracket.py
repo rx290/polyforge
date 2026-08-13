@@ -1,0 +1,101 @@
+from .base import Param, Template, register
+
+
+def _generate(p: dict) -> str:
+    return f"""// PolyForge template: l_bracket
+// units: millimetres
+// A right-angle corner/mending bracket joining two perpendicular surfaces:
+// a horizontal flange (holes drilled downward through it) fused to a
+// vertical flange (holes drilled through it toward the wall), spanning the
+// bracket width in X. Hole placement is expressed as fractions of
+// width/flange_a/flange_b so it stays valid for any override of those
+// dimensions.
+
+/* [Primary dimensions] */
+width = {p['width']};           // X, length of the bracket
+flange_a = {p['flange_a']};     // Y, length of the horizontal flange
+flange_b = {p['flange_b']};     // Z, length of the vertical flange
+thickness = {p['thickness']};
+
+/* [Holes, one row per flange] */
+hole_diameter = {p['hole_diameter']};
+holes_per_flange = {p['holes_per_flange']};
+hole_margin_fraction = {p['hole_margin_fraction']};   // end margin, as a fraction of width
+hole_offset_fraction = {p['hole_offset_fraction']};   // hole row position along each flange, as a fraction of that flange's length
+hole_margin = width * hole_margin_fraction;
+offset_a = flange_a * hole_offset_fraction;
+offset_b = flange_b * hole_offset_fraction;
+
+/* [Quality] */
+$fn = $preview ? 32 : 96;
+eps = 0.01;
+
+assert(flange_a > thickness, "flange_a must exceed thickness");
+assert(flange_b > thickness, "flange_b must exceed thickness");
+assert(holes_per_flange >= 1, "holes_per_flange must be at least 1");
+assert(hole_margin_fraction > 0 && hole_margin_fraction < 0.5, "hole_margin_fraction must be between 0 and 0.5");
+assert(hole_offset_fraction > 0 && hole_offset_fraction < 1, "hole_offset_fraction must be between 0 and 1");
+assert(offset_a > thickness + hole_diameter / 2, "hole_offset_fraction places holes too close to the bend on flange_a");
+assert(offset_b > thickness + hole_diameter / 2, "hole_offset_fraction places holes too close to the bend on flange_b");
+assert(offset_a < flange_a - hole_diameter / 2, "hole_offset_fraction runs off the end of flange_a");
+assert(offset_b < flange_b - hole_diameter / 2, "hole_offset_fraction runs off the end of flange_b");
+assert(hole_diameter < thickness * 5, "hole_diameter looks implausibly large for this plate thickness");
+
+module horizontal_flange() {{
+    cube([width, flange_a, thickness]);
+}}
+
+module vertical_flange() {{
+    cube([width, thickness, flange_b]);
+}}
+
+module hole_positions() {{
+    step = (holes_per_flange > 1) ? (width - 2 * hole_margin) / (holes_per_flange - 1) : 0;
+    for (i = [0 : holes_per_flange - 1])
+        translate([hole_margin + i * step, 0, 0])
+            children();
+}}
+
+module horizontal_flange_holes() {{
+    hole_positions()
+        translate([0, offset_a, -eps])
+            cylinder(h = thickness + 2 * eps, d = hole_diameter);
+}}
+
+module vertical_flange_holes() {{
+    hole_positions()
+        translate([0, -eps, offset_b])
+            rotate([-90, 0, 0])
+                cylinder(h = thickness + 2 * eps, d = hole_diameter);
+}}
+
+difference() {{
+    union() {{
+        horizontal_flange();
+        vertical_flange();
+    }}
+    horizontal_flange_holes();
+    vertical_flange_holes();
+}}
+"""
+
+
+TEMPLATE = register(
+    Template(
+        key="l_bracket",
+        title="Right-angle corner bracket",
+        keywords=("l bracket", "l-bracket", "corner bracket", "mending bracket", "angle bracket", "corner brace"),
+        params=[
+            Param("width", 40, description="X, length of the bracket"),
+            Param("flange_a", 30, description="Y, length of the horizontal flange"),
+            Param("flange_b", 30, description="Z, length of the vertical flange"),
+            Param("thickness", 4, description="plate thickness"),
+            Param("hole_diameter", 4.5, description="hole diameter (M4 clearance)"),
+            Param("holes_per_flange", 2, description="holes in each flange"),
+            Param("hole_margin_fraction", 0.2, unit="", description="end margin as a fraction of width"),
+            Param("hole_offset_fraction", 0.5, unit="", description="hole row position along each flange, as a fraction of its length"),
+        ],
+        generate=_generate,
+        description="A right-angle bracket joining two perpendicular surfaces, with holes in both flanges.",
+    )
+)

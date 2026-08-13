@@ -1,8 +1,14 @@
 __pycache__/
 *.pyc
 .venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
 *.stl
 *.png
 MESH_REPORT.md
 MODEL_SPEC.md
+previews/
+output/
 .DS_Store
