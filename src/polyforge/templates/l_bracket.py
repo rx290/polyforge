@@ -1,4 +1,4 @@
-from .base import Param, Template, register
+from .base import Param, Template, freecad_macro, register
 
 
 def _generate(p: dict) -> str:
@@ -80,6 +80,49 @@ difference() {{
 """
 
 
+def _generate_freecad(p: dict) -> str:
+    param_lines = (
+        f"width = {p['width']}\n"
+        f"flange_a = {p['flange_a']}\n"
+        f"flange_b = {p['flange_b']}\n"
+        f"thickness = {p['thickness']}\n"
+        f"hole_diameter = {p['hole_diameter']}\n"
+        f"holes_per_flange = {p['holes_per_flange']}\n"
+        f"hole_margin_fraction = {p['hole_margin_fraction']}\n"
+        f"hole_offset_fraction = {p['hole_offset_fraction']}\n"
+        "hole_margin = width * hole_margin_fraction\n"
+        "offset_a = flange_a * hole_offset_fraction\n"
+        "offset_b = flange_b * hole_offset_fraction\n\n"
+        'assert flange_a > thickness, "flange_a must exceed thickness"\n'
+        'assert flange_b > thickness, "flange_b must exceed thickness"\n'
+        'assert holes_per_flange >= 1, "holes_per_flange must be at least 1"\n'
+        'assert 0 < hole_margin_fraction < 0.5, "hole_margin_fraction must be between 0 and 0.5"\n'
+        'assert 0 < hole_offset_fraction < 1, "hole_offset_fraction must be between 0 and 1"\n'
+        'assert offset_a > thickness + hole_diameter / 2, "hole_offset_fraction places holes too close to the bend on flange_a"\n'
+        'assert offset_b > thickness + hole_diameter / 2, "hole_offset_fraction places holes too close to the bend on flange_b"\n'
+        'assert offset_a < flange_a - hole_diameter / 2, "hole_offset_fraction runs off the end of flange_a"\n'
+        'assert offset_b < flange_b - hole_diameter / 2, "hole_offset_fraction runs off the end of flange_b"\n'
+        'assert hole_diameter < thickness * 5, "hole_diameter looks implausibly large for this plate thickness"'
+    )
+    body = """horizontal_flange = Part.makeBox(width, flange_a, thickness)
+vertical_flange = Part.makeBox(width, thickness, flange_b)
+shape = horizontal_flange.fuse(vertical_flange)
+
+step = (width - 2 * hole_margin) / (holes_per_flange - 1) if holes_per_flange > 1 else 0
+for i in range(holes_per_flange):
+    x = hole_margin + i * step
+    horizontal_hole = Part.makeCylinder(
+        hole_diameter / 2, thickness + 2 * eps,
+        FreeCAD.Vector(x, offset_a, -eps), FreeCAD.Vector(0, 0, 1),
+    )
+    vertical_hole = Part.makeCylinder(
+        hole_diameter / 2, thickness + 2 * eps,
+        FreeCAD.Vector(x, -eps, offset_b), FreeCAD.Vector(0, 1, 0),
+    )
+    shape = shape.cut(horizontal_hole).cut(vertical_hole)"""
+    return freecad_macro("l_bracket", param_lines, body)
+
+
 TEMPLATE = register(
     Template(
         key="l_bracket",
@@ -96,6 +139,7 @@ TEMPLATE = register(
             Param("hole_offset_fraction", 0.5, unit="", description="hole row position along each flange, as a fraction of its length"),
         ],
         generate=_generate,
+        generate_freecad=_generate_freecad,
         description="A right-angle bracket joining two perpendicular surfaces, with holes in both flanges.",
     )
 )
