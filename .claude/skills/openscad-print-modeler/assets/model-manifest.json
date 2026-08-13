@@ -1,0 +1,21 @@
+{
+  "name": "Parametric Part",
+  "revision": "v1",
+  "purpose": "Describe the part's function",
+  "units": "mm",
+  "source": "src/model.scad",
+  "printer_profile": "modified-ender-3-v2",
+  "nozzle_mm": 0.6,
+  "material": "PETG",
+  "orientation": "largest flat face on bed",
+  "parameters": [
+    {"name": "part_x", "value": 60, "kind": "nominal", "description": "overall X"},
+    {"name": "part_y", "value": 40, "kind": "nominal", "description": "overall Y"},
+    {"name": "part_z", "value": 8, "kind": "nominal", "description": "overall Z"}
+  ],
+  "features": [
+    {"type": "through_hole", "quantity": 4, "diameter_mm": 3.4, "description": "M3 clearance holes"}
+  ],
+  "assumptions": [],
+  "warnings": []
+}
