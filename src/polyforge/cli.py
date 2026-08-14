@@ -1,6 +1,6 @@
 """PolyForge command-line entry point.
 
-Runs fully standalone -- no agent, no LLM required for the default `templates`
+Runs fully standalone, no agent, no LLM required for the default `templates`
 engine. See README.md for the full command reference.
 """
 
@@ -80,8 +80,8 @@ def _cmd_design(args) -> int:
 
 def _cmd_preview(args) -> int:
     if _backend_for(args.source) == "freecad":
-        print("error: preview (multi-view PNG) isn't available for the FreeCAD backend yet -- "
-              "it needs FreeCAD's GUI/OpenGL stack, not just freecadcmd. Use `export` to get a "
+        print("error: preview (multi-view PNG) isn't available for the FreeCAD backend yet. "
+              "It needs FreeCAD's GUI/OpenGL stack, not just freecadcmd. Use `export` to get a "
               "validated STL/STEP instead.", file=sys.stderr)
         return 1
     try:

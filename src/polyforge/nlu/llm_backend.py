@@ -1,6 +1,6 @@
 """Optional local-model-backed engine for freer-form request text.
 
-Still bounded to the same template vocabulary as template_matcher — the model's
+Still bounded to the same template vocabulary as template_matcher: the model's
 job is only smarter slot-filling for casually phrased requests, not writing
 arbitrary novel OpenSCAD. Talks to an Ollama-compatible local server by default
 (nothing leaves the machine); point POLYFORGE_LLM_URL at any OpenAI- or

@@ -7,7 +7,7 @@ description: Create, understand, explain, modify, reconstruct, validate, documen
 
 Create an editable `.scad` source as the normal deliverable. Export STL, repair meshes, or make a publication pack only when requested or needed to verify geometry.
 
-Everything below describes the agent-driven workflow (this SKILL.md, used by Claude Code, ChatGPT/Codex, or any agent that can load it as instructions). For a quick common shape, or when no agent/LLM is available at all, the same underlying engine also runs completely standalone from the command line — see "Standalone CLI" below.
+Everything below describes the agent-driven workflow (this SKILL.md, used by Claude Code, ChatGPT/Codex, or any agent that can load it as instructions). For a quick common shape, or when no agent/LLM is available at all, the same underlying engine also runs completely standalone from the command line, see "Standalone CLI" below.
 
 ## Start safely
 
@@ -35,7 +35,7 @@ Everything below describes the agent-driven workflow (this SKILL.md, used by Cla
 - Derive mating features from shared datums and parameters.
 - Put subtractive holes, slots, and pockets late in the feature tree.
 - Extend cutters beyond the target by a small epsilon to avoid coplanar boolean artifacts.
-- Use `assert()` for impossible dimensions, inadequate walls, or invalid clearances. Prefer expressing dependent positions (a hole row's height, an offset from a bend) as a *fraction* of the dimension they sit within rather than a fixed absolute — that keeps the model valid under arbitrary parameter overrides instead of only the author's original numbers. See `src/polyforge/templates/shelf_bracket.py` and `l_bracket.py` for the pattern.
+- Use `assert()` for impossible dimensions, inadequate walls, or invalid clearances. Prefer expressing dependent positions (a hole row's height, an offset from a bend) as a *fraction* of the dimension they sit within rather than a fixed absolute: that keeps the model valid under arbitrary parameter overrides instead of only the author's original numbers. See `src/polyforge/templates/shelf_bracket.py` and `l_bracket.py` for the pattern.
 - Set preview and export facet quality separately. Avoid excessive `$fn` on non-critical geometry.
 - Make the preferred print face flat when practical and avoid trapped supports.
 - Do not silently scale an STL to solve a dimensional mismatch. Establish whether the cause is model dimensions, shrinkage, slicer scaling, extrusion calibration, or measurement error.
@@ -45,7 +45,7 @@ Use `assets/parametric-part.scad` as a structural starting point and `assets/mod
 
 ## Standalone CLI
 
-For common part shapes (box/enclosure, wall shelf, corner bracket, cable comb, standoff mount plate), the skill's actual generation logic lives in the `polyforge` Python package (`src/polyforge/`), not only in this document — so it also runs with **no agent and no LLM required**:
+For common part shapes (box/enclosure, wall shelf, corner bracket, cable comb, standoff mount plate), the skill's actual generation logic lives in the `polyforge` Python package (`src/polyforge/`), not only in this document, so it also runs with **no agent and no LLM required**:
 
 ```bash
 pip install -e .
@@ -53,11 +53,11 @@ polyforge design "a wall shelf 200x150x5mm with 2 M4 holes"
 polyforge list-templates   # see every known template and its parameters
 ```
 
-This uses the zero-dependency `templates` engine by default (keyword + regex matching against a bounded template library — it only knows the shapes above, it will not invent novel geometry). Pass `--engine llm` to instead ask a local model (e.g. Ollama) to fill in the same templates from more casually phrased text; see the package README for setup.
+This uses the zero-dependency `templates` engine by default (keyword and regex matching against a bounded template library: it only knows the shapes above, it will not invent novel geometry). Pass `--engine llm` to instead ask a local model (e.g. Ollama) to fill in the same templates from more casually phrased text; see the package README for setup.
 
-Pass `--backend freecad` to get an editable FreeCAD `.FCMacro` (built on FreeCAD's Part API) instead of OpenSCAD source — useful when the destination workflow is FreeCAD-based. `polyforge export model.FCMacro` runs it headlessly via `freecadcmd` and validates the resulting mesh the same way as the OpenSCAD path; there's no multi-view PNG preview for FreeCAD yet (that needs its GUI/OpenGL stack).
+Pass `--backend freecad` to get an editable FreeCAD `.FCMacro` (built on FreeCAD's Part API) instead of OpenSCAD source, useful when the destination workflow is FreeCAD-based. `polyforge export model.FCMacro` runs it headlessly via `freecadcmd` and validates the resulting mesh the same way as the OpenSCAD path; there's no multi-view PNG preview for FreeCAD yet (that needs its GUI/OpenGL stack).
 
-As an agent, prefer this path only for a quick, common shape the templates already cover. For anything bespoke — custom features, unusual constraints, mating parts, images to reconstruct from — write the `.scad` (or FreeCAD Python) yourself following the authoring rules above; the CLI's vocabulary is intentionally bounded.
+As an agent, prefer this path only for a quick, common shape the templates already cover. For anything bespoke, custom features, unusual constraints, mating parts, images to reconstruct from, write the `.scad` (or FreeCAD Python) yourself following the authoring rules above; the CLI's vocabulary is intentionally bounded.
 
 ## Dimension and fit discipline
 
@@ -75,7 +75,7 @@ Read `references/design-and-repair.md` for reconstruction, mesh-repair decisions
 
 - Select a named printer profile, nozzle, material, and intended orientation.
 - Treat profile values as defaults, not facts overriding the user's current configuration.
-- Compare bounding dimensions against the usable—not merely advertised—build envelope.
+- Compare bounding dimensions against the usable build envelope, not merely the advertised one.
 - Relate minimum walls to extrusion width and perimeter count.
 - Check bridges, overhangs, elephant-foot-sensitive fits, heat-set insert bosses, screw access, tool access, and assembly order.
 - For structural printer parts, call out load direction, layer adhesion, stress concentrations, heat exposure, and whether a metal fastener or captured nut carries the load.
@@ -139,7 +139,7 @@ Do not pretend mesh analysis can reliably discover every hole diameter. Take sem
 
 ## Roadmap: beyond OpenSCAD
 
-This skill produces OpenSCAD/STL and, for the five bounded templates, FreeCAD `.FCMacro`/STEP via the standalone CLI (`--backend freecad`). Still planned, not yet built: a Blender export backend and multi-photo-to-mesh reconstruction feeding the existing STL-reconstruct workflow. Don't claim either exists until it lands — check the repo README for current status.
+This skill produces OpenSCAD/STL and, for the five bounded templates, FreeCAD `.FCMacro`/STEP via the standalone CLI (`--backend freecad`). Still planned, not yet built: a Blender export backend and multi-photo-to-mesh reconstruction feeding the existing STL-reconstruct workflow. Don't claim either exists until it lands, check the repo README for current status.
 
 ## Completion standard
 

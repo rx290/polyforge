@@ -4,7 +4,7 @@ Picks one template from the bounded library (polyforge.templates) by keyword
 match (with a fuzzy fallback for typos), then fills its parameters by pattern-
 matching common phrasings: WxDxH dimension triples, screw sizes ("M3"), and
 hole/slot counts ("4 holes", "four slots"). This never invents geometry outside
-the known template vocabulary — for open-ended descriptions, use the
+the known template vocabulary; for open-ended descriptions, use the
 `llm_backend` engine instead (`polyforge design --engine llm ...`).
 """
 
