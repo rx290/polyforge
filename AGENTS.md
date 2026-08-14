@@ -1,7 +1,7 @@
 # Using PolyForge from any agent or LLM
 
 There is no shared skill/plugin format across Claude, ChatGPT, Gemini, Kimi K2, and
-local models — Claude Code has `SKILL.md`, OpenAI products have `agents/openai.yaml`,
+local models: Claude Code has `SKILL.md`, OpenAI products have `agents/openai.yaml`,
 and everything else has nothing standard. Chasing every platform's proprietary format
 isn't the fix. Instead, PolyForge's actual capability is a **standalone CLI that needs
 no agent at all** (`src/polyforge/`, installed as the `polyforge` command). Every
@@ -9,7 +9,7 @@ platform below just needs to be told to call it.
 
 ## Claude Code
 
-Native support — drop `.claude/skills/polyforge/` into your skills directory. See the
+Native support. Drop `.claude/skills/polyforge/` into your skills directory. See the
 main [README](README.md#install).
 
 ## ChatGPT / Codex
@@ -38,7 +38,7 @@ JSON tool schema:
 
 Wire the call to `subprocess.run(["polyforge", "design", text, "--engine", engine, "--out", out_path])`
 and return the written `.scad` path (and its contents, if the model needs to read them
-back). The same pattern works for `preview`, `export`, `inspect`, and `repair` — see
+back). The same pattern works for `preview`, `export`, `inspect`, and `repair`, see
 `polyforge --help` for their arguments.
 
 ## No agent at all

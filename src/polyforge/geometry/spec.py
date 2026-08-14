@@ -15,7 +15,7 @@ def write_spec(base: Path, source: Path, artifact: Path, manifest_path, mesh_dat
     manifest = json.loads(manifest_path.read_text()) if manifest_path else {}
     size = mesh_data["bounds_mm"]["size"]
     lines = [
-        f"# {manifest.get('name', source.stem)} — model specification",
+        f"# {manifest.get('name', source.stem)}: model specification",
         "",
         f"- Revision: {manifest.get('revision', 'unspecified')}",
         f"- Purpose: {manifest.get('purpose', 'unspecified')}",
