@@ -139,7 +139,7 @@ Do not pretend mesh analysis can reliably discover every hole diameter. Take sem
 
 ## Roadmap: beyond OpenSCAD
 
-This skill produces OpenSCAD/STL and, for the five bounded templates, FreeCAD `.FCMacro`/STEP via the standalone CLI (`--backend freecad`). Still planned, not yet built: a Blender export backend and multi-photo-to-mesh reconstruction feeding the existing STL-reconstruct workflow. Don't claim either exists until it lands, check the repo README for current status.
+This skill produces OpenSCAD/STL and, for the five bounded templates, FreeCAD `.FCMacro`/STEP and Blender `.blender.py`/STL via the standalone CLI (`--backend freecad` / `--backend blender`). It also has `reconstruct-from-photos`, which turns a directory of photos into an STL via offline COLMAP + OpenMVS photogrammetry, feeding the existing STL-reconstruct workflow above -- treat that mesh the same way, as evidence to measure and rebuild from, not as editable source, and note it has no absolute scale until rescaled against a known real-world measurement. Check the repo README for current status before claiming any capability exists.
 
 ## Completion standard
 

@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-32%2F32%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-40%2F40%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
@@ -47,6 +47,8 @@ Every template is unit-tested and also compile-tested against the real `openscad
 
 **An optional local-model engine.** `--engine llm` asks a local model (Ollama by default) to fill in the same templates from more casual phrasing. Still fully offline, still limited to the shapes the template library actually knows.
 
+**Photos in, mesh out.** `polyforge reconstruct-from-photos` turns a directory of overlapping photos of a real object into an STL, fully offline: COLMAP for structure-from-motion, handed off to OpenMVS for the dense reconstruction and meshing (COLMAP's own dense stage is CUDA-only with no CPU path, confirmed directly, not assumed). The result is reconstructed evidence, not editable parametric source, and it has no absolute real-world scale until you measure and rescale it against something known, same as any photogrammetry output.
+
 ## Roadmap
 
 I'm building this one phase at a time, each on its own branch, tested before it merges into main.
@@ -54,7 +56,7 @@ I'm building this one phase at a time, each on its own branch, tested before it 
 - [x] **Phase 1, standalone offline CLI core.** Template library, the zero-ML text matcher, the optional local-LLM matcher, OpenSCAD preview/export, STL inspection, mesh repair.
 - [x] **Phase 2, FreeCAD export backend.** A second parametric target through FreeCAD's headless Python API (`freecadcmd`), producing an editable `.FCMacro` plus STEP/STL export. No multi-view preview for it yet, that needs FreeCAD's GUI/OpenGL stack, not just the console CLI, so use `export` for a validated STL/STEP instead.
 - [x] **Phase 3, Blender export backend.** A third target through Blender's headless Python API (`bpy`/`bmesh`), producing an editable `.blender.py` plus STL export (mesh-only, Blender has no B-rep kernel so there's no STEP output here). Same no-preview caveat as FreeCAD, same reason, use `export` instead.
-- [ ] **Phase 4, image-to-3D.** Multi-photo photogrammetry, offline, open-source structure-from-motion, producing a mesh that feeds into the existing reconstruct-from-STL workflow. It needs real photo coverage from more than one angle, and it approximates a mesh rather than recovering exact parametric intent, so treat it accordingly.
+- [x] **Phase 4, image-to-3D.** Multi-photo photogrammetry, fully offline: COLMAP for sparse structure-from-motion, handed off to OpenMVS for CPU-capable dense reconstruction and meshing (COLMAP's own dense stage is CUDA-only, no CPU fallback, confirmed by deliberately crashing it). Feeds into the existing reconstruct-from-STL workflow: treat the result as evidence to measure and rebuild from, not editable source, and note it has no absolute scale until rescaled against a known real-world measurement.
 - [ ] **Somewhere after that, a low-poly vase generator.** Randomized low-poly faceting over a revolved profile, reusing the same OpenSCAD/FreeCAD split above.
 
 If a box above isn't checked, that feature isn't built yet. Don't take my word for it either, go read the code.
@@ -88,6 +90,8 @@ sudo apt install freecad    # or brew install freecad, or freecad.org: needed fo
 sudo apt install blender    # or brew install blender, or blender.org: needed for --backend blender export
 python3 -m pip install trimesh   # optional, only for mesh repair
 ```
+
+**For `reconstruct-from-photos`**, you need COLMAP and OpenMVS. Neither ships in most distros' official repos; on Arch/Manjaro they're AUR-only (`colmap`, `openmvs`) and, depending on how current your system's OpenCV/vcpkg are relative to when those packages were last updated, may need a couple of small source patches to build (nothing polyforge-specific, just AUR-package staleness against a rolling-release system) -- see the comments at the top of [`geometry/photogrammetry.py`](src/polyforge/geometry/photogrammetry.py) for what to expect. Build CPU-only (`BUILD_CUDA=OFF`) unless you actually have a CUDA toolchain: COLMAP's dense stage needs CUDA either way (there's no CPU path in the mainline binary at all), which is exactly why this pipeline routes dense reconstruction through OpenMVS instead.
 
 `design`, `list-templates`, and STL `inspect` don't need anything beyond the Python standard library.
 
@@ -125,6 +129,9 @@ polyforge inspect path/to/model.stl --markdown MESH_REPORT.md
 
 # Conservative mesh repair: duplicate/degenerate faces, bad normals, small holes
 polyforge repair input.stl repaired.stl --mode safe
+
+# Turn a directory of overlapping photos into an STL (needs colmap + openmvs)
+polyforge reconstruct-from-photos path/to/photos/ --out workspace/  # produces an STL, MESH_REPORT.md, MODEL_SPEC.md
 ```
 
 Once the skill is installed in an agent, Claude Code, ChatGPT, or anything wired up through `AGENTS.md`, just ask for what you want in plain language, "design a cable comb with 8 slots for 3mm cables", and it follows the same workflow on its own, writing the `.scad` by hand for anything the template library doesn't cover.
@@ -157,6 +164,8 @@ No NLU engine writes raw OpenSCAD, FreeCAD, or Blender Python from scratch. They
 
 One thing worth knowing if you're going to touch this code: both `freecadcmd` and `blender --background --python` catch exceptions raised inside a script on their own and still exit 0. `geometry/freecad_export.py` checks for the string `"Exception while processing file"` in the macro's output instead of trusting the return code. Blender is trickier: it also prints a benign traceback of its own on every single headless run, both before the script starts and again during shutdown (an unrelated addon failing an optional import), so a plain substring check would misfire constantly. Every generated `.blender.py` prints a start and an end marker, and `geometry/blender_export.py` only looks for a traceback in the text strictly between them; if the end marker never shows up at all, that's treated as a crash regardless of what's in the trailing noise. Found both of these the hard way, by deliberately raising inside a throwaway script and watching what each tool actually did before writing a single line of the real export code.
 
+`reconstruct-from-photos` is a different shape from the other three backends: there's no template key or params, the input is a directory of photos, and the output is reconstructed geometry rather than something generated from a spec. It runs COLMAP for sparse structure-from-motion (fully CPU-capable), then hands that off to OpenMVS for dense reconstruction and meshing. That handoff exists because COLMAP's own dense stage requires CUDA with no CPU path in the mainline binary at all -- confirmed by deliberately running it without a GPU and watching it abort, not assumed from documentation. Unlike freecadcmd/blender, both colmap and the OpenMVS binaries return proper nonzero exit codes on real failures, so `geometry/photogrammetry.py` doesn't need any of the marker-scanning tricks above. The resulting mesh has no absolute scale (structure-from-motion from photos alone recovers geometry only up to an arbitrary scale factor) and usually isn't watertight (cameras can't see a surface's underside), and both of those are correct, expected behavior for this backend specifically, not bugs. See [`tests/test_photogrammetry.py`](tests/test_photogrammetry.py).
+
 ## Layout
 
 ```
@@ -177,7 +186,9 @@ src/polyforge/
     ├── preview_export.py      # OpenSCAD preview and export
     ├── freecad_export.py      # FreeCAD export via freecadcmd
     ├── blender_export.py      # Blender export via blender --background --python
-    ├── spec.py                # the MODEL_SPEC.md writer, shared by all three backends
+    ├── photogrammetry.py      # photo directory -> STL via COLMAP (sparse SfM) + OpenMVS (dense + mesh)
+    ├── ply.py                 # dependency-free PLY mesh reader/STL writer, used by photogrammetry.py
+    ├── spec.py                # the MODEL_SPEC.md writer, shared by every backend
     ├── inspect.py              # dependency-free STL geometry and topology
     └── repair.py              # trimesh-backed conservative repair
 
@@ -187,13 +198,13 @@ src/polyforge/
 ├── references/                # printer profiles, design and repair guidance
 └── assets/                    # starter .scad and manifest schema
 
-tests/                         # pytest: templates, the freecad backend, the blender backend, matcher, render, CLI
+tests/                         # pytest: templates, the freecad backend, the blender backend, photogrammetry, matcher, render, CLI
 AGENTS.md                      # how to wire PolyForge into any other LLM or agent
 ```
 
 ## Contributing
 
-Issues and PRs are welcome. New part templates, printer profiles, phrasings the matcher should catch, or a hand with the image-to-3D phase, all fair game. Each phase lands on its own branch and gets tested before it merges, so expect the workflow and the template library to keep growing.
+Issues and PRs are welcome. New part templates, printer profiles, phrasings the matcher should catch, or a hand with the low-poly vase generator, all fair game. Each phase lands on its own branch and gets tested before it merges, so expect the workflow and the template library to keep growing.
 
 ## Author
 
