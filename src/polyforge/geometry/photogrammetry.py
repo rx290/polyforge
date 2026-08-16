@@ -21,7 +21,27 @@ merge everything into one reconstruction. This picks whichever sub-model
 registered the most images (via `colmap model_analyzer`, not a guess) as the
 one to carry forward -- a photo set that fragments into several small
 sub-models produced too little overlap for a good reconstruction regardless
-of which fragment is chosen, so this doesn't try to be clever about it.
+of which fragment is chosen, so this doesn't try to be clever about it. The
+number of sub-models found and the chosen one's image count are returned so
+a caller can tell whether the reconstruction fragmented without having to
+inspect `output_dir/sparse/` by hand.
+
+Empirically tested minimum photo coverage (see project memory / PR history
+for the full test matrix, not repeated here): a single- or two-elevation-ring
+camera orbit fails outright regardless of photo count (tested up to 24
+photos) -- at least 3 elevation rings are required. Within that, density
+matters too: 27 photos across 3 rings failed, 30 succeeded, for a roughly
+60x40x30mm test object at a 160mm camera radius. Treat "3+ elevation rings,
+~10 azimuths each, ~30 photos" as the practical floor, not a hard guarantee
+-- it will scale with object size/detail and camera distance.
+
+Runtime scales badly with photo count, but not where you'd expect: feature
+extraction and matching stay roughly linear (SIFT + exhaustive_matcher),
+but COLMAP's incremental `mapper` (bundle adjustment) does not -- measured
+3.1s at 16 photos vs 122.7s at 36 photos, a ~39x jump for 2.25x the photos.
+Switching to `sequential_matcher` would not help (matching was never the
+bottleneck); if mapper cost becomes a real problem, look at COLMAP's
+`hierarchical_mapper` or cap `--Mapper.ba_global_max_num_iterations` instead.
 """
 
 from __future__ import annotations
@@ -70,11 +90,14 @@ def _registered_image_count(colmap: str, submodel: Path) -> int:
     return int(match.group(1))
 
 
-def _best_submodel(colmap: str, sparse_dir: Path) -> Path:
+def _best_submodel(colmap: str, sparse_dir: Path) -> tuple[Path, int, int]:
+    """Returns (chosen submodel path, its registered image count, total submodel count)."""
     candidates = [p for p in sorted(sparse_dir.iterdir()) if p.is_dir() and (p / "images.bin").exists()]
     if not candidates:
         raise RuntimeError(f"COLMAP produced no registered sparse model under {sparse_dir}")
-    return max(candidates, key=lambda p: _registered_image_count(colmap, p))
+    counts = {p: _registered_image_count(colmap, p) for p in candidates}
+    best = max(counts, key=counts.get)
+    return best, counts[best], len(candidates)
 
 
 def reconstruct(image_dir: Path, output_dir: Path, camera_model: str = "SIMPLE_RADIAL") -> dict:
@@ -116,7 +139,7 @@ def reconstruct(image_dir: Path, output_dir: Path, camera_model: str = "SIMPLE_R
          "--image_path", str(image_dir),
          "--output_path", str(sparse_dir)])
 
-    submodel = _best_submodel(colmap, sparse_dir)
+    submodel, submodel_image_count, submodel_count = _best_submodel(colmap, sparse_dir)
 
     undistorted_dir = output_dir / "undistorted"
     run([colmap, "image_undistorter",
@@ -156,4 +179,10 @@ def reconstruct(image_dir: Path, output_dir: Path, camera_model: str = "SIMPLE_R
     mesh_md.write_text(mesh_inspect.markdown(mesh_data))
 
     spec_path = mesh_spec.write_spec(output_dir, image_dir, stl_path, mesh_spec.locate_manifest(image_dir, output_dir), mesh_data)
-    return {"stl": stl_path, "mesh_report": mesh_md, "spec": spec_path}
+    return {
+        "stl": stl_path,
+        "mesh_report": mesh_md,
+        "spec": spec_path,
+        "submodel_count": submodel_count,
+        "submodel_image_count": submodel_image_count,
+    }

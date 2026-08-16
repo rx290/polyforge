@@ -37,6 +37,8 @@ def test_reconstruct_produces_a_real_mesh(tmp_path):
     assert result["stl"].exists() and result["stl"].stat().st_size > 0
     assert result["mesh_report"].exists()
     assert result["spec"].exists()
+    assert result["submodel_count"] >= 1
+    assert result["submodel_image_count"] >= 1
 
     mesh_data = mesh_inspect.inspect(result["stl"])
     assert mesh_data["triangles"] > 0
