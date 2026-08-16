@@ -1,4 +1,4 @@
-from .base import Param, Template, freecad_macro, register
+from .base import BMESH_PRIMITIVES, Param, Template, blender_macro, freecad_macro, register
 
 
 def _generate(p: dict) -> str:
@@ -96,6 +96,39 @@ for i in range(hole_count):
     return freecad_macro("shelf_bracket", param_lines, body)
 
 
+def _generate_blender(p: dict) -> str:
+    param_lines = (
+        f"shelf_width = {p['shelf_width']}\n"
+        f"shelf_depth = {p['shelf_depth']}\n"
+        f"back_height = {p['back_height']}\n"
+        f"thickness = {p['thickness']}\n"
+        f"hole_diameter = {p['hole_diameter']}\n"
+        f"hole_count = {int(p['hole_count'])}\n"
+        f"hole_margin_fraction = {p['hole_margin_fraction']}\n"
+        f"hole_z_fraction = {p['hole_z_fraction']}\n"
+        "hole_margin = shelf_width * hole_margin_fraction\n"
+        "hole_z = back_height * hole_z_fraction\n\n"
+        'assert shelf_depth > thickness, "shelf_depth must exceed thickness"\n'
+        'assert back_height > thickness, "back_height must exceed thickness"\n'
+        'assert hole_count >= 1, "hole_count must be at least 1"\n'
+        'assert 0 < hole_margin_fraction < 0.5, "hole_margin_fraction must be between 0 and 0.5"\n'
+        'assert 0 < hole_z_fraction < 1, "hole_z_fraction must be between 0 and 1"\n'
+        'assert hole_diameter < thickness * 4, "hole_diameter looks implausibly large for this plate thickness"'
+    )
+    body = f"""{BMESH_PRIMITIVES}
+
+back_plate = make_box(shelf_width, thickness, back_height, (0, 0, 0), "back_plate")
+shelf_plate = make_box(shelf_width, shelf_depth, thickness, (0, 0, 0), "shelf_plate")
+result_obj = boolean(back_plate, shelf_plate, 'UNION')
+
+step = (shelf_width - 2 * hole_margin) / (hole_count - 1) if hole_count > 1 else 0
+for i in range(hole_count):
+    x = hole_margin + i * step
+    hole = make_cylinder(hole_diameter / 2, thickness + 2 * eps, (x, -eps, hole_z), 'Y', f"hole_{{i}}")
+    result_obj = boolean(result_obj, hole, 'DIFFERENCE')"""
+    return blender_macro("shelf_bracket", param_lines, body)
+
+
 TEMPLATE = register(
     Template(
         key="shelf_bracket",
@@ -113,6 +146,7 @@ TEMPLATE = register(
         ],
         generate=_generate,
         generate_freecad=_generate_freecad,
+        generate_blender=_generate_blender,
         description="A wall-mounted shelf: an L-shaped profile with mounting holes through the back plate.",
     )
 )

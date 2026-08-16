@@ -1,4 +1,4 @@
-from .base import Param, Template, freecad_macro, register
+from .base import BMESH_PRIMITIVES, Param, Template, blender_macro, freecad_macro, register
 
 
 def _generate(p: dict) -> str:
@@ -109,6 +109,46 @@ for cx, cy in centers:
     return freecad_macro("standoff_mount", param_lines, body)
 
 
+def _generate_blender(p: dict) -> str:
+    param_lines = (
+        f"plate_width = {p['plate_width']}\n"
+        f"plate_depth = {p['plate_depth']}\n"
+        f"plate_thickness = {p['plate_thickness']}\n"
+        f"columns = {int(p['columns'])}\n"
+        f"rows = {int(p['rows'])}\n"
+        f"margin_x = {p['margin_x']}\n"
+        f"margin_y = {p['margin_y']}\n"
+        f"standoff_height = {p['standoff_height']}\n"
+        f"standoff_diameter = {p['standoff_diameter']}\n"
+        f"hole_diameter = {p['hole_diameter']}\n\n"
+        'assert columns >= 1 and rows >= 1, "columns and rows must each be at least 1"\n'
+        'assert plate_width > 2 * margin_x or columns == 1, "margin_x is too large for plate_width"\n'
+        'assert plate_depth > 2 * margin_y or rows == 1, "margin_y is too large for plate_depth"\n'
+        'assert hole_diameter < standoff_diameter, "hole_diameter must be smaller than standoff_diameter"\n'
+        'assert standoff_diameter < min(plate_width, plate_depth), "standoff_diameter is too large for the plate"'
+    )
+    body = f"""{BMESH_PRIMITIVES}
+
+result_obj = make_box(plate_width, plate_depth, plate_thickness, (0, 0, 0), "plate")
+
+x_step = (plate_width - 2 * margin_x) / (columns - 1) if columns > 1 else 0
+y_step = (plate_depth - 2 * margin_y) / (rows - 1) if rows > 1 else 0
+centers = [
+    (margin_x + c * x_step, margin_y + r * y_step)
+    for c in range(columns)
+    for r in range(rows)
+]
+
+for i, (cx, cy) in enumerate(centers):
+    standoff = make_cylinder(standoff_diameter / 2, plate_thickness + standoff_height, (cx, cy, 0), 'Z', f"standoff_{{i}}")
+    result_obj = boolean(result_obj, standoff, 'UNION')
+
+for i, (cx, cy) in enumerate(centers):
+    hole = make_cylinder(hole_diameter / 2, plate_thickness + standoff_height + 2 * eps, (cx, cy, -eps), 'Z', f"hole_{{i}}")
+    result_obj = boolean(result_obj, hole, 'DIFFERENCE')"""
+    return blender_macro("standoff_mount", param_lines, body)
+
+
 TEMPLATE = register(
     Template(
         key="standoff_mount",
@@ -128,6 +168,7 @@ TEMPLATE = register(
         ],
         generate=_generate,
         generate_freecad=_generate_freecad,
+        generate_blender=_generate_blender,
         description="A base plate with a grid of standoffs and through-holes for mounting a PCB or panel.",
     )
 )
