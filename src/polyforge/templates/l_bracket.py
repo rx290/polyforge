@@ -1,4 +1,4 @@
-from .base import Param, Template, freecad_macro, register
+from .base import BMESH_PRIMITIVES, Param, Template, blender_macro, freecad_macro, register
 
 
 def _generate(p: dict) -> str:
@@ -123,6 +123,46 @@ for i in range(holes_per_flange):
     return freecad_macro("l_bracket", param_lines, body)
 
 
+def _generate_blender(p: dict) -> str:
+    param_lines = (
+        f"width = {p['width']}\n"
+        f"flange_a = {p['flange_a']}\n"
+        f"flange_b = {p['flange_b']}\n"
+        f"thickness = {p['thickness']}\n"
+        f"hole_diameter = {p['hole_diameter']}\n"
+        f"holes_per_flange = {int(p['holes_per_flange'])}\n"
+        f"hole_margin_fraction = {p['hole_margin_fraction']}\n"
+        f"hole_offset_fraction = {p['hole_offset_fraction']}\n"
+        "hole_margin = width * hole_margin_fraction\n"
+        "offset_a = flange_a * hole_offset_fraction\n"
+        "offset_b = flange_b * hole_offset_fraction\n\n"
+        'assert flange_a > thickness, "flange_a must exceed thickness"\n'
+        'assert flange_b > thickness, "flange_b must exceed thickness"\n'
+        'assert holes_per_flange >= 1, "holes_per_flange must be at least 1"\n'
+        'assert 0 < hole_margin_fraction < 0.5, "hole_margin_fraction must be between 0 and 0.5"\n'
+        'assert 0 < hole_offset_fraction < 1, "hole_offset_fraction must be between 0 and 1"\n'
+        'assert offset_a > thickness + hole_diameter / 2, "hole_offset_fraction places holes too close to the bend on flange_a"\n'
+        'assert offset_b > thickness + hole_diameter / 2, "hole_offset_fraction places holes too close to the bend on flange_b"\n'
+        'assert offset_a < flange_a - hole_diameter / 2, "hole_offset_fraction runs off the end of flange_a"\n'
+        'assert offset_b < flange_b - hole_diameter / 2, "hole_offset_fraction runs off the end of flange_b"\n'
+        'assert hole_diameter < thickness * 5, "hole_diameter looks implausibly large for this plate thickness"'
+    )
+    body = f"""{BMESH_PRIMITIVES}
+
+horizontal_flange = make_box(width, flange_a, thickness, (0, 0, 0), "horizontal_flange")
+vertical_flange = make_box(width, thickness, flange_b, (0, 0, 0), "vertical_flange")
+result_obj = boolean(horizontal_flange, vertical_flange, 'UNION')
+
+step = (width - 2 * hole_margin) / (holes_per_flange - 1) if holes_per_flange > 1 else 0
+for i in range(holes_per_flange):
+    x = hole_margin + i * step
+    horizontal_hole = make_cylinder(hole_diameter / 2, thickness + 2 * eps, (x, offset_a, -eps), 'Z', f"h_hole_{{i}}")
+    result_obj = boolean(result_obj, horizontal_hole, 'DIFFERENCE')
+    vertical_hole = make_cylinder(hole_diameter / 2, thickness + 2 * eps, (x, -eps, offset_b), 'Y', f"v_hole_{{i}}")
+    result_obj = boolean(result_obj, vertical_hole, 'DIFFERENCE')"""
+    return blender_macro("l_bracket", param_lines, body)
+
+
 TEMPLATE = register(
     Template(
         key="l_bracket",
@@ -140,6 +180,7 @@ TEMPLATE = register(
         ],
         generate=_generate,
         generate_freecad=_generate_freecad,
+        generate_blender=_generate_blender,
         description="A right-angle bracket joining two perpendicular surfaces, with holes in both flanges.",
     )
 )

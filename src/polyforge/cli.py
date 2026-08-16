@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 from . import render, templates
+from .geometry import blender_export
 from .geometry import freecad_export
 from .geometry import inspect as mesh_inspect
 from .geometry import preview_export
@@ -22,7 +23,12 @@ FREECAD_SUFFIXES = {".fcmacro", ".fcstd"}
 
 
 def _backend_for(path: Path) -> str:
-    return "freecad" if path.suffix.lower() in FREECAD_SUFFIXES else "openscad"
+    name = path.name.lower()
+    if name.endswith(".blender.py"):
+        return "blender"
+    if path.suffix.lower() in FREECAD_SUFFIXES:
+        return "freecad"
+    return "openscad"
 
 
 def _cmd_list_templates(args) -> int:
@@ -79,10 +85,16 @@ def _cmd_design(args) -> int:
 
 
 def _cmd_preview(args) -> int:
-    if _backend_for(args.source) == "freecad":
+    backend = _backend_for(args.source)
+    if backend == "freecad":
         print("error: preview (multi-view PNG) isn't available for the FreeCAD backend yet. "
               "It needs FreeCAD's GUI/OpenGL stack, not just freecadcmd. Use `export` to get a "
               "validated STL/STEP instead.", file=sys.stderr)
+        return 1
+    if backend == "blender":
+        print("error: preview (multi-view PNG) isn't available for the Blender backend yet. "
+              "It needs Blender's GUI/OpenGL stack, not just --background. Use `export` to get a "
+              "validated STL instead.", file=sys.stderr)
         return 1
     try:
         views = preview_export.preview(args.source, imgsize=args.imgsize, definitions=args.definitions)
@@ -100,6 +112,8 @@ def _cmd_export(args) -> int:
     try:
         if backend == "freecad":
             result = freecad_export.export(args.source)
+        elif backend == "blender":
+            result = blender_export.export(args.source)
         else:
             result = preview_export.export(args.source, imgsize=args.imgsize, definitions=args.definitions)
     except Exception as exc:  # noqa: BLE001
@@ -147,7 +161,7 @@ def build_parser() -> argparse.ArgumentParser:
     design_p = sub.add_parser("design", help="turn request text into a .scad or .FCMacro file")
     design_p.add_argument("text", help="what to build, e.g. 'a wall shelf 200x150x5mm with 2 M4 holes'")
     design_p.add_argument("--engine", choices=("templates", "llm"), default="templates")
-    design_p.add_argument("--backend", choices=("openscad", "freecad"), default="openscad")
+    design_p.add_argument("--backend", choices=("openscad", "freecad", "blender"), default="openscad")
     design_p.add_argument("--out", type=Path, default=None)
     design_p.add_argument("--set", action="append", metavar="name=value", help="override a specific parameter")
     design_p.add_argument("--llm-url", default=None, help="local model server URL (engine=llm only)")

@@ -1,4 +1,4 @@
-from .base import Param, Template, freecad_macro, register
+from .base import Param, Template, blender_macro, freecad_macro, register
 
 
 def _generate(p: dict) -> str:
@@ -78,6 +78,70 @@ shape = outer.cut(inner)"""
     return freecad_macro("box", param_lines, body)
 
 
+def _generate_blender(p: dict) -> str:
+    param_lines = (
+        f"width = {p['width']}\n"
+        f"depth = {p['depth']}\n"
+        f"height = {p['height']}\n"
+        f"wall = {p['wall']}\n"
+        f"corner_r = {p['corner_radius']}\n\n"
+        'assert width > 2 * corner_r, "width is too small for corner_radius"\n'
+        'assert depth > 2 * corner_r, "depth is too small for corner_radius"\n'
+        'assert wall > 0 and wall * 2 < min(width, depth), "wall is too thick for width/depth"\n'
+        'assert height > wall, "height must exceed the floor thickness (wall)"'
+    )
+    body = """def rounded_rect_points(w, d, r, segs=16):
+    if r <= 1e-6:
+        return [(-w / 2, -d / 2), (w / 2, -d / 2), (w / 2, d / 2), (-w / 2, d / 2)]
+    centers = [
+        (w / 2 - r, d / 2 - r), (-(w / 2 - r), d / 2 - r),
+        (-(w / 2 - r), -(d / 2 - r)), (w / 2 - r, -(d / 2 - r)),
+    ]
+    starts = [0, 90, 180, 270]
+    pts = []
+    for (cx, cy), start in zip(centers, starts):
+        for i in range(segs + 1):
+            a = math.radians(start + 90 * i / segs)
+            pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    return pts
+
+
+def extrude_solid(points, h, name):
+    bm = bmesh.new()
+    verts = [bm.verts.new((x, y, 0.0)) for x, y in points]
+    bm.verts.ensure_lookup_table()
+    face = bm.faces.new(verts)
+    bmesh.ops.recalc_face_normals(bm, faces=[face])
+    ret = bmesh.ops.extrude_face_region(bm, geom=[face])
+    extruded_verts = [v for v in ret['geom'] if isinstance(v, bmesh.types.BMVert)]
+    bmesh.ops.translate(bm, verts=extruded_verts, vec=(0, 0, h))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    mesh = bpy.data.meshes.new(name + "_mesh")
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return obj
+
+
+inner_r = max(corner_r - wall, 0.1)
+outer = extrude_solid(rounded_rect_points(width, depth, corner_r), height, "box_outer")
+inner = extrude_solid(rounded_rect_points(width - 2 * wall, depth - 2 * wall, inner_r), height, "box_inner")
+inner.location.z = wall
+
+cut = outer.modifiers.new(name="cut", type='BOOLEAN')
+cut.operation = 'DIFFERENCE'
+cut.object = inner
+cut.solver = 'EXACT'
+
+bpy.context.view_layer.objects.active = outer
+bpy.ops.object.modifier_apply(modifier=cut.name)
+bpy.data.objects.remove(inner, do_unlink=True)
+
+result_obj = outer"""
+    return blender_macro("box", param_lines, body)
+
+
 TEMPLATE = register(
     Template(
         key="box",
@@ -92,6 +156,7 @@ TEMPLATE = register(
         ],
         generate=_generate,
         generate_freecad=_generate_freecad,
+        generate_blender=_generate_blender,
         description="A simple open-top rectangular enclosure with rounded corners and a solid floor.",
     )
 )
