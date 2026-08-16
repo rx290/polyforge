@@ -15,6 +15,7 @@ from . import render, templates
 from .geometry import blender_export
 from .geometry import freecad_export
 from .geometry import inspect as mesh_inspect
+from .geometry import photogrammetry
 from .geometry import preview_export
 from .geometry import repair as mesh_repair
 from .nlu import template_matcher
@@ -141,6 +142,24 @@ def _cmd_inspect(args) -> int:
     return 0
 
 
+def _cmd_reconstruct_from_photos(args) -> int:
+    try:
+        result = photogrammetry.reconstruct(args.image_dir, args.out, camera_model=args.camera_model)
+    except Exception as exc:  # noqa: BLE001
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"STL: {result['stl']}")
+    print(f"Mesh report: {result['mesh_report']}")
+    print(f"Specification: {result['spec']}")
+    print("This mesh is reconstructed evidence, not editable parametric source -- "
+          "measure it and rebuild important geometry parametrically before printing.")
+    print("It also has NO absolute real-world scale: structure-from-motion recovers geometry "
+          "only up to an arbitrary scale factor from photos alone. Measure a known real "
+          "dimension on the physical object with calipers and rescale the mesh to match "
+          "before trusting any of its measurements.")
+    return 0
+
+
 def _cmd_repair(args) -> int:
     try:
         report = mesh_repair.repair(args.input, args.output, mode=args.mode, max_size_change_mm=args.max_size_change_mm)
@@ -186,6 +205,15 @@ def build_parser() -> argparse.ArgumentParser:
     inspect_p.add_argument("--json", type=Path, default=None)
     inspect_p.add_argument("--markdown", type=Path, default=None)
     inspect_p.set_defaults(func=_cmd_inspect)
+
+    reconstruct_p = sub.add_parser(
+        "reconstruct-from-photos",
+        help="turn a directory of photos into an STL mesh (offline COLMAP + OpenMVS photogrammetry)",
+    )
+    reconstruct_p.add_argument("image_dir", type=Path, help="directory of photos of the object, taken from many overlapping angles")
+    reconstruct_p.add_argument("--out", type=Path, required=True, help="output workspace directory (STL, MESH_REPORT.md, MODEL_SPEC.md written here)")
+    reconstruct_p.add_argument("--camera-model", default="SIMPLE_RADIAL", help="COLMAP camera model for images without usable EXIF calibration")
+    reconstruct_p.set_defaults(func=_cmd_reconstruct_from_photos)
 
     repair_p = sub.add_parser("repair", help="conservative STL repair (requires trimesh)")
     repair_p.add_argument("input", type=Path)
