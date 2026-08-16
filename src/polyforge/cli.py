@@ -151,6 +151,10 @@ def _cmd_reconstruct_from_photos(args) -> int:
     print(f"STL: {result['stl']}")
     print(f"Mesh report: {result['mesh_report']}")
     print(f"Specification: {result['spec']}")
+    if result["submodel_count"] > 1:
+        print(f"Warning: COLMAP fragmented this photo set into {result['submodel_count']} disconnected "
+              f"reconstructions; used the largest ({result['submodel_image_count']} registered images). "
+              "More overlap between shots would let it merge into one.")
     print("This mesh is reconstructed evidence, not editable parametric source -- "
           "measure it and rebuild important geometry parametrically before printing.")
     print("It also has NO absolute real-world scale: structure-from-motion recovers geometry "
@@ -210,7 +214,7 @@ def build_parser() -> argparse.ArgumentParser:
         "reconstruct-from-photos",
         help="turn a directory of photos into an STL mesh (offline COLMAP + OpenMVS photogrammetry)",
     )
-    reconstruct_p.add_argument("image_dir", type=Path, help="directory of photos of the object, taken from many overlapping angles")
+    reconstruct_p.add_argument("image_dir", type=Path, help="directory of photos of the object; shoot at least 3 elevation rings (not just one), ~10 azimuths each, ~30 photos minimum -- fewer rings fails outright regardless of photo count")
     reconstruct_p.add_argument("--out", type=Path, required=True, help="output workspace directory (STL, MESH_REPORT.md, MODEL_SPEC.md written here)")
     reconstruct_p.add_argument("--camera-model", default="SIMPLE_RADIAL", help="COLMAP camera model for images without usable EXIF calibration")
     reconstruct_p.set_defaults(func=_cmd_reconstruct_from_photos)
