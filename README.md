@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-71%2F71%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-82%2F82%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
@@ -65,7 +65,21 @@ If a box above isn't checked, that feature isn't built yet. Don't take my word f
 
 ## Install
 
-**Standalone CLI, works anywhere, no agent needed:**
+**Installer scripts (Linux and Windows)**, if you'd rather not run the steps below by hand: they create a virtualenv (asks first), install polyforge, check for OpenSCAD, detect your GPU (NVIDIA/CUDA or AMD/ROCm) and recommend an Ollama model size to match, and can install Ollama + pull that model (asks first for both -- one runs a remote installer, the other downloads several GB).
+
+```bash
+git clone https://github.com/rx290/polyforge.git && cd polyforge
+./scripts/install.sh          # Linux -- add --yes to skip every prompt (CI/unattended)
+```
+
+```powershell
+git clone https://github.com/rx290/polyforge.git; cd polyforge
+.\scripts\install.bat         # Windows -- double-click it, or run install.ps1 directly; add -Yes to skip prompts
+```
+
+The GPU-detection/model-recommendation logic (`polyforge hardware-scan`) is itself a normal, tested part of the package -- the installer scripts are thin bootstrap wrappers around it, not where the actual logic lives. The Linux script has been run end to end in this repo's own dev environment; the Windows one has been written and reasoned through carefully but not yet executed on a real Windows machine -- report anything that doesn't work as written.
+
+**Standalone CLI, works anywhere, no agent needed** (what the installer scripts above actually automate):
 
 ```bash
 git clone https://github.com/rx290/polyforge.git
@@ -111,6 +125,10 @@ polyforge design "something to hold my cables together, six slots" --engine llm
 
 # Check (or start) the local Ollama server and see what models it has installed
 polyforge ollama-status
+
+# Detect your GPU (NVIDIA/CUDA or AMD/ROCm) and recommend an Ollama model size;
+# --pull also pulls it
+polyforge hardware-scan --pull
 
 # Local web GUI -- stdlib http.server only, no extra dependencies, opens your
 # browser to a form for design/preview/export instead of the CLI
@@ -184,6 +202,7 @@ One thing worth knowing if you're going to touch this code: both `freecadcmd` an
 src/polyforge/
 ├── cli.py                     # the `polyforge` entry point
 ├── render.py                  # template key + params -> source text, whichever backend
+├── hardware.py                # GPU/VRAM detection (nvidia-smi/rocm-smi) + Ollama model recommendation
 ├── templates/                 # the bounded part vocabulary
 │   ├── base.py                 Param/Template/registry, freecad_macro()/blender_macro() boilerplate, shared bmesh primitives
 │   ├── box.py                  each file has generate() for .scad, generate_freecad() for .FCMacro, generate_blender() for .blender.py
@@ -208,6 +227,11 @@ src/polyforge/
     ├── spec.py                # the MODEL_SPEC.md writer, shared by every backend
     ├── inspect.py              # dependency-free STL geometry and topology
     └── repair.py              # trimesh-backed conservative repair
+
+scripts/
+├── install.sh                 # Linux installer (venv, package, OpenSCAD check, hardware scan, Ollama)
+├── install.ps1                # Windows installer, same steps
+└── install.bat                # double-clickable wrapper for install.ps1
 
 .claude/skills/polyforge/
 ├── SKILL.md                   # the agent-driven workflow

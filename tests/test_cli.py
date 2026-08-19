@@ -80,3 +80,19 @@ def test_export_dispatches_to_blender_by_suffix(tmp_path):
     rc = cli.main(["export", str(macro)])
     assert rc == 0
     assert (tmp_path / "output" / "shelf.blender.stl").exists()
+
+
+def test_hardware_scan_runs_and_reports_something(capsys):
+    rc = cli.main(["hardware-scan"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "Recommended model:" in out
+    assert "rule of thumb" in out
+
+
+def test_ollama_status_runs(capsys):
+    rc = cli.main(["ollama-status", "--no-auto-start"])
+    out = capsys.readouterr().out
+    err = capsys.readouterr().err
+    assert rc in (0, 1)
+    assert "Server:" in out or "error:" in err

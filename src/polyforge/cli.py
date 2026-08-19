@@ -8,11 +8,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
-from . import render, templates
+from . import hardware, render, templates
 from .geometry import blender_export
 from .geometry import freecad_export
 from .geometry import inspect as mesh_inspect
@@ -199,6 +200,39 @@ def _cmd_ollama_status(args) -> int:
     return 0
 
 
+def _cmd_hardware_scan(args) -> int:
+    gpu = hardware.detect_gpu()
+    rec = hardware.recommend_model(gpu)
+
+    if gpu.vendor == "none":
+        print("GPU: none detected (or nvidia-smi/rocm-smi not found on PATH)")
+    else:
+        print(f"GPU: {gpu.name or gpu.vendor} ({gpu.vendor}, via {gpu.detected_via})")
+        print(f"VRAM: {gpu.vram_mb} MB" if gpu.vram_mb is not None else "VRAM: unknown")
+
+    print(f"Recommended model: {rec.model}  [{rec.tier}]")
+    print(f"Reason: {rec.reason}")
+    print(
+        "This is a rule of thumb (~1GB VRAM per 1B parameters at Q4 quantization, plus "
+        "headroom) -- not a guarantee. A model that fits can still run slowly, and actual "
+        "context length used matters too."
+    )
+
+    if args.pull:
+        from .nlu import ollama_client
+
+        try:
+            ollama_client.ensure_server(auto_start=True)
+        except ollama_client.OllamaUnavailable as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(f"Pulling {rec.model} ...")
+        binary = ollama_client.find_ollama_binary()
+        completed = subprocess.run([binary, "pull", rec.model])
+        return completed.returncode
+    return 0
+
+
 def _cmd_gui(args) -> int:
     from .gui import server as gui_server
 
@@ -230,6 +264,10 @@ def build_parser() -> argparse.ArgumentParser:
     ollama_status_p.add_argument("--llm-url", default=None, help="server URL (default http://localhost:11434)")
     ollama_status_p.add_argument("--no-auto-start", action="store_true", help="only report status; don't launch `ollama serve` if it's not running")
     ollama_status_p.set_defaults(func=_cmd_ollama_status)
+
+    hw_p = sub.add_parser("hardware-scan", help="detect GPU/VRAM (NVIDIA/CUDA or AMD/ROCm) and recommend an Ollama model size to match")
+    hw_p.add_argument("--pull", action="store_true", help="also `ollama pull` the recommended model (starts the server first if needed)")
+    hw_p.set_defaults(func=_cmd_hardware_scan)
 
     gui_p = sub.add_parser("gui", help="start the local web GUI (stdlib http.server, no extra dependencies)")
     gui_p.add_argument("--port", type=int, default=8420)
