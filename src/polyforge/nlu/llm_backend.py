@@ -5,6 +5,13 @@ job is only smarter slot-filling for casually phrased requests, not writing
 arbitrary novel OpenSCAD. Talks to an Ollama-compatible local server by default
 (nothing leaves the machine); point POLYFORGE_LLM_URL at any OpenAI- or
 Ollama-compatible endpoint to use a different local runtime.
+
+Model/server handling goes through `ollama_client`: no hardcoded model name
+(the previous fixed `DEFAULT_MODEL = "llama3.2"` would just fail outright on
+a machine that never pulled that exact model), the server is health-checked
+and started automatically if it's just not running yet, and connection
+failures come back as one clear, actionable error instead of a raw socket
+exception.
 """
 
 from __future__ import annotations
@@ -14,10 +21,11 @@ import os
 import urllib.request
 
 from .. import templates
+from . import ollama_client
+from .ollama_client import OllamaUnavailable
 from .template_matcher import MatchResult
 
-DEFAULT_BASE_URL = "http://localhost:11434"
-DEFAULT_MODEL = "llama3.2"
+DEFAULT_BASE_URL = ollama_client.DEFAULT_BASE_URL
 
 
 class LLMBackendUnavailable(Exception):
@@ -44,14 +52,27 @@ def _build_prompt(text: str) -> str:
     )
 
 
+DEFAULT_GENERATE_TIMEOUT_S = 180.0  # a real local model, especially a "thinking" one, can take
+                                     # well over a minute -- confirmed live (~85s for gemma4 on
+                                     # this machine's hardware) -- 30s was cutting it off early.
+
+
 def match(
     text: str,
     base_url: str | None = None,
     model: str | None = None,
-    timeout: float = 30.0,
+    timeout: float = DEFAULT_GENERATE_TIMEOUT_S,
+    auto_start: bool = True,
 ) -> MatchResult:
     base_url = base_url or os.environ.get("POLYFORGE_LLM_URL", DEFAULT_BASE_URL)
-    model = model or os.environ.get("POLYFORGE_LLM_MODEL", DEFAULT_MODEL)
+    requested_model = model or os.environ.get("POLYFORGE_LLM_MODEL")
+
+    try:
+        ollama_client.ensure_server(base_url, auto_start=auto_start)
+        model = ollama_client.select_model(base_url, requested=requested_model)
+    except OllamaUnavailable as exc:
+        raise LLMBackendUnavailable(str(exc)) from exc
+
     prompt = _build_prompt(text)
     payload = json.dumps({"model": model, "prompt": prompt, "stream": False}).encode("utf-8")
     request = urllib.request.Request(
@@ -64,9 +85,9 @@ def match(
             body = json.loads(response.read().decode("utf-8"))
     except Exception as exc:  # noqa: BLE001 - any transport/parse failure means "unavailable"
         raise LLMBackendUnavailable(
-            f"Could not reach a local model at {base_url} (model={model}): {exc}. "
-            "Start it (e.g. `ollama serve` + `ollama pull llama3.2`), set POLYFORGE_LLM_URL/"
-            "POLYFORGE_LLM_MODEL to point elsewhere, or use --engine templates instead."
+            f"Ollama at {base_url} was reachable but the generate request failed "
+            f"(model={model}): {exc}. Set POLYFORGE_LLM_URL to point elsewhere, or use "
+            "--engine templates instead."
         ) from exc
 
     raw = body.get("response", "")

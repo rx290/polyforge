@@ -18,7 +18,7 @@ from .geometry import inspect as mesh_inspect
 from .geometry import photogrammetry
 from .geometry import preview_export
 from .geometry import repair as mesh_repair
-from .nlu import template_matcher
+from .nlu import ollama_client, template_matcher
 
 FREECAD_SUFFIXES = {".fcmacro", ".fcstd"}
 
@@ -55,7 +55,10 @@ def _cmd_design(args) -> int:
     engine = _load_engine(args.engine)
     try:
         if args.engine == "llm":
-            result = engine.match(args.text, base_url=args.llm_url, model=args.llm_model)
+            llm_kwargs = {"base_url": args.llm_url, "model": args.llm_model, "auto_start": not args.no_auto_start}
+            if args.llm_timeout is not None:
+                llm_kwargs["timeout"] = args.llm_timeout
+            result = engine.match(args.text, **llm_kwargs)
         else:
             result = engine.match(args.text)
     except Exception as exc:  # noqa: BLE001 - surfaced to the user as a clean CLI error
@@ -174,6 +177,27 @@ def _cmd_repair(args) -> int:
     return 0
 
 
+def _cmd_ollama_status(args) -> int:
+    base_url = args.llm_url or ollama_client.DEFAULT_BASE_URL
+    try:
+        status = ollama_client.ensure_server(base_url, auto_start=not args.no_auto_start)
+    except ollama_client.OllamaUnavailable as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"Server: {status.base_url}")
+    print(f"Reachable: yes{' (just started it)' if status.started_by_us else ''}")
+    print(f"Version: {status.version or 'unknown (endpoint not supported on this build)'}")
+    if not status.models:
+        print("Models: none installed -- `ollama pull <model>` to add one")
+    else:
+        print("Models:")
+        for m in status.models:
+            details = " / ".join(v for v in (m.parameter_size, m.quantization) if v)
+            print(f"  - {m.name}" + (f"  ({details})" if details else ""))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="polyforge", description="Offline parametric CAD generation and validation.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -188,8 +212,15 @@ def build_parser() -> argparse.ArgumentParser:
     design_p.add_argument("--out", type=Path, default=None)
     design_p.add_argument("--set", action="append", metavar="name=value", help="override a specific parameter")
     design_p.add_argument("--llm-url", default=None, help="local model server URL (engine=llm only)")
-    design_p.add_argument("--llm-model", default=None, help="local model name (engine=llm only)")
+    design_p.add_argument("--llm-model", default=None, help="local model name (engine=llm only); default auto-picks an installed one")
+    design_p.add_argument("--no-auto-start", action="store_true", help="don't launch `ollama serve` automatically if it's not running (engine=llm only)")
+    design_p.add_argument("--llm-timeout", type=float, default=None, help="seconds to wait for the local model's response (engine=llm only, default 180s -- local generation, especially a 'thinking' model, can legitimately take over a minute)")
     design_p.set_defaults(func=_cmd_design)
+
+    ollama_status_p = sub.add_parser("ollama-status", help="check/start the local Ollama server and list its installed models")
+    ollama_status_p.add_argument("--llm-url", default=None, help="server URL (default http://localhost:11434)")
+    ollama_status_p.add_argument("--no-auto-start", action="store_true", help="only report status; don't launch `ollama serve` if it's not running")
+    ollama_status_p.set_defaults(func=_cmd_ollama_status)
 
     preview_p = sub.add_parser("preview", help="render seven labeled views of a .scad model (OpenSCAD only)")
     preview_p.add_argument("source", type=Path)
