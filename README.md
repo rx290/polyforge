@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-55%2F55%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-71%2F71%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
@@ -46,6 +46,8 @@ Every template is unit-tested and also compile-tested against the real `openscad
 **Agent-driven**, for everything a template can't cover. The full [`SKILL.md`](.claude/skills/polyforge/SKILL.md) workflow: create, understand, modify, reconstruct from an STL, repair a mesh, export, publish, plus printer-aware fit checks for a modified Ender 3 V2, a QALAM Pro 400, or a generic FDM profile. See [`references/printer-profiles.md`](.claude/skills/polyforge/references/printer-profiles.md) and [`references/design-and-repair.md`](.claude/skills/polyforge/references/design-and-repair.md).
 
 **An optional local-model engine.** `--engine llm` asks a local model (Ollama by default) to fill in the same templates from more casual phrasing. Still fully offline, still limited to the shapes the template library actually knows. The Ollama server itself is managed for you: `polyforge ollama-status` (or `design --engine llm` directly) detects whether it's installed, checks whether it's already running, starts `ollama serve` automatically if not, and lists whichever models you've actually pulled -- no hardcoded model name to fall out of date with what's installed on a given machine.
+
+**A local web GUI.** `polyforge gui` starts a small local server (Python's own `http.server`, no Flask/FastAPI, same zero-dependency ethos as the rest of the standalone core) and opens your browser to a form: Ollama status, a design box with live template/param results, per-param editing and regeneration, the seven-view preview, and STL export -- the same calls the CLI makes, just with a UI instead of flags.
 
 **Photos in, mesh out.** `polyforge reconstruct-from-photos` turns a directory of overlapping photos of a real object into an STL, fully offline: COLMAP for structure-from-motion, handed off to OpenMVS for the dense reconstruction and meshing (COLMAP's own dense stage is CUDA-only with no CPU path, confirmed directly, not assumed). The result is reconstructed evidence, not editable parametric source, and it has no absolute real-world scale until you measure and rescale it against something known, same as any photogrammetry output.
 
@@ -109,6 +111,10 @@ polyforge design "something to hold my cables together, six slots" --engine llm
 
 # Check (or start) the local Ollama server and see what models it has installed
 polyforge ollama-status
+
+# Local web GUI -- stdlib http.server only, no extra dependencies, opens your
+# browser to a form for design/preview/export instead of the CLI
+polyforge gui
 
 # Override any specific parameter no matter which engine picked it
 polyforge design "a box" --set width=100 --set wall=3
@@ -189,6 +195,10 @@ src/polyforge/
 │   ├── template_matcher.py    # zero-ML text -> (template, params)
 │   ├── llm_backend.py         # optional local-model text -> (template, params)
 │   └── ollama_client.py       # detect/health-check/auto-start Ollama, list installed models
+├── gui/
+│   ├── app.py                 # pure request/response logic, framework-agnostic
+│   ├── server.py               # stdlib http.server wrapper (routing, static files)
+│   └── static/index.html       # the single-page front end
 └── geometry/
     ├── preview_export.py      # OpenSCAD preview and export
     ├── freecad_export.py      # FreeCAD export via freecadcmd

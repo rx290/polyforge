@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PolyForge</title>
+<style>
+  :root {
+    --bg: #14151a; --panel: #1c1e26; --panel2: #23252f; --border: #2e3140;
+    --text: #e6e7eb; --muted: #8a8d9a; --accent: #5a67d8; --accent2: #7c86e8;
+    --ok: #2fbf71; --err: #e0546b; --mono: "SFMono-Regular", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header h1 { margin: 0; font-size: 18px; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px; display: grid; gap: 20px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .panel h2 { margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  textarea, input[type=text], input[type=number], select {
+    background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 8px 10px; font: inherit;
+  }
+  textarea { width: 100%; min-height: 60px; resize: vertical; font-family: var(--mono); }
+  button {
+    background: var(--accent); color: #fff; border: none; border-radius: 6px;
+    padding: 9px 16px; font: inherit; cursor: pointer;
+  }
+  button:hover { background: var(--accent2); }
+  button.secondary { background: var(--panel2); border: 1px solid var(--border); }
+  button:disabled { opacity: .5; cursor: default; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
+    border-radius: 999px; font-size: 12px; background: var(--panel2); border: 1px solid var(--border);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--ok); } .dot.err { background: var(--err); }
+  pre {
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 12px; overflow: auto; max-height: 360px; font-family: var(--mono); font-size: 12.5px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td, th { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+  th { color: var(--muted); font-weight: 500; }
+  .grid-imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px; }
+  .grid-imgs figure { margin: 0; }
+  .grid-imgs img { width: 100%; border-radius: 6px; border: 1px solid var(--border); background: #fffdf0; }
+  .grid-imgs figcaption { text-align: center; color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .msg { padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+  .msg.err { background: rgba(224,84,107,.12); color: var(--err); border: 1px solid rgba(224,84,107,.3); }
+  .msg.ok { background: rgba(47,191,113,.12); color: var(--ok); border: 1px solid rgba(47,191,113,.3); }
+  .tmpl-list details { border-bottom: 1px solid var(--border); padding: 8px 0; }
+  .tmpl-list summary { cursor: pointer; }
+  .tmpl-list .desc { color: var(--muted); margin: 6px 0; }
+  .muted { color: var(--muted); }
+  a { color: var(--accent2); }
+  label.check { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>PolyForge</h1>
+  <div class="sub">Offline parametric CAD generation, local web GUI</div>
+</header>
+<main>
+
+  <section class="panel" id="ollama-panel">
+    <h2>Local model (Ollama)</h2>
+    <div class="row">
+      <span class="pill"><span class="dot" id="ollama-dot"></span><span id="ollama-summary">checking...</span></span>
+      <button class="secondary" id="ollama-refresh">Refresh</button>
+      <button class="secondary" id="ollama-start">Start server</button>
+      <label class="check"><input type="checkbox" id="ollama-autostart" checked> auto-start when generating</label>
+    </div>
+    <div id="ollama-models" class="muted" style="margin-top:8px;"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Design</h2>
+    <textarea id="design-text" placeholder="e.g. a wall shelf 200x150x5mm with 2 M4 holes"></textarea>
+    <div class="row" style="margin-top:10px;">
+      <label>Engine
+        <select id="engine">
+          <option value="templates">templates (zero-ML, offline)</option>
+          <option value="llm">local LLM (Ollama)</option>
+        </select>
+      </label>
+      <label id="model-row" style="display:none;">Model
+        <select id="model"></select>
+      </label>
+      <label>Backend
+        <select id="backend">
+          <option value="openscad">OpenSCAD</option>
+          <option value="freecad">FreeCAD</option>
+          <option value="blender">Blender</option>
+        </select>
+      </label>
+      <button id="generate">Generate</button>
+    </div>
+    <div id="design-msg" style="margin-top:10px;"></div>
+  </section>
+
+  <section class="panel" id="result-panel" style="display:none;">
+    <h2>Result</h2>
+    <div id="result-meta" class="muted"></div>
+    <table id="params-table"></table>
+    <div class="row" style="margin-top:10px;">
+      <button class="secondary" id="regenerate">Regenerate with edited params</button>
+      <a id="download-link" download><button class="secondary">Download source</button></a>
+      <button class="secondary" id="preview-btn">Preview (7 views)</button>
+      <button class="secondary" id="export-btn">Export + validate STL</button>
+    </div>
+    <div id="preview-msg" style="margin-top:10px;"></div>
+    <div class="grid-imgs" id="preview-grid" style="margin-top:10px;"></div>
+    <h2 style="margin-top:18px;">Source</h2>
+    <pre id="source-view"></pre>
+  </section>
+
+  <section class="panel">
+    <h2>Known templates</h2>
+    <div class="tmpl-list" id="template-list">loading...</div>
+  </section>
+
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let currentFilename = null;
+let currentParams = null;
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || res.statusText);
+  return body;
+}
+
+function setMsg(el, text, kind) {
+  el.innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : "";
+}
+
+// ---- Ollama status ----
+async function refreshOllama(autoStart) {
+  $("ollama-summary").textContent = "checking...";
+  $("ollama-dot").className = "dot";
+  try {
+    const s = await api(`/api/ollama/status?auto_start=${autoStart ? 1 : 0}`);
+    if (s.reachable) {
+      $("ollama-dot").className = "dot ok";
+      $("ollama-summary").textContent = `running (v${s.version || "?"})${s.started_by_us ? " -- just started" : ""}`;
+      const modelSel = $("model");
+      modelSel.innerHTML = "";
+      (s.models || []).forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.name;
+        opt.textContent = m.name + (m.parameter_size ? ` (${m.parameter_size})` : "");
+        modelSel.appendChild(opt);
+      });
+      $("ollama-models").textContent = s.models.length
+        ? `${s.models.length} model(s) installed`
+        : "no models installed -- `ollama pull <model>`";
+    } else {
+      $("ollama-dot").className = "dot err";
+      $("ollama-summary").textContent = s.error || "not reachable";
+      $("ollama-models").textContent = "";
+    }
+  } catch (e) {
+    $("ollama-dot").className = "dot err";
+    $("ollama-summary").textContent = e.message;
+  }
+}
+$("ollama-refresh").onclick = () => refreshOllama(false);
+$("ollama-start").onclick = () => refreshOllama(true);
+
+// ---- Engine/model row toggle ----
+$("engine").onchange = () => {
+  $("model-row").style.display = $("engine").value === "llm" ? "" : "none";
+};
+
+// ---- Templates browser ----
+async function loadTemplates() {
+  const list = await api("/api/templates");
+  $("template-list").innerHTML = list.map(t => `
+    <details>
+      <summary><strong>${t.key}</strong> -- ${t.title}</summary>
+      <div class="desc">${t.description}</div>
+      <table>
+        <tr><th>param</th><th>default</th><th>unit</th><th>description</th></tr>
+        ${t.params.map(p => `<tr><td>${p.name}</td><td>${p.default}</td><td>${p.unit}</td><td>${p.description}</td></tr>`).join("")}
+      </table>
+      <div class="muted">backends: ${t.backends.join(", ")}</div>
+    </details>`).join("");
+}
+
+// ---- Design / generate ----
+function renderResult(data) {
+  currentFilename = data.filename;
+  currentParams = data.params;
+  $("result-panel").style.display = "";
+  $("result-meta").innerHTML =
+    `template: <strong>${data.template_key}</strong> &nbsp; confidence: ${data.confidence.toFixed(2)}` +
+    (data.notes.length ? `<br>${data.notes.map(n => "&middot; " + n).join("<br>")}` : "");
+  const rows = Object.entries(data.params).map(([k, v]) => `
+    <tr><td>${k}</td><td><input type="number" step="any" data-param="${k}" value="${v}" style="width:110px"></td></tr>`).join("");
+  $("params-table").innerHTML = `<tr><th>param</th><th>value</th></tr>${rows}`;
+  $("source-view").textContent = data.source;
+  const link = $("download-link");
+  link.href = `/files/${data.filename}`;
+  link.setAttribute("download", data.filename);
+  $("preview-grid").innerHTML = "";
+  setMsg($("preview-msg"), "", "");
+}
+
+async function generate(overrides) {
+  setMsg($("design-msg"), "", "");
+  $("generate").disabled = true;
+  try {
+    const payload = {
+      text: $("design-text").value,
+      engine: $("engine").value,
+      backend: $("backend").value,
+      set: overrides || {},
+    };
+    if (payload.engine === "llm") {
+      payload.llm_model = $("model").value || null;
+      payload.auto_start = $("ollama-autostart").checked;
+    }
+    const data = await api("/api/design", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    renderResult(data);
+    setMsg($("design-msg"), "Generated.", "ok");
+  } catch (e) {
+    setMsg($("design-msg"), e.message, "err");
+  } finally {
+    $("generate").disabled = false;
+  }
+}
+$("generate").onclick = () => generate();
+$("regenerate").onclick = () => {
+  const overrides = {};
+  document.querySelectorAll("#params-table input[data-param]").forEach(inp => {
+    overrides[inp.dataset.param] = inp.value;
+  });
+  generate(overrides);
+};
+
+// ---- Preview / export ----
+$("preview-btn").onclick = async () => {
+  setMsg($("preview-msg"), "Rendering seven views (OpenSCAD)... this can take a little while.", "ok");
+  $("preview-grid").innerHTML = "";
+  try {
+    const data = await api("/api/preview", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename: currentFilename }),
+    });
+    setMsg($("preview-msg"), "", "");
+    $("preview-grid").innerHTML = data.views.map(v =>
+      `<figure><img src="/files/previews/${encodeURIComponent(v.name)}.png"><figcaption>${v.name}</figcaption></figure>`
+    ).join("");
+  } catch (e) {
+    setMsg($("preview-msg"), e.message, "err");
+  }
+};
+
+$("export-btn").onclick = async () => {
+  setMsg($("preview-msg"), "Exporting + validating STL...", "ok");
+  try {
+    const data = await api("/api/export", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename: currentFilename }),
+    });
+    setMsg($("preview-msg"), `STL exported and validated. <a href="/files/output/${encodeURIComponent(currentFilename.replace(/\.[^.]+$/, ""))}.stl">Download STL</a>`, "ok");
+    $("preview-grid").innerHTML = data.views.map(v =>
+      `<figure><img src="/files/previews/${encodeURIComponent(v.name)}.png"><figcaption>${v.name}</figcaption></figure>`
+    ).join("");
+  } catch (e) {
+    setMsg($("preview-msg"), e.message, "err");
+  }
+};
+
+refreshOllama(false);
+loadTemplates();
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 from . import render, templates
@@ -198,6 +199,14 @@ def _cmd_ollama_status(args) -> int:
     return 0
 
 
+def _cmd_gui(args) -> int:
+    from .gui import server as gui_server
+
+    workdir = args.workdir or Path(tempfile.mkdtemp(prefix="polyforge_gui_"))
+    gui_server.serve(workdir, port=args.port, open_browser=not args.no_browser)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="polyforge", description="Offline parametric CAD generation and validation.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -221,6 +230,12 @@ def build_parser() -> argparse.ArgumentParser:
     ollama_status_p.add_argument("--llm-url", default=None, help="server URL (default http://localhost:11434)")
     ollama_status_p.add_argument("--no-auto-start", action="store_true", help="only report status; don't launch `ollama serve` if it's not running")
     ollama_status_p.set_defaults(func=_cmd_ollama_status)
+
+    gui_p = sub.add_parser("gui", help="start the local web GUI (stdlib http.server, no extra dependencies)")
+    gui_p.add_argument("--port", type=int, default=8420)
+    gui_p.add_argument("--workdir", type=Path, default=None, help="where generated files go (default: a fresh temp directory)")
+    gui_p.add_argument("--no-browser", action="store_true", help="don't automatically open a browser tab")
+    gui_p.set_defaults(func=_cmd_gui)
 
     preview_p = sub.add_parser("preview", help="render seven labeled views of a .scad model (OpenSCAD only)")
     preview_p.add_argument("source", type=Path)
