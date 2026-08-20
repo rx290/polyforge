@@ -5,7 +5,7 @@ import pytest
 
 from polyforge import templates
 
-EXPECTED_KEYS = {"box", "shelf_bracket", "l_bracket", "cable_comb", "standoff_mount"}
+EXPECTED_KEYS = {"box", "shelf_bracket", "l_bracket", "cable_comb", "standoff_mount", "vase"}
 
 
 def test_all_expected_templates_registered():

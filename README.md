@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-82%2F82%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-97%2F97%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
@@ -33,7 +33,7 @@ So I pulled it apart and rebuilt it as PolyForge. The part that turns a descript
 
 ## What it does today
 
-**Standalone, no LLM required.** A small library of parametric part templates, box, wall shelf, corner bracket, cable comb, standoff mount plate, each one filled in from plain text by keyword matching and regex extraction (dimensions, screw sizes, hole counts), then rendered to any of three CAD backends:
+**Standalone, no LLM required.** A small library of parametric part templates, box, wall shelf, corner bracket, cable comb, standoff mount plate, low-poly faceted vase, each one filled in from plain text by keyword matching and regex extraction (dimensions, screw sizes, hole counts), then rendered to any of three CAD backends:
 
 ```bash
 polyforge design "a wall shelf 200x150x5mm with 2 M4 holes"                    # writes a .scad
@@ -59,7 +59,7 @@ I'm building this one phase at a time, each on its own branch, tested before it 
 - [x] **Phase 2, FreeCAD export backend.** A second parametric target through FreeCAD's headless Python API (`freecadcmd`), producing an editable `.FCMacro` plus STEP/STL export. No multi-view preview for it yet, that needs FreeCAD's GUI/OpenGL stack, not just the console CLI, so use `export` for a validated STL/STEP instead.
 - [x] **Phase 3, Blender export backend.** A third target through Blender's headless Python API (`bpy`/`bmesh`), producing an editable `.blender.py` plus STL export (mesh-only, Blender has no B-rep kernel so there's no STEP output here). Same no-preview caveat as FreeCAD, same reason, use `export` instead.
 - [x] **Phase 4, image-to-3D.** Multi-photo photogrammetry, fully offline: COLMAP for sparse structure-from-motion, handed off to OpenMVS for CPU-capable dense reconstruction and meshing (COLMAP's own dense stage is CUDA-only, no CPU fallback, confirmed by deliberately crashing it). Feeds into the existing reconstruct-from-STL workflow: treat the result as evidence to measure and rebuild from, not editable source, and note it has no absolute scale until rescaled against a known real-world measurement.
-- [ ] **Somewhere after that, a low-poly vase generator.** Randomized low-poly faceting over a revolved profile, reusing the same OpenSCAD/FreeCAD split above.
+- [x] **Phase 5, a low-poly faceted vase generator.** A 5-point diameter profile (base/25%/waist/75%/rim), smoothstep-blended and revolved with a jittered N-sided cross-section and an optional spiral twist, across all three backends (OpenSCAD/FreeCAD/Blender). `polyforge design "a low poly vase"`.
 
 If a box above isn't checked, that feature isn't built yet. Don't take my word for it either, go read the code.
 
@@ -245,7 +245,7 @@ AGENTS.md                      # how to wire PolyForge into any other LLM or age
 
 ## Contributing
 
-Issues and PRs are welcome. New part templates, printer profiles, phrasings the matcher should catch, or a hand with the low-poly vase generator, all fair game. Each phase lands on its own branch and gets tested before it merges, so expect the workflow and the template library to keep growing.
+Issues and PRs are welcome. New part templates, printer profiles, or phrasings the matcher should catch are all fair game. Each phase lands on its own branch and gets tested before it merges, so expect the workflow and the template library to keep growing.
 
 ## Author
 

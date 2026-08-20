@@ -15,7 +15,22 @@ EXPECTED_SIZE_MM = {
     "l_bracket": [40.0, 30.0, 30.0],
     "shelf_bracket": [200.0, 120.0, 60.0],
     "standoff_mount": [80.0, 60.0, 9.0],
+    "vase": [67.46, 68.25, 150.0],
 }
+
+# See test_freecad_backend.py's matching comment: vase's facet jitter uses
+# each backend's own native RNG, so its default params can't dimensionally
+# cross-check exactly the way every other (fully deterministic) template's
+# can. Checked with facet_jitter=0 instead and a small real tolerance --
+# even jitter-free, a lofted/curved shape still comes out a fraction of a
+# mm different between OpenSCAD's and Blender's own geometry/mesh kernels.
+SIZE_TOLERANCE_MM = {"vase": 1.0}
+
+
+def _size_check_params(template):
+    if template.key == "vase":
+        return {**template.defaults(), "facet_jitter": 0}
+    return template.defaults()
 
 
 def test_all_templates_have_a_blender_generator():
@@ -37,15 +52,17 @@ def test_generate_blender_exports_match_openscad_sizes(tmp_path):
     for template in templates.all_templates():
         macro_path = tmp_path / template.key / f"{template.key}.blender.py"
         macro_path.parent.mkdir(parents=True, exist_ok=True)
-        macro_path.write_text(template.generate_blender(template.defaults()))
+        macro_path.write_text(template.generate_blender(_size_check_params(template)))
 
         result = blender_export.export(macro_path)
 
         mesh_data = mesh_inspect.inspect(result["stl"])
         assert mesh_data["watertight_by_edge_count"], f"{template.key}: Blender export is not watertight"
         size = [round(v, 2) for v in mesh_data["bounds_mm"]["size"]]
-        assert size == EXPECTED_SIZE_MM[template.key], (
-            f"{template.key}: size {size} != expected {EXPECTED_SIZE_MM[template.key]}"
+        expected = EXPECTED_SIZE_MM[template.key]
+        tol = SIZE_TOLERANCE_MM.get(template.key, 0.0)
+        assert all(abs(s - e) <= tol for s, e in zip(size, expected)), (
+            f"{template.key}: size {size} != expected {expected} (tolerance {tol}mm)"
         )
 
 
