@@ -70,6 +70,10 @@
     transition: width .25s ease;
   }
   .progress-label { color: var(--muted); font-size: 12px; margin-top: 5px; }
+  .param-slider-row { display: flex; align-items: center; gap: 8px; }
+  .param-slider-row input[type=range] { flex: 1 1 auto; accent-color: var(--accent); }
+  .param-slider-row input[type=number] { width: 78px; flex: 0 0 auto; }
+  #params-table select { width: 100%; }
   .tmpl-list details { border-bottom: 1px solid var(--border); padding: 8px 0; }
   .tmpl-list summary { cursor: pointer; }
   .tmpl-list .desc { color: var(--muted); margin: 6px 0; }
@@ -152,6 +156,24 @@
 const $ = (id) => document.getElementById(id);
 let currentFilename = null;
 let currentParams = null;
+let currentTemplateKey = null;
+
+// Slider ranges for the vase template's params -- [min, max, step]. Sliders
+// make the "richer profile system" (sections, ring, texture) actually
+// explorable in the GUI instead of just a flat table of number boxes.
+const VASE_PARAM_RANGES = {
+  d_base: [10, 200, 1], vase_height: [20, 400, 1],
+  s1_end_d: [5, 200, 1], s1_peak_d: [5, 200, 1], s1_height_frac: [0.01, 1, 0.01],
+  s2_end_d: [5, 200, 1], s2_peak_d: [5, 200, 1], s2_height_frac: [0.01, 1, 0.01],
+  s3_end_d: [5, 200, 1], s3_peak_d: [5, 200, 1], s3_height_frac: [0.01, 1, 0.01],
+  s4_end_d: [5, 200, 1], s4_peak_d: [5, 200, 1], s4_height_frac: [0.01, 1, 0.01],
+  num_sides: [3, 64, 1], facet_jitter: [0, 0.4, 0.01], random_seed: [0, 50, 1],
+  profile_slices: [4, 96, 1], total_twist_deg: [-720, 720, 5],
+  wall_thickness: [0.8, 10, 0.1], base_thickness: [1, 20, 0.5],
+  drainage_hole_d: [0, 40, 1], holder_ring_d: [0, 20, 0.5], holder_ring_height_frac: [0, 1, 0.01],
+  base_texture_amplitude: [0, 0.4, 0.01], base_texture_frequency: [1, 40, 1], base_texture_height_frac: [0, 1, 0.01],
+};
+const SECTION_TYPE_LABELS = ["0 = cylinder", "1 = cone", "2 = taper (eased)", "3 = bulge"];
 
 async function api(path, opts) {
   const res = await fetch(path, opts);
@@ -218,15 +240,36 @@ async function loadTemplates() {
 }
 
 // ---- Design / generate ----
+function paramCell(key, value) {
+  if (currentTemplateKey === "vase" && /_type$/.test(key)) {
+    const options = SECTION_TYPE_LABELS.map((label, i) =>
+      `<option value="${i}" ${i === Number(value) ? "selected" : ""}>${label}</option>`).join("");
+    return `<select data-param="${key}">${options}</select>`;
+  }
+  const range = currentTemplateKey === "vase" ? VASE_PARAM_RANGES[key] : null;
+  if (range) {
+    const [min, max, step] = range;
+    return `
+      <div class="param-slider-row">
+        <input type="range" min="${min}" max="${max}" step="${step}" value="${value}"
+               oninput="this.nextElementSibling.value = this.value">
+        <input type="number" step="${step}" data-param="${key}" value="${value}"
+               oninput="this.previousElementSibling.value = this.value">
+      </div>`;
+  }
+  return `<input type="number" step="any" data-param="${key}" value="${value}" style="width:110px">`;
+}
+
 function renderResult(data) {
   currentFilename = data.filename;
   currentParams = data.params;
+  currentTemplateKey = data.template_key;
   $("result-panel").style.display = "";
   $("result-meta").innerHTML =
     `template: <strong>${data.template_key}</strong> &nbsp; confidence: ${data.confidence.toFixed(2)}` +
     (data.notes.length ? `<br>${data.notes.map(n => "&middot; " + n).join("<br>")}` : "");
   const rows = Object.entries(data.params).map(([k, v]) => `
-    <tr><td>${k}</td><td><input type="number" step="any" data-param="${k}" value="${v}" style="width:110px"></td></tr>`).join("");
+    <tr><td>${k}</td><td>${paramCell(k, v)}</td></tr>`).join("");
   $("params-table").innerHTML = `<tr><th>param</th><th>value</th></tr>${rows}`;
   $("source-view").textContent = data.source;
   const link = $("download-link");
@@ -264,7 +307,7 @@ async function generate(overrides) {
 $("generate").onclick = () => generate();
 $("regenerate").onclick = () => {
   const overrides = {};
-  document.querySelectorAll("#params-table input[data-param]").forEach(inp => {
+  document.querySelectorAll("#params-table [data-param]").forEach(inp => {
     overrides[inp.dataset.param] = inp.value;
   });
   generate(overrides);
