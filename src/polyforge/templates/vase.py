@@ -12,6 +12,83 @@ from .base import BMESH_PRIMITIVES, Param, Template, blender_macro, freecad_macr
 # both ends, since it's just the sign of that difference).
 SECTION_CYLINDER, SECTION_CONE, SECTION_TAPER, SECTION_BULGE = 0, 1, 2, 3
 
+# A conservative rule-of-thumb overhang limit most slicers (Cura, PrusaSlicer)
+# default to -- a wall flaring outward faster than this, going up, needs
+# support underneath it. This is deliberately a native Python port of the
+# exact same section_radius()/ease() math the OpenSCAD/FreeCAD/Blender
+# generators below use (see _PROFILE_MATH_PY), not an approximation: it's
+# checked once per `polyforge design`/GUI request so "does this need
+# support" is a real measurement surfaced in the result, not something to
+# eyeball off a render.
+OVERHANG_WARNING_DEG = 45.0
+
+
+def _ease(u: float) -> float:
+    import math
+    return (1 - math.cos(math.radians(180 * u))) / 2
+
+
+def _section_radius(u: float, r0: float, r1: float, rp: float, stype: float) -> float:
+    if stype == SECTION_CYLINDER:
+        return r0
+    if stype == SECTION_CONE:
+        return r0 + (r1 - r0) * u
+    if stype == SECTION_BULGE:
+        return r0 + (rp - r0) * _ease(2 * u) if u <= 0.5 else rp + (r1 - rp) * _ease(2 * (u - 0.5))
+    return r0 + (r1 - r0) * _ease(u)  # SECTION_TAPER, and the fallback for any other value
+
+
+def _radius_at(p: dict, t: float) -> float:
+    t = min(max(t, 0.0), 1.0)
+    d_base = p["d_base"]
+    end_d = [p["s1_end_d"], p["s2_end_d"], p["s3_end_d"], p["s4_end_d"]]
+    peak_d = [p["s1_peak_d"], p["s2_peak_d"], p["s3_peak_d"], p["s4_peak_d"]]
+    types = [p["s1_type"], p["s2_type"], p["s3_type"], p["s4_type"]]
+    start_d = [d_base] + end_d[:3]
+    fracs_raw = [p["s1_height_frac"], p["s2_height_frac"], p["s3_height_frac"], p["s4_height_frac"]]
+    total = sum(fracs_raw) or 1.0
+    fracs = [f / total for f in fracs_raw]
+    t_start = [0.0, fracs[0], fracs[0] + fracs[1], fracs[0] + fracs[1] + fracs[2]]
+    idx = 3
+    for i in (0, 1, 2):
+        if t < t_start[i + 1]:
+            idx = i
+            break
+    frac = fracs[idx]
+    u = min(max((t - t_start[idx]) / frac, 0.0), 1.0) if frac > 0 else 0.0
+    return _section_radius(u, start_d[idx] / 2, end_d[idx] / 2, peak_d[idx] / 2, types[idx])
+
+
+def max_overhang_deg(p: dict, samples: int = 500) -> tuple[float, float]:
+    """Returns (worst outward-flare angle in degrees from vertical, the
+    height in mm it occurs at). Only outward flare counts -- a wall that
+    only ever tapers inward as it goes up is always self-supporting no
+    matter how steep, so radius *decreasing* with height is never flagged."""
+    import math
+    vase_height = p["vase_height"]
+    worst_deg, worst_h = 0.0, 0.0
+    prev_r = _radius_at(p, 0.0)
+    for i in range(1, samples + 1):
+        t = i / samples
+        r = _radius_at(p, t)
+        dr = r - prev_r
+        if dr > 0:
+            dh = vase_height / samples
+            angle = math.degrees(math.atan2(dr, dh))
+            if angle > worst_deg:
+                worst_deg, worst_h = angle, t * vase_height
+        prev_r = r
+    return worst_deg, worst_h
+
+
+def printability_notes(p: dict) -> list[str]:
+    angle, height = max_overhang_deg(p)
+    if angle <= 0.01:
+        return ["printability: no outward flare anywhere -- prints standing up with no supports needed"]
+    verdict = "likely needs supports" if angle > OVERHANG_WARNING_DEG else "should print fine without supports"
+    return [f"printability: steepest outward overhang is {angle:.0f} deg from vertical at {height:.0f}mm up -- {verdict} "
+            f"(most slicers default to warning past {OVERHANG_WARNING_DEG:.0f} deg)"]
+
 
 def _generate(p: dict) -> str:
     return f"""// PolyForge template: vase
@@ -592,5 +669,6 @@ TEMPLATE = register(
             "an optional holder ring, and an optional textured base. Prints in any mode (not "
             "vase-mode-dependent) thanks to a real wall thickness and solid base."
         ),
+        printability_check=printability_notes,
     )
 )

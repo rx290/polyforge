@@ -32,6 +32,7 @@ class Template:
     generate_freecad: Optional[Callable[[dict], str]] = None
     generate_blender: Optional[Callable[[dict], str]] = None
     description: str = ""
+    printability_check: Optional[Callable[[dict], list[str]]] = None
 
     def defaults(self) -> dict:
         return {p.name: p.default for p in self.params}

@@ -6,6 +6,53 @@ import pytest
 from polyforge import render, templates
 
 
+def test_vase_default_profile_is_already_support_free():
+    # The default profile (all taper sections, no bulge) flares out a bit
+    # in section 3 (45mm -> 65mm) but stays under the usual ~45deg slicer
+    # warning threshold -- confirms the out-of-the-box vase doesn't need
+    # the "without support" keyword to be printable as-is.
+    from polyforge.templates.vase import max_overhang_deg
+    template = templates.get("vase")
+    angle, height = max_overhang_deg(template.defaults())
+    assert 15 < angle < 30
+    assert 0 < height < template.defaults()["vase_height"]
+
+
+def test_max_overhang_deg_is_zero_for_a_purely_non_increasing_profile():
+    from polyforge.templates.vase import max_overhang_deg
+    template = templates.get("vase")
+    p = template.defaults()
+    p.update(s3_end_d=45, s4_end_d=45)  # matches the "without support" clamp result
+    angle, _ = max_overhang_deg(p)
+    assert angle == 0.0
+
+
+def test_max_overhang_deg_flags_a_bulge_sections_flare():
+    from polyforge.templates.vase import max_overhang_deg
+    template = templates.get("vase")
+    p = template.defaults()
+    p.update(s4_type=3, s4_end_d=60, s4_peak_d=90)  # the "bulb" keyword's own override
+    angle, height = max_overhang_deg(p)
+    assert angle > 45
+    assert height > template.defaults()["vase_height"] * 0.5  # the bulge is in the top section
+
+
+def test_printability_notes_says_support_free_for_a_flat_profile():
+    template = templates.get("vase")
+    p = template.defaults()
+    p.update(s3_end_d=45, s4_end_d=45)
+    notes = template.printability_check(p)
+    assert any("no outward flare" in n for n in notes)
+
+
+def test_printability_notes_warns_for_the_bulb_shape():
+    template = templates.get("vase")
+    p = template.defaults()
+    p.update(s4_type=3, s4_end_d=60, s4_peak_d=90)
+    notes = template.printability_check(p)
+    assert any("likely needs supports" in n for n in notes)
+
+
 def test_vase_registered_with_expected_defaults():
     template = templates.get("vase")
     defaults = template.defaults()

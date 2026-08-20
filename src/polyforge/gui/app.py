@@ -95,10 +95,15 @@ def design_json(payload: dict, workdir: Path, next_id: int) -> dict:
     filename = f"{result.template_key}_{next_id}{ext}"
     (workdir / filename).write_text(source)
 
+    notes = list(result.notes)
+    template = templates.get(result.template_key)
+    if template.printability_check is not None:
+        notes.extend(template.printability_check(merged_params))
+
     return {
         "template_key": result.template_key,
         "confidence": result.confidence,
-        "notes": result.notes,
+        "notes": notes,
         "params": merged_params,
         "source": source,
         "filename": filename,

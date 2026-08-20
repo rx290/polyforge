@@ -83,6 +83,10 @@ def _cmd_design(args) -> int:
     print(f"Template: {result.template_key} (confidence {result.confidence:.2f})")
     for note in result.notes:
         print(f"  - {note}")
+    template = templates.get(result.template_key)
+    if template.printability_check is not None:
+        for note in template.printability_check(merged_params):
+            print(f"  - {note}")
     print("Parameters:")
     for name, value in merged_params.items():
         print(f"  {name} = {value}")
