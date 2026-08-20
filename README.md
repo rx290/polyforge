@@ -158,6 +158,13 @@ an hourglass vase with a plain neck and a bulb holder on top and wave ripples
 
 That last one is the "hourglass base, plain neck, bulb top with a holder ring, textured base" shape from the original ask, all from one sentence. Any keyword not present just leaves that param at its default, and an explicit number always wins over a keyword nudge, so `a vase 500mm height` sets exactly that, nothing more.
 
+**Gallery** -- six of the prompts above, rendered headlessly (`scripts/demo_vase_gallery.sh`, no GUI or manual screenshot involved):
+
+| | | |
+|---|---|---|
+| <img src="docs/images/vase-gallery-plain-smooth.png" width="220"><br>`a plain smooth vase 200mm height 90mm diameter` | <img src="docs/images/vase-gallery-hourglass-ripples.png" width="220"><br>`an hourglass vase with wave ripples` | <img src="docs/images/vase-gallery-bulb-holder.png" width="220"><br>`a vase with a bulb holder on top` |
+| <img src="docs/images/vase-gallery-low-poly-twisted.png" width="220"><br>`a low poly twisted vase` | <img src="docs/images/vase-gallery-support-free.png" width="220"><br>`a detailed vase with smooth texture that prints without support` | <img src="docs/images/vase-gallery-combined.png" width="220"><br>`an hourglass vase with a plain neck and a bulb holder on top and wave ripples` |
+
 ```bash
 # Generate a part from text (the zero-ML template engine, the default)
 polyforge design "a wall shelf 200x150x5mm with 2 M4 holes" --out shelf.scad
