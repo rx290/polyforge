@@ -1,5 +1,6 @@
 import json
 import threading
+import time
 import urllib.error
 import urllib.request
 
@@ -80,3 +81,45 @@ def test_design_bad_request_returns_400_not_a_stack_trace(running_server):
 def test_files_path_traversal_is_rejected(running_server):
     status, body = _get(f"{running_server}/files/../../../../etc/passwd")
     assert status == 403
+
+
+def _poll_job(base_url, job_id, timeout=60):
+    """Poll a background job to completion, asserting the progress payload
+    shape on every tick along the way (this is what the GUI's progress bar
+    is driven by, so a malformed shape here would silently break it)."""
+    deadline = time.time() + timeout
+    job = None
+    while time.time() < deadline:
+        status, job = _get(f"{base_url}/api/jobs/{job_id}")
+        assert status == 200
+        assert job["progress"].keys() >= {"done", "total", "label"}
+        if job["status"] != "running":
+            return job
+        time.sleep(0.1)
+    raise AssertionError(f"job {job_id} did not finish within {timeout}s: {job}")
+
+
+def test_unknown_job_id_returns_404(running_server):
+    status, body = _get(f"{running_server}/api/jobs/does-not-exist")
+    assert status == 404
+
+
+def test_preview_starts_a_pollable_background_job(running_server):
+    """/api/preview must return immediately with a job id (not block the
+    request for the full multi-view render), so the GUI can poll progress
+    instead of just staring at a spinner with no feedback."""
+    status, body = _post(f"{running_server}/api/design", {"text": "a box"})
+    assert status == 200
+    filename = body["filename"]
+
+    status, body = _post(f"{running_server}/api/preview", {"filename": filename})
+    assert status == 202
+    assert body["job_id"]
+
+    job = _poll_job(running_server, body["job_id"])
+    # Whether or not openscad is installed on this machine, the job must
+    # resolve cleanly either way -- and if it succeeds, all 7 views ran.
+    assert job["status"] in ("done", "error")
+    if job["status"] == "done":
+        assert len(job["result"]["views"]) == 7
+        assert job["progress"]["done"] == job["progress"]["total"] == 7

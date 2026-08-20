@@ -105,23 +105,23 @@ def design_json(payload: dict, workdir: Path, next_id: int) -> dict:
     }
 
 
-def preview_json(filename: str, workdir: Path, imgsize: str = "800,600") -> dict:
+def preview_json(filename: str, workdir: Path, imgsize: str = "800,600", on_progress=None) -> dict:
     scad = workdir / filename
     if scad.suffix.lower() != ".scad":
         raise DesignError("preview is only available for the OpenSCAD backend")
     try:
-        views = preview_export.preview(scad, imgsize=imgsize)
+        views = preview_export.preview(scad, imgsize=imgsize, on_progress=on_progress)
     except Exception as exc:  # noqa: BLE001 - surfaced as a clean 400/500 message, not a stack trace
         raise DesignError(str(exc)) from exc
     return {"views": [{"name": v.stem, "path": str(v)} for v in views]}
 
 
-def export_json(filename: str, workdir: Path) -> dict:
+def export_json(filename: str, workdir: Path, on_progress=None) -> dict:
     scad = workdir / filename
     if scad.suffix.lower() != ".scad":
         raise DesignError("export (STL) is only available for the OpenSCAD backend from the GUI")
     try:
-        result = preview_export.export(scad)
+        result = preview_export.export(scad, on_progress=on_progress)
     except Exception as exc:  # noqa: BLE001
         raise DesignError(str(exc)) from exc
     return {

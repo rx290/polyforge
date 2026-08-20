@@ -59,6 +59,17 @@
   .msg { padding: 8px 10px; border-radius: 6px; font-size: 13px; }
   .msg.err { background: rgba(224,84,107,.12); color: var(--err); border: 1px solid rgba(224,84,107,.3); }
   .msg.ok { background: rgba(47,191,113,.12); color: var(--ok); border: 1px solid rgba(47,191,113,.3); }
+  .progress-wrap { display: none; margin-top: 10px; }
+  .progress-wrap.active { display: block; }
+  .progress-track {
+    background: var(--panel2); border: 1px solid var(--border); border-radius: 999px;
+    height: 8px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; width: 0%; background: var(--accent);
+    transition: width .25s ease;
+  }
+  .progress-label { color: var(--muted); font-size: 12px; margin-top: 5px; }
   .tmpl-list details { border-bottom: 1px solid var(--border); padding: 8px 0; }
   .tmpl-list summary { cursor: pointer; }
   .tmpl-list .desc { color: var(--muted); margin: 6px 0; }
@@ -121,6 +132,10 @@
       <button class="secondary" id="export-btn">Export + validate STL</button>
     </div>
     <div id="preview-msg" style="margin-top:10px;"></div>
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="progress-label" id="progress-label"></div>
+    </div>
     <div class="grid-imgs" id="preview-grid" style="margin-top:10px;"></div>
     <h2 style="margin-top:18px;">Source</h2>
     <pre id="source-view"></pre>
@@ -255,37 +270,70 @@ $("regenerate").onclick = () => {
   generate(overrides);
 };
 
-// ---- Preview / export ----
+// ---- Preview / export (background jobs, polled for progress) ----
+function showProgress(done, total, label) {
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  $("progress-wrap").classList.add("active");
+  $("progress-bar").style.width = `${pct}%`;
+  $("progress-label").textContent = `${label || "working..."} (${done}/${total})`;
+}
+
+function hideProgress() {
+  $("progress-wrap").classList.remove("active");
+  $("progress-bar").style.width = "0%";
+  $("progress-label").textContent = "";
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function runJob(path, payload) {
+  const { job_id } = await api(path, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+  });
+  while (true) {
+    const job = await api(`/api/jobs/${job_id}`);
+    showProgress(job.progress.done, job.progress.total, job.progress.label);
+    if (job.status === "done") return job.result;
+    if (job.status === "error") throw new Error(job.error || "job failed");
+    await sleep(300);
+  }
+}
+
+function renderViewsGrid(views) {
+  $("preview-grid").innerHTML = views.map(v =>
+    `<figure><img src="/files/previews/${encodeURIComponent(v.name)}.png"><figcaption>${v.name}</figcaption></figure>`
+  ).join("");
+}
+
 $("preview-btn").onclick = async () => {
-  setMsg($("preview-msg"), "Rendering seven views (OpenSCAD)... this can take a little while.", "ok");
+  setMsg($("preview-msg"), "", "");
   $("preview-grid").innerHTML = "";
+  $("preview-btn").disabled = true;
   try {
-    const data = await api("/api/preview", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: currentFilename }),
-    });
-    setMsg($("preview-msg"), "", "");
-    $("preview-grid").innerHTML = data.views.map(v =>
-      `<figure><img src="/files/previews/${encodeURIComponent(v.name)}.png"><figcaption>${v.name}</figcaption></figure>`
-    ).join("");
+    const data = await runJob("/api/preview", { filename: currentFilename });
+    renderViewsGrid(data.views);
   } catch (e) {
     setMsg($("preview-msg"), e.message, "err");
+  } finally {
+    $("preview-btn").disabled = false;
+    hideProgress();
   }
 };
 
 $("export-btn").onclick = async () => {
-  setMsg($("preview-msg"), "Exporting + validating STL...", "ok");
+  setMsg($("preview-msg"), "", "");
+  $("export-btn").disabled = true;
   try {
-    const data = await api("/api/export", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: currentFilename }),
-    });
+    const data = await runJob("/api/export", { filename: currentFilename });
     setMsg($("preview-msg"), `STL exported and validated. <a href="/files/output/${encodeURIComponent(currentFilename.replace(/\.[^.]+$/, ""))}.stl">Download STL</a>`, "ok");
-    $("preview-grid").innerHTML = data.views.map(v =>
-      `<figure><img src="/files/previews/${encodeURIComponent(v.name)}.png"><figcaption>${v.name}</figcaption></figure>`
-    ).join("");
+    renderViewsGrid(data.views);
   } catch (e) {
     setMsg($("preview-msg"), e.message, "err");
+  } finally {
+    $("export-btn").disabled = false;
+    hideProgress();
   }
 };
 

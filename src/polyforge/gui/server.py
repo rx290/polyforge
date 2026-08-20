@@ -29,6 +29,41 @@ def _make_handler(workdir: Path):
     counter_lock = threading.Lock()
     counter = {"n": 0}
 
+    jobs_lock = threading.Lock()
+    jobs: dict[str, dict] = {}
+    job_counter = {"n": 0}
+
+    def _start_job(worker) -> str:
+        """Run `worker(on_progress)` in a background thread and return a job
+        id immediately, so a slow multi-view render/export doesn't hold the
+        HTTP request open -- the browser polls /api/jobs/<id> instead."""
+        with jobs_lock:
+            job_counter["n"] += 1
+            job_id = str(job_counter["n"])
+            jobs[job_id] = {"status": "running", "progress": {"done": 0, "total": 1, "label": "starting"}, "result": None, "error": None}
+
+        def on_progress(done: int, total: int, label: str):
+            with jobs_lock:
+                jobs[job_id]["progress"] = {"done": done, "total": total, "label": label}
+
+        def run_job():
+            try:
+                result = worker(on_progress)
+                with jobs_lock:
+                    jobs[job_id]["status"] = "done"
+                    jobs[job_id]["result"] = result
+            except gui_app.DesignError as exc:
+                with jobs_lock:
+                    jobs[job_id]["status"] = "error"
+                    jobs[job_id]["error"] = str(exc)
+            except Exception as exc:  # noqa: BLE001 - never leak a bare stack trace to the browser
+                with jobs_lock:
+                    jobs[job_id]["status"] = "error"
+                    jobs[job_id]["error"] = f"internal error: {exc}"
+
+        threading.Thread(target=run_job, daemon=True).start()
+        return job_id
+
     class Handler(BaseHTTPRequestHandler):
         server_version = "PolyForgeGUI/1"
 
@@ -79,6 +114,16 @@ def _make_handler(workdir: Path):
                 self._send_json(200, gui_app.ollama_status_json(auto_start=auto_start))
                 return
 
+            if path.startswith("/api/jobs/"):
+                job_id = path[len("/api/jobs/"):]
+                with jobs_lock:
+                    job = jobs.get(job_id)
+                if job is None:
+                    self._send_json(404, {"error": "unknown job"})
+                    return
+                self._send_json(200, job)
+                return
+
             if path.startswith("/files/"):
                 requested = (workdir / path[len("/files/"):]).resolve()
                 if workdir.resolve() not in requested.parents and requested != workdir.resolve():
@@ -105,11 +150,13 @@ def _make_handler(workdir: Path):
                     result = gui_app.design_json(payload, workdir, next_id)
                     self._send_json(200, result)
                 elif path == "/api/preview":
-                    result = gui_app.preview_json(payload.get("filename", ""), workdir)
-                    self._send_json(200, result)
+                    filename = payload.get("filename", "")
+                    job_id = _start_job(lambda on_progress: gui_app.preview_json(filename, workdir, on_progress=on_progress))
+                    self._send_json(202, {"job_id": job_id})
                 elif path == "/api/export":
-                    result = gui_app.export_json(payload.get("filename", ""), workdir)
-                    self._send_json(200, result)
+                    filename = payload.get("filename", "")
+                    job_id = _start_job(lambda on_progress: gui_app.export_json(filename, workdir, on_progress=on_progress))
+                    self._send_json(202, {"job_id": job_id})
                 else:
                     self._send_json(404, {"error": "not found"})
             except gui_app.DesignError as exc:

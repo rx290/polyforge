@@ -45,10 +45,18 @@ def project_paths(scad: Path):
     return base, base / "output", base / "previews"
 
 
-def render_views(openscad: str, scad: Path, preview_dir: Path, imgsize: str, definitions: list[str]) -> list[Path]:
+def render_views(
+    openscad: str,
+    scad: Path,
+    preview_dir: Path,
+    imgsize: str,
+    definitions: list[str],
+    on_progress=None,
+) -> list[Path]:
     preview_dir.mkdir(parents=True, exist_ok=True)
     outputs = []
-    for name, rotation in VIEWS.items():
+    total = len(VIEWS)
+    for i, (name, rotation) in enumerate(VIEWS.items(), start=1):
         out = preview_dir / f"{name}.png"
         cmd = [openscad, "--render", "--autocenter", "--viewall", "--projection=o", f"--camera=0,0,0,{rotation},0", f"--imgsize={imgsize}"]
         for definition in definitions:
@@ -58,26 +66,30 @@ def render_views(openscad: str, scad: Path, preview_dir: Path, imgsize: str, def
         if not out.exists() or out.stat().st_size == 0:
             raise RuntimeError(f"OpenSCAD did not create a usable {name} image")
         outputs.append(out)
+        if on_progress:
+            on_progress(i, total, f"rendered {name} view")
     return outputs
 
 
-def preview(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None = None) -> list[Path]:
+def preview(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None = None, on_progress=None) -> list[Path]:
     scad = scad.resolve()
     if not scad.exists():
         raise FileNotFoundError(f"file not found: {scad}")
     openscad = find_openscad()
     _, _, preview_dir = project_paths(scad)
-    return render_views(openscad, scad, preview_dir, imgsize, definitions or [])
+    return render_views(openscad, scad, preview_dir, imgsize, definitions or [], on_progress=on_progress)
 
 
-def export(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None = None) -> dict:
+def export(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None = None, on_progress=None) -> dict:
     scad = scad.resolve()
     if not scad.exists():
         raise FileNotFoundError(f"file not found: {scad}")
     definitions = definitions or []
     openscad = find_openscad()
     base, output_dir, preview_dir = project_paths(scad)
-    views = render_views(openscad, scad, preview_dir, imgsize, definitions)
+    total = len(VIEWS) + 1  # + 1 for the STL render step below
+    views_progress = (lambda done, _, label: on_progress(done, total, label)) if on_progress else None
+    views = render_views(openscad, scad, preview_dir, imgsize, definitions, on_progress=views_progress)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     stl = output_dir / f"{scad.stem}.stl"
@@ -88,6 +100,8 @@ def export(scad: Path, imgsize: str = "1200,900", definitions: list[str] | None 
     run(cmd)
     if not stl.exists() or stl.stat().st_size == 0:
         raise RuntimeError("OpenSCAD did not create a usable STL")
+    if on_progress:
+        on_progress(total, total, "exported STL")
 
     mesh_data = mesh_inspect.inspect(stl)
     mesh_json = output_dir / f"{scad.stem}.mesh.json"
