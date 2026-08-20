@@ -86,7 +86,41 @@ VASE_SHAPE_KEYWORDS = [
     (("holder ring", "finger ring", "bulb holder"), {"holder_ring_d": 6}),
     (("low poly", "low-poly", "faceted", "angular"), {"num_sides": 6, "facet_jitter": 0.18}),
     (("smooth", "rounded"), {"num_sides": 48, "facet_jitter": 0}),
+    (("detailed", "fine detail", "finely detailed", "high resolution", "high-resolution"), {"profile_slices": 64}),
 ]
+
+# Phrases that mean "this has to print without supports" -- handled separately
+# from VASE_SHAPE_KEYWORDS above because it isn't a fixed param=value nudge,
+# it's a constraint on the *relationship* between params: no section may be
+# wider than the one below it (an outward flare is an overhang a slicer can't
+# bridge without support), and no section may be a bulge (which always flares
+# out over at least half its height). See _make_vase_print_without_support.
+VASE_NO_SUPPORT_PHRASES = ("without support", "no support", "no supports", "support-free", "support free")
+
+_VASE_DIAMETER_CHAIN = ["d_base", "s1_end_d", "s2_end_d", "s3_end_d", "s4_end_d"]
+_VASE_SECTION_TYPES = ["s1_type", "s2_type", "s3_type", "s4_type"]
+
+
+def _make_vase_print_without_support(params: dict, template) -> list[str]:
+    """Force the profile to only ever taper the same or narrower going up
+    (never flare outward), so the whole vase is self-supporting in any
+    orientation -- disables bulge sections and clamps each section's end
+    diameter to the one before it wherever the current values would flare."""
+    defaults = template.defaults()
+    notes = []
+    for type_param in _VASE_SECTION_TYPES:
+        if params.get(type_param, defaults[type_param]) == 3:
+            params[type_param] = 2
+            notes.append(f"'without support' -> {type_param} = 2 (bulge sections always overhang)")
+    prev_name, prev_value = _VASE_DIAMETER_CHAIN[0], params.get(_VASE_DIAMETER_CHAIN[0], defaults[_VASE_DIAMETER_CHAIN[0]])
+    for name in _VASE_DIAMETER_CHAIN[1:]:
+        value = params.get(name, defaults[name])
+        if value > prev_value:
+            params[name] = prev_value
+            notes.append(f"'without support' -> {name} clamped to {prev_value} (was flaring out past {prev_name})")
+            value = prev_value
+        prev_name, prev_value = name, value
+    return notes
 
 
 class NoTemplateMatchError(Exception):
@@ -222,6 +256,13 @@ def extract_params(text: str, template) -> tuple[dict, list[str]]:
                 if param_name not in params and param_name in template_param_names:
                     params[param_name] = value
                     notes.append(f"{matched_phrase!r} -> {param_name} = {value}")
+
+        # Runs last so it can see (and correct) whatever the shape keywords
+        # above already set -- e.g. "an hourglass vase that prints without
+        # support" should still end up support-free, not silently keep the
+        # overhanging bulge just because "hourglass" was matched first.
+        if any(phrase in text_l for phrase in VASE_NO_SUPPORT_PHRASES):
+            notes.extend(_make_vase_print_without_support(params, template))
 
     return params, notes
 

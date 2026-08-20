@@ -118,3 +118,40 @@ def test_vase_numeric_dimension_extraction_takes_priority_over_keyword_nudges():
     # params" precedence check in extract_params directly.
     result = match("a vase 500mm height")
     assert result.params["vase_height"] == 500
+
+
+def test_vase_detailed_keyword_bumps_profile_slices():
+    result = match("a detailed vase")
+    assert result.params["profile_slices"] == 64
+
+
+def _merged_diameters(template, params):
+    from polyforge.nlu.template_matcher import _VASE_DIAMETER_CHAIN
+    merged = template.defaults()
+    merged.update(params)
+    return [merged[name] for name in _VASE_DIAMETER_CHAIN]
+
+
+def test_vase_without_support_disables_a_bulge_that_was_just_requested():
+    from polyforge import templates
+    result = match("an hourglass vase that prints without support")
+    assert result.params["s1_type"] == 2  # bulge (3) forced back to taper
+    diameters = _merged_diameters(templates.get("vase"), result.params)
+    assert all(a >= b for a, b in zip(diameters, diameters[1:])), diameters
+
+
+def test_vase_without_support_clamps_a_flaring_default_profile():
+    from polyforge import templates
+    result = match("a vase that prints without support")
+    diameters = _merged_diameters(templates.get("vase"), result.params)
+    assert all(a >= b for a, b in zip(diameters, diameters[1:])), diameters
+
+
+def test_vase_detailed_smooth_without_support_all_combine():
+    from polyforge import templates
+    result = match("a detailed vase with smooth texture and it should print without support")
+    assert result.params["profile_slices"] == 64
+    assert result.params["num_sides"] == 48
+    assert result.params["facet_jitter"] == 0
+    diameters = _merged_diameters(templates.get("vase"), result.params)
+    assert all(a >= b for a, b in zip(diameters, diameters[1:])), diameters
