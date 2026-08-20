@@ -132,12 +132,26 @@ def _merged_diameters(template, params):
     return [merged[name] for name in _VASE_DIAMETER_CHAIN]
 
 
+def _assert_genuinely_zero_overhang(template, params):
+    # Not just "diameters look non-increasing" -- actually run the same
+    # overhang-angle math the printability note is built on, so this test
+    # would catch a regression even if the diameter-chain check above
+    # somehow passed for the wrong reason (e.g. a bulge section left
+    # in place with both ends still individually clamped).
+    from polyforge.templates.vase import max_overhang_deg
+    merged = template.defaults()
+    merged.update(params)
+    angle, _ = max_overhang_deg(merged)
+    assert angle == 0.0, f"expected zero overhang, got {angle} deg"
+
+
 def test_vase_without_support_disables_a_bulge_that_was_just_requested():
     from polyforge import templates
     result = match("an hourglass vase that prints without support")
     assert result.params["s1_type"] == 2  # bulge (3) forced back to taper
     diameters = _merged_diameters(templates.get("vase"), result.params)
     assert all(a >= b for a, b in zip(diameters, diameters[1:])), diameters
+    _assert_genuinely_zero_overhang(templates.get("vase"), result.params)
 
 
 def test_vase_without_support_clamps_a_flaring_default_profile():
@@ -145,6 +159,7 @@ def test_vase_without_support_clamps_a_flaring_default_profile():
     result = match("a vase that prints without support")
     diameters = _merged_diameters(templates.get("vase"), result.params)
     assert all(a >= b for a, b in zip(diameters, diameters[1:])), diameters
+    _assert_genuinely_zero_overhang(templates.get("vase"), result.params)
 
 
 def test_vase_detailed_smooth_without_support_all_combine():
@@ -153,5 +168,6 @@ def test_vase_detailed_smooth_without_support_all_combine():
     assert result.params["profile_slices"] == 64
     assert result.params["num_sides"] == 48
     assert result.params["facet_jitter"] == 0
+    _assert_genuinely_zero_overhang(templates.get("vase"), result.params)
     diameters = _merged_diameters(templates.get("vase"), result.params)
     assert all(a >= b for a, b in zip(diameters, diameters[1:])), diameters
