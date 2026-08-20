@@ -62,3 +62,59 @@ def test_empty_text_raises():
 def test_gibberish_raises():
     with pytest.raises(NoTemplateMatchError):
         match("xqzvbn plonk fribble wozzit")
+
+
+# ---- vase free-text extraction -----------------------------------------
+# Regression coverage for a real reported bug: free-text vase requests like
+# "300mm height and 200mm width" produced no param overrides at all (the
+# old extractor only understood WxDxH triples/pairs joined by "x"/"by"),
+# so every vase request rendered identically regardless of what was typed.
+
+def test_vase_named_dimensions_and_texture_keyword_from_free_text():
+    result = match("a square vase with wave ripples 300mm height and 200mm width")
+    assert result.template_key == "vase"
+    assert result.params["vase_height"] == 300
+    assert result.params["d_base"] == 200
+    assert result.params["base_texture_amplitude"] == 0.12
+
+
+def test_vase_dimension_word_before_the_number_also_works():
+    result = match("a vase, height 250mm, diameter 90mm")
+    assert result.params["vase_height"] == 250
+    assert result.params["d_base"] == 90
+
+
+def test_vase_hourglass_keyword_sets_a_bulge_section_narrower_than_its_ends():
+    result = match("an hourglass vase")
+    assert result.params["s1_type"] == 3
+    assert result.params["s1_peak_d"] < result.params["s1_end_d"]
+
+
+def test_vase_bulb_holder_sets_both_a_globe_bulge_and_a_holder_ring():
+    result = match("a vase with a bulb holder on top")
+    assert result.params["s4_type"] == 3
+    assert result.params["s4_peak_d"] > result.params["s4_end_d"]
+    assert result.params["holder_ring_d"] > 0
+
+
+def test_vase_twist_keyword_sets_total_twist_deg():
+    result = match("a spiral twisted vase")
+    assert result.params["total_twist_deg"] == 360
+
+
+def test_vase_low_poly_vs_smooth_keywords_pick_opposite_facet_settings():
+    low_poly = match("a low poly vase")
+    assert low_poly.params["num_sides"] <= 8
+    assert low_poly.params["facet_jitter"] > 0
+
+    smooth = match("a smooth vase")
+    assert smooth.params["num_sides"] >= 40
+    assert smooth.params["facet_jitter"] == 0
+
+
+def test_vase_numeric_dimension_extraction_takes_priority_over_keyword_nudges():
+    # An explicit number should never be clobbered by a same-named keyword
+    # nudge -- there's no overlap today, but this guards the "already in
+    # params" precedence check in extract_params directly.
+    result = match("a vase 500mm height")
+    assert result.params["vase_height"] == 500

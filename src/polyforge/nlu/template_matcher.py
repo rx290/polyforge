@@ -52,6 +52,42 @@ _COUNT_RE = re.compile(
     re.IGNORECASE,
 )
 
+# A named dimension word ("height", "wide", ...) maps to whichever of these
+# candidate param names the matched template actually has (first match wins) --
+# this is what lets free text like "300mm height" or "width 200mm" work for
+# templates whose own param names don't literally match the English word used
+# (e.g. the vase template's diameter param is called "d_base", not "width").
+DIMENSION_ALIASES = {
+    "height": ["height", "vase_height"],
+    "tall": ["height", "vase_height"],
+    "width": ["width", "d_base"],
+    "wide": ["width", "d_base"],
+    "diameter": ["d_base", "diameter"],
+    "diam": ["d_base", "diameter"],
+    "depth": ["depth"],
+    "length": ["length", "width"],
+    "long": ["length", "width"],
+}
+_DIM_WORD_ALT = "|".join(sorted(DIMENSION_ALIASES, key=len, reverse=True))
+_NUM_THEN_WORD_RE = re.compile(rf"{_NUM}\s*{_UNIT}\s*(?:in\s+)?({_DIM_WORD_ALT})\b", re.IGNORECASE)
+_WORD_THEN_NUM_RE = re.compile(rf"\b({_DIM_WORD_ALT})\s*(?:of\s*)?{_NUM}\s*{_UNIT}", re.IGNORECASE)
+
+# Bounded, zero-ML keyword -> param nudges for the vase template's free-text
+# shape vocabulary (this is the "richer profile system" the params expose --
+# the matcher just needs to know which words turn which knobs). Only applied
+# when a phrase is present and the param wasn't already set by something more
+# specific above (numeric dimension extraction always wins).
+VASE_SHAPE_KEYWORDS = [
+    (("wave ripples", "wavy", "ripples", "ripple", "textured"), {"base_texture_amplitude": 0.12}),
+    (("twist", "twisted", "spiral", "helix"), {"total_twist_deg": 360}),
+    (("hourglass", "waist", "pinched"), {"s1_type": 3, "s1_end_d": 60, "s1_peak_d": 35}),
+    (("bulb", "globe", "dome", "round top"), {"s4_type": 3, "s4_end_d": 60, "s4_peak_d": 90}),
+    (("plain neck", "simple neck", "straight neck"), {"s2_type": 0}),
+    (("holder ring", "finger ring", "bulb holder"), {"holder_ring_d": 6}),
+    (("low poly", "low-poly", "faceted", "angular"), {"num_sides": 6, "facet_jitter": 0.18}),
+    (("smooth", "rounded"), {"num_sides": 48, "facet_jitter": 0}),
+]
+
 
 class NoTemplateMatchError(Exception):
     """Raised when no known template plausibly matches the request text."""
@@ -160,6 +196,32 @@ def extract_params(text: str, template) -> tuple[dict, list[str]]:
         n = int(raw) if n is None else n
         params[count_param] = n
         notes.append(f"count {n!r} -> {count_param}")
+
+    template_param_names = {p.name for p in template.params}
+
+    def _apply_named_dim(word: str, value: float, unit: str | None):
+        for candidate in DIMENSION_ALIASES.get(word.lower(), ()):
+            if candidate in template_param_names:
+                if candidate not in params:
+                    mm = round(_to_mm(value, unit), 3)
+                    params[candidate] = mm
+                    notes.append(f"{word} {value}{unit or 'mm'} -> {candidate} = {mm} mm")
+                return
+
+    for m in _NUM_THEN_WORD_RE.finditer(text_l):
+        _apply_named_dim(m.group(3), float(m.group(1)), m.group(2))
+    for m in _WORD_THEN_NUM_RE.finditer(text_l):
+        _apply_named_dim(m.group(1), float(m.group(2)), m.group(3))
+
+    if template.key == "vase":
+        for phrases, overrides in VASE_SHAPE_KEYWORDS:
+            matched_phrase = next((p for p in phrases if p in text_l), None)
+            if matched_phrase is None:
+                continue
+            for param_name, value in overrides.items():
+                if param_name not in params and param_name in template_param_names:
+                    params[param_name] = value
+                    notes.append(f"{matched_phrase!r} -> {param_name} = {value}")
 
     return params, notes
 
