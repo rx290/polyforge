@@ -16,8 +16,10 @@ exception.
 
 from __future__ import annotations
 
+import difflib
 import json
 import os
+import re
 import urllib.request
 
 from .. import templates
@@ -36,7 +38,7 @@ def _templates_prompt() -> str:
     lines = []
     for t in templates.all_templates():
         params = ", ".join(f"{p.name} (default {p.default}{p.unit}) - {p.description}" for p in t.params)
-        lines.append(f"- key={t.key}: {t.description}\n  params: {params}")
+        lines.append(f'- "{t.key}": {t.description}\n  params: {params}')
     return "\n".join(lines)
 
 
@@ -46,10 +48,38 @@ def _build_prompt(text: str) -> str:
         "user's request implies; leave the rest out so defaults apply.\n"
         "Respond with ONLY strict JSON of the shape "
         '{\"template\": \"<key>\", \"params\": {\"<name>\": <number>, ...}}. '
+        'The \"<key>\" value must be copied verbatim from one of the quoted template '
+        "names below (just the name, e.g. \"vase\" -- never a label like \"key=vase\").\n"
         "No prose, no markdown fences, no explanation.\n\n"
         f"Available templates:\n{_templates_prompt()}\n\n"
+        "Example response for a request that matches the vase template:\n"
+        '{\"template\": \"vase\", \"params\": {\"vase_height\": 200}}\n\n'
         f"User request: {text}"
     )
+
+
+def _clean_template_key(raw: str) -> str:
+    """Small local models sometimes echo the prompt's own formatting back
+    instead of just the bare key (e.g. 'key=vase' or '\"vase\",' or a
+    trailing sentence) -- strip that noise before giving up on a response
+    that actually did pick the right template."""
+    cleaned = raw.strip().strip("'\"")
+    cleaned = re.sub(r"^\s*(template\s*=|template\s*:|key\s*=)\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = cleaned.strip().strip("'\"")
+    return cleaned.split()[0].rstrip(".,;:") if cleaned.split() else cleaned
+
+
+def _resolve_template_key(raw: str) -> str:
+    known = [t.key for t in templates.all_templates()]
+    candidate = _clean_template_key(raw)
+    if candidate in known:
+        return candidate
+    # last resort: the model named something close to a real key (typo,
+    # extra punctuation, wrong casing) -- try a fuzzy match before failing.
+    close = difflib.get_close_matches(candidate.lower(), known, n=1, cutoff=0.6)
+    if close:
+        return close[0]
+    raise KeyError(f"unknown template: {raw!r}. Known: {known}")
 
 
 DEFAULT_GENERATE_TIMEOUT_S = 180.0  # a real local model, especially a "thinking" one, can take
@@ -91,16 +121,23 @@ def match(
         ) from exc
 
     raw = body.get("response", "")
+    # Small local models frequently wrap the JSON in a markdown fence or add
+    # a stray sentence before/after it despite being told not to -- pull out
+    # the first {...} object rather than requiring the whole response to be
+    # pure JSON.
+    json_match = re.search(r"\{.*\}", raw, re.DOTALL)
+    candidate_json = json_match.group(0) if json_match else raw
     try:
-        parsed = json.loads(raw)
+        parsed = json.loads(candidate_json)
         template_key = parsed["template"]
         params = parsed.get("params", {})
     except (json.JSONDecodeError, KeyError, TypeError) as exc:
         raise LLMBackendUnavailable(f"Local model returned unusable output: {raw!r}") from exc
 
     try:
-        templates.get(template_key)
+        template_key = _resolve_template_key(template_key)
     except KeyError as exc:
         raise LLMBackendUnavailable(str(exc)) from exc
 
+    params = params if isinstance(params, dict) else {}
     return MatchResult(template_key=template_key, confidence=0.6, params=params, notes=[f"local model {model} @ {base_url}"])

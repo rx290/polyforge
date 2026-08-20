@@ -1,6 +1,73 @@
+import json
+
 import pytest
 
 from polyforge.nlu import llm_backend, ollama_client
+
+
+class _FakeResponse:
+    def __init__(self, body: dict):
+        self._body = json.dumps(body).encode("utf-8")
+
+    def read(self):
+        return self._body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        return False
+
+
+def _mock_generate(monkeypatch, model_response_text: str):
+    """Skip past the ollama_client plumbing and make the /api/generate call
+    return `model_response_text` as if the model had produced it, so tests
+    can focus on how match() parses (or recovers from) that text."""
+    monkeypatch.setattr(ollama_client, "ensure_server", lambda base_url, auto_start=True: None)
+    monkeypatch.setattr(ollama_client, "select_model", lambda base_url, requested=None: "llama3.2:1b")
+    monkeypatch.setattr(
+        llm_backend.urllib.request, "urlopen",
+        lambda request, timeout=None: _FakeResponse({"response": model_response_text}),
+    )
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("vase", "vase"),
+        ("key=vase", "vase"),
+        ('"vase"', "vase"),
+        ("template=vase", "vase"),
+        ("vase.", "vase"),
+        ("vase,", "vase"),
+    ],
+)
+def test_clean_template_key_strips_common_small_model_noise(raw, expected):
+    assert llm_backend._clean_template_key(raw) == expected
+
+
+def test_resolve_template_key_fuzzy_matches_a_close_typo():
+    assert llm_backend._resolve_template_key("vasse") == "vase"
+
+
+def test_resolve_template_key_raises_for_something_unrecognizable():
+    with pytest.raises(KeyError):
+        llm_backend._resolve_template_key("a spaceship")
+
+
+def test_match_recovers_from_a_key_equals_echoed_template_name(monkeypatch):
+    # This is the real failure seen live with the small 1B model: it echoed
+    # the prompt's own "key=vase" labeling instead of just "vase".
+    _mock_generate(monkeypatch, json.dumps({"template": "key=vase", "params": {"vase_height": 200}}))
+    result = llm_backend.match("a tall vase")
+    assert result.template_key == "vase"
+    assert result.params == {"vase_height": 200}
+
+
+def test_match_extracts_json_from_a_markdown_fence(monkeypatch):
+    _mock_generate(monkeypatch, '```json\n{"template": "vase", "params": {}}\n```')
+    result = llm_backend.match("a vase")
+    assert result.template_key == "vase"
 
 
 def test_match_surfaces_ollama_unavailable_as_llm_backend_unavailable(monkeypatch):
