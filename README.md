@@ -137,6 +137,8 @@ The vase template's free text does more than just pick the template -- it also f
 | `twist`, `twisted`, `spiral`, `helix` | a full 360 degree spiral from base to rim |
 | `low poly`, `faceted`, `angular` | a chunky, visibly-faceted look |
 | `smooth`, `rounded` | a near-smooth body (high facet count, no jitter) |
+| `detailed`, `fine detail`, `high resolution` | a more finely sampled curve (higher `profile_slices`) |
+| `without support`, `no support(s)`, `support-free` | forces every section to taper the same or narrower than the one below it (never flares outward), and turns off any bulge section -- the whole vase prints standing up with no overhangs to bridge |
 
 Sample prompts to try (`polyforge design "<text>"`, or the GUI's Design box):
 
@@ -148,8 +150,11 @@ a vase with a bulb holder on top
 a spiral twisted vase 300mm height
 a low poly vase
 a smooth vase
+a detailed vase with smooth texture that prints without support
 an hourglass vase with a plain neck and a bulb holder on top and wave ripples
 ```
+
+`without support` runs after every other shape keyword, so it wins ties -- "an hourglass vase that prints without support" still comes out support-free, not silently overhanging just because "hourglass" matched first.
 
 That last one is the "hourglass base, plain neck, bulb top with a holder ring, textured base" shape from the original ask, all from one sentence. Any keyword not present just leaves that param at its default, and an explicit number always wins over a keyword nudge, so `a vase 500mm height` sets exactly that, nothing more.
 
