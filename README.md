@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-132%2F133%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-137%2F138%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
@@ -155,6 +155,8 @@ an hourglass vase with a plain neck and a bulb holder on top and wave ripples
 ```
 
 `without support` runs after every other shape keyword, so it wins ties -- "an hourglass vase that prints without support" still comes out support-free, not silently overhanging just because "hourglass" matched first.
+
+Every vase design (not just ones that ask for `without support`) also gets a real printability note in its result, computed from the actual profile math rather than eyeballed off a render: the steepest outward-flare angle and whether it's likely to need supports (past the usual ~45 degree slicer default). It shows up in both `polyforge design`'s output and the GUI's result notes. A plain `a vase` comes out around 23 degrees (support-free); `an hourglass vase` or `a vase with a bulb holder on top` come out around 46 degrees (likely needs supports) -- the bulge shapes are the only ones that actually need this, since a bulge always flares out over at least half its own height by definition.
 
 That last one is the "hourglass base, plain neck, bulb top with a holder ring, textured base" shape from the original ask, all from one sentence. Any keyword not present just leaves that param at its default, and an explicit number always wins over a keyword nudge, so `a vase 500mm height` sets exactly that, nothing more.
 
