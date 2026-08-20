@@ -25,7 +25,7 @@ import urllib.request
 from .. import templates
 from . import ollama_client
 from .ollama_client import OllamaUnavailable
-from .template_matcher import MatchResult
+from .template_matcher import DIMENSION_ALIASES, MatchResult
 
 DEFAULT_BASE_URL = ollama_client.DEFAULT_BASE_URL
 
@@ -80,6 +80,37 @@ def _resolve_template_key(raw: str) -> str:
     if close:
         return close[0]
     raise KeyError(f"unknown template: {raw!r}. Known: {known}")
+
+
+def _resolve_params(raw_params: dict, known_names: set) -> tuple[dict, list]:
+    """A small model invents plausible-looking param names fairly often
+    (e.g. 'wave_ripples_height' instead of the vase template's actual
+    'vase_height') even though the prompt lists the real names verbatim.
+    Silently passing those through would just be a quieter version of the
+    same "nothing I type changes anything" bug -- render.render() merges
+    unknown keys into the params dict without ever using them. Recover
+    what we can via the same dimension-word aliases template_matcher's
+    free-text extractor uses, and drop (with a note) whatever's left."""
+    resolved: dict = {}
+    dropped: list = []
+    for name, value in raw_params.items():
+        if not isinstance(value, (int, float)):
+            dropped.append(name)
+            continue
+        if name in known_names:
+            resolved[name] = value
+            continue
+        lname = name.lower()
+        match_name = next(
+            (candidate for word, aliases in DIMENSION_ALIASES.items() if word in lname
+             for candidate in aliases if candidate in known_names),
+            None,
+        )
+        if match_name and match_name not in resolved:
+            resolved[match_name] = value
+        else:
+            dropped.append(name)
+    return resolved, dropped
 
 
 DEFAULT_GENERATE_TIMEOUT_S = 180.0  # a real local model, especially a "thinking" one, can take
@@ -139,5 +170,10 @@ def match(
     except KeyError as exc:
         raise LLMBackendUnavailable(str(exc)) from exc
 
-    params = params if isinstance(params, dict) else {}
-    return MatchResult(template_key=template_key, confidence=0.6, params=params, notes=[f"local model {model} @ {base_url}"])
+    known_names = {p.name for p in templates.get(template_key).params}
+    params, dropped = _resolve_params(params if isinstance(params, dict) else {}, known_names)
+
+    notes = [f"local model {model} @ {base_url}"]
+    if dropped:
+        notes.append(f"ignored param name(s) the model invented (not in {template_key}'s schema): {dropped}")
+    return MatchResult(template_key=template_key, confidence=0.6, params=params, notes=notes)

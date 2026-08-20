@@ -70,6 +70,21 @@ def test_match_extracts_json_from_a_markdown_fence(monkeypatch):
     assert result.template_key == "vase"
 
 
+def test_match_rescues_invented_param_names_via_dimension_aliases(monkeypatch):
+    # Real failure seen live: llama3.2:1b invented "wave_ripples_height"/
+    # "wave_ripples_width" instead of the vase template's actual
+    # "vase_height"/"d_base" -- render.render() would otherwise silently
+    # merge these in as dead extra keys and do nothing with them, which is
+    # just a quieter version of "nothing I type changes anything."
+    _mock_generate(monkeypatch, json.dumps({
+        "template": "vase",
+        "params": {"wave_ripples_height": 300, "wave_ripples_width": 200, "totally_made_up": 5},
+    }))
+    result = llm_backend.match("a square vase with wave ripples 300mm height and 200mm width")
+    assert result.params == {"vase_height": 300, "d_base": 200}
+    assert any("totally_made_up" in n for n in result.notes)
+
+
 def test_match_surfaces_ollama_unavailable_as_llm_backend_unavailable(monkeypatch):
     def raise_unavailable(base_url, auto_start=True):
         raise ollama_client.OllamaUnavailable("no server here")
