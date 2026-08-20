@@ -3,7 +3,7 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
   <img alt="Works with any LLM" src="https://img.shields.io/badge/works%20with-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20local%20models-5A67D8">
   <img alt="Runs fully offline" src="https://img.shields.io/badge/runs-fully%20offline-10a37f">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-128%2F129%20passing-success">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-132%2F133%20passing-success">
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </p>
 
