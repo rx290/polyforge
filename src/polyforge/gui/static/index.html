@@ -108,8 +108,16 @@
         <select id="engine">
           <option value="templates">templates (zero-ML, offline)</option>
           <option value="llm">local LLM (Ollama)</option>
+          <option value="character">character / figure / scene (local GPU)</option>
         </select>
       </label>
+      <span id="char-row" style="display:none;">
+        <label>Height mm <input id="char-height" type="number" value="150" min="30" max="400" style="width:70px;"></label>
+        <label>Tries <input id="char-candidates" type="number" value="4" min="1" max="8" style="width:50px;"></label>
+        <label>Image
+          <select id="char-image"><option value="flux">FLUX (best hands/faces)</option><option value="sdxl">SDXL-Turbo (fast draft)</option></select>
+        </label>
+      </span>
       <label id="model-row" style="display:none;">Model
         <select id="model"></select>
       </label>
@@ -222,6 +230,8 @@ $("ollama-start").onclick = () => refreshOllama(true);
 // ---- Engine/model row toggle ----
 $("engine").onchange = () => {
   $("model-row").style.display = $("engine").value === "llm" ? "" : "none";
+  $("char-row").style.display = $("engine").value === "character" ? "" : "none";
+  $("backend").parentElement.style.display = $("engine").value === "character" ? "none" : "";
 };
 
 // ---- Templates browser ----
@@ -279,7 +289,29 @@ function renderResult(data) {
   setMsg($("preview-msg"), "", "");
 }
 
+async function generateCharacter() {
+  setMsg($("design-msg"), "", "");
+  $("generate").disabled = true;
+  try {
+    const st = await api("/api/character/status");
+    if (!st.available) throw new Error(st.reason);
+    const data = await runJob("/api/character", {
+      text: $("design-text").value, height_mm: Number($("char-height").value),
+      candidates: Number($("char-candidates").value), image_model: $("char-image").value, quality: "full",
+    });
+    const img = data.image ? `<img src="/files/${encodeURI(data.image)}" style="max-width:320px;display:block;margin:8px 0;">` : "";
+    setMsg($("design-msg"), `Done: ${data.summary}${data.anatomy_scores ? "<br>candidate scores: " + data.anatomy_scores : ""}${img}` +
+      `<a href="/files/${encodeURI(data.stl)}" download>Download STL</a>`, "ok");
+  } catch (e) {
+    setMsg($("design-msg"), e.message, "err");
+  } finally {
+    $("generate").disabled = false;
+    hideProgress();
+  }
+}
+
 async function generate(overrides) {
+  if ($("engine").value === "character") return generateCharacter();
   setMsg($("design-msg"), "", "");
   $("generate").disabled = true;
   try {

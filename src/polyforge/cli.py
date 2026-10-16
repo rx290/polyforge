@@ -245,6 +245,26 @@ def _cmd_gui(args) -> int:
     return 0
 
 
+def _cmd_character(args) -> int:
+    from . import character
+
+    def progress(done, total, label):
+        print(f"[{done}/{total}] {label}", flush=True)
+
+    try:
+        res = character.generate(args.text, args.out, height_mm=args.height, candidates=args.candidates,
+                                 image_model=args.image_model, quality=args.quality, on_progress=progress)
+    except character.CharacterError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"STL:   {res.stl}")
+    print(f"image: {res.image}")
+    print(f"check: {res.summary}")
+    if res.anatomy_scores:
+        print(f"candidate scores: {res.anatomy_scores}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="polyforge", description="Offline parametric CAD generation and validation.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -272,6 +292,15 @@ def build_parser() -> argparse.ArgumentParser:
     hw_p = sub.add_parser("hardware-scan", help="detect GPU/VRAM (NVIDIA/CUDA or AMD/ROCm) and recommend an Ollama model size to match")
     hw_p.add_argument("--pull", action="store_true", help="also `ollama pull` the recommended model (starts the server first if needed)")
     hw_p.set_defaults(func=_cmd_hardware_scan)
+
+    char_p = sub.add_parser("character", help="describe any character, figure or scene -> printable STL (local GPU image-to-3D pipeline)")
+    char_p.add_argument("text", help="e.g. 'three Spider-Man figures pointing at each other' or 'a six-winged angel with a halo'")
+    char_p.add_argument("--out", type=Path, default=Path("characters"), help="output folder (default ./characters)")
+    char_p.add_argument("--height", type=float, default=150.0, help="figure height in mm (default 150)")
+    char_p.add_argument("--candidates", type=int, default=4, help="images to draw; a local vision model keeps the most printable (default 4)")
+    char_p.add_argument("--image-model", choices=("flux", "sdxl"), default="flux", help="flux: better hands/faces, slower; sdxl: fast draft")
+    char_p.add_argument("--quality", choices=("full", "fast"), default="full", help="3D detail (fast uses less VRAM)")
+    char_p.set_defaults(func=_cmd_character)
 
     gui_p = sub.add_parser("gui", help="start the local web GUI (stdlib http.server, no extra dependencies)")
     gui_p.add_argument("--port", type=int, default=8420)

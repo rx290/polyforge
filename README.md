@@ -220,6 +220,18 @@ polyforge reconstruct-from-photos path/to/photos/ --out workspace/  # produces a
 
 Once the skill is installed in an agent, Claude Code, ChatGPT, or anything wired up through `AGENTS.md`, just ask for what you want in plain language, "design a cable comb with 8 slots for 3mm cables", and it follows the same workflow on its own, writing the `.scad` by hand for anything the template library doesn't cover.
 
+### Characters, figures and whole scenes
+
+Templates only cover parametric parts. For anything else I describe it in plain words and let a local GPU pipeline do the rest:
+
+```bash
+polyforge character "three Spider-Man figures standing in a triangle pointing at each other" --height 150
+```
+
+A local LLM writes the image prompt, FLUX draws a few candidates, a local vision model keeps the one with the cleanest hands, limbs and symmetry, TripoSG turns it into a mesh, and the mesh is repaired and scaled so it slices straight away. The same thing is in the web GUI as the "character / figure / scene" engine.
+
+The pipeline itself lives outside this repo because it needs a ROCm or CUDA torch setup and several GB of weights. Point PolyForge at it with `POLYFORGE_CHARACTER_PIPELINE`, `POLYFORGE_CHARACTER_PYTHON` and `POLYFORGE_CHARACTER_CWD`. On my RX 6700 XT (12 GB) one figure takes about 4 to 6 minutes with SDXL-Turbo and longer with FLUX.
+
 ## Architecture
 
 ```

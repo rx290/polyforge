@@ -108,6 +108,9 @@ def _make_handler(workdir: Path):
                 self._send_json(200, gui_app.templates_json())
                 return
 
+            if path == "/api/character/status":
+                self._send_json(200, gui_app.character_status_json())
+                return
             if path == "/api/ollama/status":
                 qs = parse_qs(parsed.query)
                 auto_start = qs.get("auto_start", ["0"])[0] == "1"
@@ -152,6 +155,9 @@ def _make_handler(workdir: Path):
                 elif path == "/api/preview":
                     filename = payload.get("filename", "")
                     job_id = _start_job(lambda on_progress: gui_app.preview_json(filename, workdir, on_progress=on_progress))
+                    self._send_json(202, {"job_id": job_id})
+                elif path == "/api/character":
+                    job_id = _start_job(lambda on_progress: gui_app.character_json(payload, workdir, on_progress=on_progress))
                     self._send_json(202, {"job_id": job_id})
                 elif path == "/api/export":
                     filename = payload.get("filename", "")

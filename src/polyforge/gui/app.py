@@ -135,3 +135,23 @@ def export_json(filename: str, workdir: Path, on_progress=None) -> dict:
         "spec": str(result["spec"]),
         "views": [{"name": v.stem, "path": str(v)} for v in result["views"]],
     }
+
+
+def character_status_json() -> dict:
+    from .. import character
+    ok, why = character.available()
+    return {"available": ok, "reason": why}
+
+
+def character_json(payload: dict, workdir: Path, on_progress=None) -> dict:
+    """Run the local character pipeline; returns workdir-relative paths the browser can fetch under /files/."""
+    from .. import character
+    out = workdir / "characters"
+    try:
+        res = character.generate(payload.get("text", ""), out, height_mm=float(payload.get("height_mm", 150)),
+                                 candidates=int(payload.get("candidates", 4)), image_model=payload.get("image_model", "flux"),
+                                 quality=payload.get("quality", "full"), on_progress=on_progress)
+    except character.CharacterError as exc:
+        raise DesignError(str(exc)) from exc
+    return {"stl": str(res.stl.relative_to(workdir)), "image": str(res.image.relative_to(workdir)) if res.image.exists() else None,
+            "summary": res.summary, "anatomy_scores": res.anatomy_scores}
