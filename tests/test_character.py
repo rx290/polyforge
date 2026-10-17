@@ -80,3 +80,12 @@ def test_gui_character_json_paths_are_workdir_relative(fake_pipeline):
     data = app.character_json({"text": "a duck", "candidates": 1}, fake_pipeline)
     assert data["stl"] == "characters/a_duck.stl" and data["image"] == "characters/a_duck_image.png"
     assert app.character_status_json()["available"] is True
+
+
+def test_gpu_fault_is_retried_once(fake_pipeline):
+    flag = fake_pipeline / "faulted"
+    script = fake_pipeline / "fake_character.py"
+    script.write_text(f"import os, sys\nif not os.path.exists({str(flag)!r}):\n    open({str(flag)!r}, 'w').close()\n"
+                      "    print('Memory access fault by GPU node-1'); sys.exit(134)\n" + FAKE)
+    res = character.generate("a cute owl", fake_pipeline / "out", candidates=1)
+    assert res.stl.exists() and flag.exists()

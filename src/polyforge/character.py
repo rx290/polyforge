@@ -89,18 +89,26 @@ def generate(text: str, out_dir: Path, height_mm: float = 150.0, candidates: int
     lines: list[str] = []
     if on_progress:
         on_progress(0, len(stages), "writing the image prompt")
-    proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            text=True, stdin=subprocess.DEVNULL)
-    try:
-        for line in proc.stdout:
-            lines.append(line.rstrip())
-            for i, (marker, label) in enumerate(stages):
-                if marker in line and on_progress:
-                    on_progress(i + 1, len(stages), label)
-        proc.wait(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        raise CharacterError(f"pipeline timed out after {timeout:.0f} s")
+    env.setdefault("HSA_ENABLE_COREDUMP", "0")   # a GPU fault must not write a 10 GB dump
+    for attempt in (1, 2):                         # ROCm on consumer cards hits random GPU page faults: retry once
+        lines.clear()
+        proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                text=True, stdin=subprocess.DEVNULL)
+        try:
+            for line in proc.stdout:
+                lines.append(line.rstrip())
+                for i, (marker, label) in enumerate(stages):
+                    if marker in line and on_progress:
+                        on_progress(i + 1, len(stages), label)
+            proc.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            raise CharacterError(f"pipeline timed out after {timeout:.0f} s")
+        gpu_fault = any("Memory access fault" in l or "page fault" in l for l in lines) or proc.returncode in (-6, -11, 134, 139)
+        if not (gpu_fault and attempt == 1):
+            break
+        if on_progress:
+            on_progress(0, len(stages), "GPU fault, retrying once")
     ok_line = next((l for l in lines if l.startswith("CHARACTER_OK")), "")
     if proc.returncode != 0 or not ok_line:
         err = next((l for l in reversed(lines) if re.search(r"Error|error", l)), lines[-1] if lines else "no output")
