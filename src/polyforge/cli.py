@@ -265,6 +265,30 @@ def _cmd_character(args) -> int:
     return 0
 
 
+def _cmd_robot(args) -> int:
+    import json as _json
+    from .robot.builder import build
+    from .robot.library import PARTS
+    if args.list_parts:
+        for k, v in sorted(PARTS.items()):
+            print(f"{k:18s} {v['label']}{'  (verify dims)' if v.get('verify') else ''}")
+        return 0
+    if not args.spec:
+        print("error: give a spec JSON (see polyforge/robot/builder.py) or --list-parts", file=sys.stderr)
+        return 1
+    try:
+        r = build(_json.loads(args.spec.read_text()), args.out)
+    except (KeyError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"deck {r['deck_mm'][0]} x {r['deck_mm'][1]} mm, wheels {r['wheel_d']} mm")
+    print("files:", ", ".join(f"{f}.stl/.step" for f in r["files"]))
+    print("screws:", ", ".join(f"{n} x {k}" for k, n in r["screws"].items()))
+    for w in r["warnings"]:
+        print("check:", w)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="polyforge", description="Offline parametric CAD generation and validation.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -302,6 +326,12 @@ def build_parser() -> argparse.ArgumentParser:
     char_p.add_argument("--style", choices=("collectible", "anime", "manga", "comic", "chibi", "realistic"), default="collectible")
     char_p.add_argument("--quality", choices=("full", "fast"), default="full", help="3D detail (fast uses less VRAM)")
     char_p.set_defaults(func=_cmd_character)
+
+    robot_p = sub.add_parser("robot", help="printable robot chassis sized around real boards and motors (STEP + STL + BOM)")
+    robot_p.add_argument("spec", type=Path, nargs="?", help="robot spec JSON")
+    robot_p.add_argument("--out", type=Path, default=Path("robot"))
+    robot_p.add_argument("--list-parts", action="store_true", help="list the component library")
+    robot_p.set_defaults(func=_cmd_robot)
 
     gui_p = sub.add_parser("gui", help="start the local web GUI (stdlib http.server, no extra dependencies)")
     gui_p.add_argument("--port", type=int, default=8420)

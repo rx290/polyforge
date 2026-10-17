@@ -107,11 +107,12 @@ def generate(text: str, out_dir: Path, height_mm: float = 150.0, candidates: int
         gpu_fault = any("Memory access fault" in l or "page fault" in l for l in lines) or proc.returncode in (-6, -11, 134, 139)
         if not (gpu_fault and attempt == 1):
             break
+        env["CHAR_SEED_OFFSET"] = "1000"             # Superman faulted twice on the same seeds: new seeds for the retry
         if on_progress:
-            on_progress(0, len(stages), "GPU fault, retrying once")
+            on_progress(0, len(stages), "GPU fault, retrying once with new seeds")
     ok_line = next((l for l in lines if l.startswith("CHARACTER_OK")), "")
     if proc.returncode != 0 or not ok_line:
-        err = next((l for l in reversed(lines) if re.search(r"Error|error", l)), lines[-1] if lines else "no output")
+        err = next((l for l in reversed(lines) if re.search(r"(Error|error|fault)[: ]", l) and "Token indices" not in l), lines[-1] if lines else "no output")
         raise CharacterError(f"pipeline failed: {err[:300]}")
     stem = slug(text)
     stl, image = out_dir / f"{stem}.stl", out_dir / f"{stem}_image.png"
