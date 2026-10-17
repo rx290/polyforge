@@ -253,7 +253,7 @@ def _cmd_character(args) -> int:
 
     try:
         res = character.generate(args.text, args.out, height_mm=args.height, candidates=args.candidates,
-                                 image_model=args.image_model, quality=args.quality, on_progress=progress)
+                                 image_model=args.image_model, quality=args.quality, style=args.style, on_progress=progress)
     except character.CharacterError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -299,6 +299,7 @@ def build_parser() -> argparse.ArgumentParser:
     char_p.add_argument("--height", type=float, default=150.0, help="figure height in mm (default 150)")
     char_p.add_argument("--candidates", type=int, default=4, help="images to draw; a local vision model keeps the most printable (default 4)")
     char_p.add_argument("--image-model", choices=("flux", "sdxl"), default="flux", help="flux: better hands/faces, slower; sdxl: fast draft")
+    char_p.add_argument("--style", choices=("collectible", "anime", "manga", "comic", "chibi", "realistic"), default="collectible")
     char_p.add_argument("--quality", choices=("full", "fast"), default="full", help="3D detail (fast uses less VRAM)")
     char_p.set_defaults(func=_cmd_character)
 

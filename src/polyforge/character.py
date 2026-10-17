@@ -63,7 +63,7 @@ def available() -> tuple[bool, str]:
 
 
 def generate(text: str, out_dir: Path, height_mm: float = 150.0, candidates: int = 4,
-             image_model: str = "flux", quality: str = "full", on_progress=None,
+             image_model: str = "flux", quality: str = "full", style: str = "collectible", on_progress=None,
              timeout: float = 5400.0) -> CharacterResult:
     """Run the pipeline for one description. Blocks; `on_progress(done, total, label)` gets stage updates."""
     text = (text or "").strip()
@@ -79,7 +79,7 @@ def generate(text: str, out_dir: Path, height_mm: float = 150.0, candidates: int
     script, python, cwd = pipeline_paths()
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    env = dict(os.environ, CHAR_IMAGE_MODEL=image_model, CHAR_CANDIDATES=str(max(1, int(candidates))),
+    env = dict(os.environ, CHAR_STYLE=style, CHAR_IMAGE_MODEL=image_model, CHAR_CANDIDATES=str(max(1, int(candidates))),
                HSA_OVERRIDE_GFX_VERSION=os.environ.get("HSA_OVERRIDE_GFX_VERSION", "10.3.0"),
                PYTORCH_HIP_ALLOC_CONF="expandable_segments:True")
     env["PYTHONPATH"] = os.pathsep.join(p for p in (str(Path.home() / "local-ai" / "stubs"), ".", env.get("PYTHONPATH", "")) if p)
