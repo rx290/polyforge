@@ -24,9 +24,15 @@ PARTS = {
                              holes=[(17.0, 20.5), (60.0, 20.5)], mount="flat", standoff=0.0, verify=True),
     # ---- servos (body dims; tab holes along x)
     "servo_sg90": dict(label="SG90 micro servo", size=(22.5, 12.2, 22.7), hole_d=2.0, screw="M2",
-                       holes=[(-2.65, 6.1), (25.15, 6.1)], mount="pocket", tab_span=32.3, verify=False),
+                       holes=[(-2.65, 6.1), (25.15, 6.1)], mount="pocket", tab_span=32.3, tab_z=15.9, tab_t=2.5,
+                       shaft_x=5.9, horn_hub_d=7.0, verify=False),
     "servo_mg996r": dict(label="MG996R servo", size=(40.7, 19.7, 42.9), hole_d=4.5, screw="M4",
                          holes=[(-4.4, 4.85), (-4.4, 14.85), (45.1, 4.85), (45.1, 14.85)], mount="pocket", tab_span=54.5),
+    # ---- sensors / power for small walkers
+    "hc_sr04": dict(label="HC-SR04 ultrasonic sensor", size=(45.0, 20.0, 15.0), hole_d=1.8, screw="M1.6",
+                    holes=[(1.5, 1.5), (43.5, 1.5), (1.5, 18.5), (43.5, 18.5)], mount="front", eye_d=16.0, eye_spacing=26.0, verify=True),
+    "battery_4aa": dict(label="4 x AA holder", size=(62.0, 58.0, 15.0), hole_d=0, screw=None, holes=[], mount="flat", verify=True),
+    "battery_1s_lipo_1000": dict(label="1S LiPo 1000 mAh", size=(50.0, 34.0, 10.0), hole_d=0, screw=None, holes=[], mount="flat", verify=True),
     # ---- drive motors
     "tt_motor": dict(label="TT gear motor (yellow)", size=(70.0, 22.5, 18.7), hole_d=3.2, screw="M3",
                      holes=[(12.0, 9.35), (29.5, 9.35)], mount="bracket", shaft_x=11.0, verify=True),

@@ -276,8 +276,17 @@ def _cmd_robot(args) -> int:
     if not args.spec:
         print("error: give a spec JSON (see polyforge/robot/builder.py) or --list-parts", file=sys.stderr)
         return 1
+    spec = _json.loads(args.spec.read_text())
+    if spec.get("type") == "biped":                 # 4-servo walker / roller
+        from .robot.biped import build_biped
+        r = build_biped(spec, args.out)
+        print(f"body {r['body_mm']} mm, inner {r['inner_mm']} mm")
+        for k, ok in r["fits"].items():
+            print(f"{'ok ' if ok else 'FAIL'} {k}")
+        print("files:", ", ".join(r["files"])); [print("check:", w) for w in r["warnings"]]
+        return 0 if all(r["fits"].values()) else 1
     try:
-        r = build(_json.loads(args.spec.read_text()), args.out)
+        r = build(spec, args.out)
     except (KeyError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

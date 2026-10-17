@@ -38,3 +38,12 @@ def test_overrides_win_over_the_library():
 def test_pi_hole_pattern_matches_the_datasheet():
     xs = sorted({x for x, _ in PARTS["rpi4"]["holes"]}); ys = sorted({y for _, y in PARTS["rpi4"]["holes"]})
     assert xs[1] - xs[0] == pytest.approx(58.0) and ys[1] - ys[0] == pytest.approx(49.0)
+
+
+def test_biped_parts_print_as_solids_and_every_part_fits(tmp_path):
+    from polyforge.robot.biped import build_biped
+    r = build_biped({}, tmp_path)
+    assert all(r["fits"].values())
+    for f in ("body", "lid", "leg_left", "foot_left", "wheel_left"):
+        m = trimesh.load(tmp_path / f"{f}.stl")
+        assert m.is_watertight and m.body_count == 1, f
