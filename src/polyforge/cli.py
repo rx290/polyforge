@@ -289,6 +289,20 @@ def _cmd_robot(args) -> int:
     return 0
 
 
+def _cmd_make(args) -> int:
+    from .make import make
+
+    res = make(args.text, args.out, rounds=args.rounds, lang=args.lang, on_progress=lambda d, t, l: print(f"[{d}/{t}] {l}", flush=True))
+    last = res.report["history"][-1]
+    if not res.ok:
+        print("error: no valid part after", res.rounds, "rounds; last problems:", "; ".join(last["problems"]), file=sys.stderr)
+        print("script kept at", res.script, file=sys.stderr)
+        return 1
+    print(f"OK in {res.rounds} round(s): {res.report['size_mm']} mm")
+    print(f"STEP: {res.step}\nSTL:  {res.stl}\nscript (editable): {res.script}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="polyforge", description="Offline parametric CAD generation and validation.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -332,6 +346,13 @@ def build_parser() -> argparse.ArgumentParser:
     robot_p.add_argument("--out", type=Path, default=Path("robot"))
     robot_p.add_argument("--list-parts", action="store_true", help="list the component library")
     robot_p.set_defaults(func=_cmd_robot)
+
+    make_p = sub.add_parser("make", help="describe a functional part with exact sizes, get checked CAD (STEP + STL + script)")
+    make_p.add_argument("text", help="e.g. 'a storage box 120x80x50 mm, 2 mm walls, open top, 3 equal dividers'")
+    make_p.add_argument("--out", type=Path, default=Path("made"))
+    make_p.add_argument("--rounds", type=int, default=4, help="fix-and-retry rounds (default 4)")
+    make_p.add_argument("--lang", choices=("openscad", "build123d"), default="openscad", help="openscad: most reliable with free models; build123d: also writes STEP")
+    make_p.set_defaults(func=_cmd_make)
 
     gui_p = sub.add_parser("gui", help="start the local web GUI (stdlib http.server, no extra dependencies)")
     gui_p.add_argument("--port", type=int, default=8420)
