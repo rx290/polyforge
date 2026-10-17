@@ -89,7 +89,8 @@ def generate(text: str, out_dir: Path, height_mm: float = 150.0, candidates: int
     lines: list[str] = []
     if on_progress:
         on_progress(0, len(stages), "writing the image prompt")
-    env.setdefault("HSA_ENABLE_COREDUMP", "0")   # a GPU fault must not write a 10 GB dump
+    env.setdefault("HSA_ENABLE_COREDUMP", "0")
+    env.setdefault("HSA_ENABLE_SDMA", "0")         # copy-engine page faults on RX 6000 cards during offload   # a GPU fault must not write a 10 GB dump
     for attempt in (1, 2):                         # ROCm on consumer cards hits random GPU page faults: retry once
         lines.clear()
         proc = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
