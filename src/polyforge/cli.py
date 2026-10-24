@@ -268,15 +268,49 @@ def _cmd_character(args) -> int:
 def _cmd_robot(args) -> int:
     import json as _json
     from .robot.builder import build
-    from .robot.library import PARTS
+    from .robot import catalog
     if args.list_parts:
-        for k, v in sorted(PARTS.items()):
-            print(f"{k:18s} {v['label']}{'  (verify dims)' if v.get('verify') else ''}")
+        for k in catalog.keys():
+            p = catalog.get(k)
+            print(f"{k:28s} {p['category']:10s} {p['label']}{'' if p.get('verified') else '  (unverified: measure)'}")
         return 0
+    if args.mounts:
+        from .robot import mounts as M
+        k = args.mounts
+        cat = catalog.get(k)["category"]
+        if cat == "servo":
+            parts = {f"cradle_{k}": M.servo_cradle(k, hollow_axis=args.hollow), f"u_bracket_{k}": M.servo_u_bracket(k, hollow_axis=args.hollow),
+                     f"horn_coupler_{k}": M.horn_coupler(k), f"l_joint_{k}": M.servo_l_joint(k)}
+            if args.hollow:
+                parts[f"hollow_pivot_{k}"] = M.hollow_pivot(k)
+        elif cat == "stepper":
+            parts = {f"mount_{k}": M.byj_mount(k) if "28byj" in k else M.nema_mount(k)}
+        elif cat in ("gear_motor", "dc_motor"):
+            parts = {f"mount_{k}": M.gear_motor_mount(k)}
+        elif cat == "battery":
+            parts = {f"tray_{k}": M.battery_tray(k)}
+        else:
+            base, lid, meta = M.enclosure(k)
+            parts = {f"tray_{k}": M.board_tray(k), f"enclosure_{k}": (base, meta), f"enclosure_{k}_lid": (lid, {})}
+        res = M.export_checked(parts, args.out, sheet_title=f"mounts for {k}")
+        for n, r in res.items():
+            print(f"{'ok ' if r['check']['ok'] else 'FAIL'} {n}.stl {'; '.join(r['check']['problems'])}")
+        print(f"contact sheet: {args.out / 'contact_sheet.png'}")
+        return 0 if all(r["check"]["ok"] for r in res.values()) else 1
     if not args.spec:
         print("error: give a spec JSON (see polyforge/robot/builder.py) or --list-parts", file=sys.stderr)
         return 1
     spec = _json.loads(args.spec.read_text())
+    if spec.get("type") == "quadruped":             # 12-servo SpotMicro-like walker
+        from .robot.quadruped import build_quadruped
+        r = build_quadruped(spec, args.out)
+        print(f"body {r['body_mm']} mm, femur {r['femur']} mm, tibia {r['tibia']} mm")
+        for k, ok in r["print_checks"].items():
+            print(f"{'ok ' if ok else 'FAIL'} print check {k} (x{r['print_counts'].get(k, 1)})")
+        for c in r["clashes"]:
+            print(f"FAIL clash {c['a']} / {c['b']} {c['mm3']} mm3")
+        print(f"files: {args.out}/print/*.stl, assembly.png, BOM.md, ASSEMBLY.md"); [print("check:", w) for w in r["warnings"]]
+        return 0 if all(r["print_checks"].values()) and not r["clashes"] else 1
     if spec.get("type") == "biped":                 # 4-servo walker / roller
         from .robot.biped import build_biped
         r = build_biped(spec, args.out)
@@ -284,7 +318,7 @@ def _cmd_robot(args) -> int:
         for k, ok in r["fits"].items():
             print(f"{'ok ' if ok else 'FAIL'} {k}")
         print("files:", ", ".join(r["files"])); [print("check:", w) for w in r["warnings"]]
-        return 0 if all(r["fits"].values()) else 1
+        return 0 if all(r["fits"].values()) and all(r.get("print_checks", {}).values()) else 1
     try:
         r = build(spec, args.out)
     except (KeyError, ValueError) as exc:
@@ -354,6 +388,8 @@ def build_parser() -> argparse.ArgumentParser:
     robot_p.add_argument("spec", type=Path, nargs="?", help="robot spec JSON")
     robot_p.add_argument("--out", type=Path, default=Path("robot"))
     robot_p.add_argument("--list-parts", action="store_true", help="list the component library")
+    robot_p.add_argument("--mounts", metavar="PART", help="print-checked mounts for one library part (board, servo, motor, battery)")
+    robot_p.add_argument("--hollow", action="store_true", help="with --mounts on a servo: hollow-axis joint for wires")
     robot_p.set_defaults(func=_cmd_robot)
 
     make_p = sub.add_parser("make", help="describe a functional part with exact sizes, get checked CAD (STEP + STL + script)")

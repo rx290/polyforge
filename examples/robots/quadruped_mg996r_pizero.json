@@ -1,0 +1,2 @@
+{"type": "quadruped", "name": "spotlike-mg996r", "servo": "mg996r", "controller": "rpi_zero_2w", "driver": "pca9685",
+ "regulator": "lm2596_module", "imu": "mpu6050", "battery": "lipo_2s_2200", "switch": "switch_kcd1_rocker", "shell": true}

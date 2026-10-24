@@ -1,0 +1,2 @@
+{"type": "biped", "name": "otto-like-pizero", "servo": "sg90", "controller": "rpi_zero_2w", "driver": "pca9685", "regulator": "mp1584_module",
+ "battery": "battery_18650_2s_holder", "sensor": "hc_sr04", "switch": "switch_ss12d00"}

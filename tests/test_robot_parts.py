@@ -7,7 +7,7 @@ import pytest
 from polyforge.robot import catalog
 
 FILES = sorted(catalog.PARTS_DIR.glob("*.json"))
-PARTS = [(f.name, p) for f in FILES for p in json.loads(f.read_text())["parts"]]
+PARTS = [(f.name, p) for f in FILES for p in json.loads(f.read_text()).get("parts", [])]
 CATS = {"sbc", "mcu", "camera", "servo", "stepper", "gear_motor", "dc_motor", "driver", "sensor", "power",
         "battery", "connector", "switch", "horn"}
 PCB = {"sbc", "mcu", "camera", "driver", "sensor"}

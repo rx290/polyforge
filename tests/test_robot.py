@@ -47,3 +47,38 @@ def test_biped_parts_print_as_solids_and_every_part_fits(tmp_path):
     for f in ("body", "lid", "leg_left", "foot_left", "wheel_left"):
         m = trimesh.load(tmp_path / f"{f}.stl")
         assert m.is_watertight and m.body_count == 1, f
+
+
+def test_library_keys_work_in_the_rover_builder(tmp_path):
+    r = build({"name": "z", "parts": ["rpi_zero_2w", "pca9685", "battery_18650_2s_holder"],
+               "motors": {"type": "tt_motor", "count": 2}}, tmp_path)
+    m = trimesh.load(tmp_path / "chassis.stl")
+    assert m.is_watertight and any("Zero 2" in b for b in r["bom"])
+
+
+def test_quadruped_prints_assembles_without_clashes_and_has_a_bom(tmp_path):
+    from polyforge.robot.quadruped import build_quadruped
+    r = build_quadruped({"servo": "sg90", "controller": "esp32_devkitc_v4", "battery": "battery_18650_2s_holder",
+                         "shell": True}, tmp_path)
+    assert all(r["print_checks"].values()), r["print_checks"]
+    assert r["clashes"] == []
+    assert r["print_counts"]["servo_cradle"] == 8 and r["print_counts"]["femur"] == 4
+    assert any("SG90" in b["item"] and b["qty"] == 12 for b in r["bom"])
+    assert r["wiring"]["knee_channel_mm"][0] >= 4.0
+    for f in ("assembly.png", "BOM.md", "ASSEMBLY.md", "print/contact_sheet.png"):
+        assert (tmp_path / f).stat().st_size > 500
+
+
+def test_biped_with_pi_zero_and_pca9685_fits_and_prints(tmp_path):
+    from polyforge.robot.biped import build_biped
+    r = build_biped({"controller": "rpi_zero_2w", "driver": "pca9685", "regulator": "mp1584_module",
+                     "battery": "battery_18650_2s_holder"}, tmp_path)
+    assert all(r["fits"].values()), r["fits"]
+    assert all(r["print_checks"].values()), r["print_checks"]
+    assert {d["part"] for d in r["deck"]} == {"rpi_zero_2w", "pca9685", "mp1584_module"}
+
+
+def test_cli_mounts_for_a_servo(tmp_path):
+    from polyforge.cli import main
+    assert main(["robot", "--mounts", "mg996r", "--hollow", "--out", str(tmp_path)]) == 0
+    assert (tmp_path / "cradle_mg996r.stl").exists() and (tmp_path / "hollow_pivot_mg996r.stl").exists()

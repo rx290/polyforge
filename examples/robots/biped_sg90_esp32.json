@@ -1,0 +1,2 @@
+{"type": "biped", "name": "otto-like-esp32", "servo": "sg90", "controller": "esp32_devkitc_v4", "driver": "pca9685", "regulator": "mp1584_module",
+ "battery": "lipo_2s_1000", "sensor": "hc_sr04", "switch": "switch_ss12d00"}

@@ -222,7 +222,11 @@
     "none_reason": "board has no mounting holes; the two transducers fill most of the PCB (not dimensioned in the datasheet)"
    },
    "keepouts": [],
-   "mech": {},
+   "mech": {
+    "eye_d": 16.0,
+    "eye_spacing": 26.0,
+    "eye_h": 12.0
+   },
    "weight_g": null,
    "sources": [
     {
@@ -239,7 +243,7 @@
     }
    ],
    "verified": true,
-   "notes": "45 x 20 x 15 mm overall including transducers. Datasheet gives 5 V, 15 mA, 15 degree angle. Header is 4 pin at 2.54 mm. Transducer centres and PCB thickness not dimensioned. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Second pass: no additional hole or dimension data found."
+   "notes": "45 x 20 x 15 mm overall including transducers. Datasheet gives 5 V, 15 mA, 15 degree angle. Header is 4 pin at 2.54 mm. Transducer centres and PCB thickness not dimensioned. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Second pass: no additional hole or dimension data found. Third pass: transducer can 16 mm diameter, 26 mm between centres, about 12 mm tall are the values most open enclosures (Otto-style heads) cut for; not dimensioned in the datasheet, so measure yours."
   },
   {
    "key": "mpu6050",

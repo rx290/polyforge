@@ -1,0 +1,2 @@
+{"type": "quadruped", "name": "mini-sg90", "servo": "sg90", "controller": "esp32_devkitc_v4", "driver": "pca9685",
+ "regulator": "mp1584_module", "imu": "mpu6050", "battery": "battery_18650_2s_holder", "switch": "switch_ss12d00", "shell": true}
