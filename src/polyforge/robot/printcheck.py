@@ -94,7 +94,8 @@ def check_mesh(mesh, bridge_max: float = 25.0, ledge_max: float = 3.0, bed_tol: 
             for (f0, f1), (v0, v1) in zip(adj[border], adj_edges[border]):
                 other = f1 if in_comp[f0] else f0
                 mid_z = (verts[v0][2] + verts[v1][2]) / 2
-                if centers[other][2] < mid_z - 1e-4:            # the neighbour runs down: a wall holds this edge
+                # the neighbour runs down (a wall holds this edge) or the edge sits on the bed
+                if centers[other][2] < mid_z - 1e-4 or mid_z < zmin + bed_tol:
                     anchors.append([verts[v0][:2], verts[v1][:2]])
             anchors = np.array(anchors, dtype=float).reshape(-1, 2, 2)
             sub = m.submesh([comp], append=True, repair=False)

@@ -1,0 +1,28 @@
+{
+  "group": "wires",
+  "awg": {
+    "22": {"od_pvc": null, "od_silicone": 1.6, "conductor_dia_mm": 0.645, "max_current_a_chassis": 7, "max_current_a_power_transmission": 0.92, "sources": ["https://www.powerstream.com/Wire_Size.htm", "https://openelab.io/a/s/products/22awg-silicone-electrical-wire-cable"]},
+    "24": {"od_pvc": null, "od_silicone": 1.4, "conductor_dia_mm": 0.511, "max_current_a_chassis": 3.5, "max_current_a_power_transmission": 0.577, "sources": ["https://www.powerstream.com/Wire_Size.htm", "https://openelab.io/a/s/products/24awg-silicone-electrical-wire-cable"]},
+    "26": {"od_pvc": null, "od_silicone": 1.5, "conductor_dia_mm": 0.404, "max_current_a_chassis": 2.2, "max_current_a_power_transmission": 0.361, "sources": ["https://www.powerstream.com/Wire_Size.htm", "https://core-electronics.com.au/silicone-cover-stranded-core-wire-25ft-26awg-green.html.plain.md"]},
+    "28": {"od_pvc": null, "od_silicone": 1.2, "conductor_dia_mm": 0.320, "max_current_a_chassis": 1.4, "max_current_a_power_transmission": 0.226, "sources": ["https://www.powerstream.com/Wire_Size.htm", "https://openelab.io/a/s/products/28awg-silicone-electrical-wire-cable"]}
+  },
+  "od_tolerance_mm": 0.2,
+  "servo_cables": {
+    "sg90": {"lead_length_mm": 245, "awg": null, "connector": "3-pin JR-type female, 2.54 mm pitch", "sources": ["https://www.taydaelectronics.com/electromechanical/dc-motor/sg90-servo-motor.html", "https://protosupplies.com/product/servo-motor-micro-sg90/"]},
+    "mg996r": {"lead_length_mm": null, "awg": null, "connector": null, "sources": []},
+    "extension_22awg": {"awg": 22, "sources": ["https://www.pololu.com/catalog/product/2185"]},
+    "extension_26awg": {"awg": 26, "sources": ["https://robu.in/product/60cm-servo-lead-extention-jr-26awg-1pcs"]},
+    "dupont_3way_housing_mm": {"length": 14.0, "width": 7.62, "height": 2.6, "sources": ["https://pro.maplin.co.uk/products/3-way-dupont-style-2-54mm-pin-housing"]}
+  },
+  "fill_factor": 0.4,
+  "bend_radius_factor": 10,
+  "bend_radius_factor_min_static": 5,
+  "service_loop": {"min_loop_length_mm_large_joint": 250, "arm_length_extra_fraction_range": [0.2, 0.5], "servo_scale_rule": "slack = r * theta_rad + 10 * OD (derived)", "sources": ["https://www8.garmin.com/manuals/webhelp/GUID-9C83E43A-D15D-4D48-9AF6-AF0CBFA49D98/EN-US/GUID-E3B1B7E3-E4BC-4E69-9628-0A0CE54A2471.html"]},
+  "sources": [
+    "https://www.igus.eu/flexible-cable/wiki/structure-and-shielding/bend-radius",
+    "https://expertce.com/learn-articles/nec-chapter-9-table-1-conduit-fill/",
+    "https://blog.igus.eu/knowledge-base/tag/filling",
+    "https://www.powerstream.com/Wire_Size.htm",
+    "https://www.adafruit.com/product/1196"
+  ]
+}
