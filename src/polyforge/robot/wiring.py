@@ -89,7 +89,7 @@ def channel_size(b: dict, pass_connector=False, min_size=4.0) -> tuple[float, fl
     if pass_connector:
         cw, ch = r["servo_cables"][b["servo_class"]]["connector"]
         w, h = max(w, cw + 2 * CLEAR + 0.4), max(h, ch + 2 * CLEAR + 0.4)
-    return round(w, 1), round(h, 1)
+    return math.ceil(w * 10) / 10, math.ceil(h * 10) / 10      # round up: never below the fill rule
 
 
 def min_bend_radius(b: dict) -> float:
