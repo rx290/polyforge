@@ -51,6 +51,8 @@ Every template is unit-tested and also compile-tested against the real `openscad
 
 **Photos in, mesh out.** `polyforge reconstruct-from-photos` turns a directory of overlapping photos of a real object into an STL, fully offline: COLMAP for structure-from-motion, handed off to OpenMVS for the dense reconstruction and meshing (COLMAP's own dense stage is CUDA-only with no CPU path, confirmed directly, not assumed). The result is reconstructed evidence, not editable parametric source, and it has no absolute real-world scale until you measure and rescale it against something known, same as any photogrammetry output.
 
+**Robots sized around real parts.** `polyforge robot spec.json` builds a 12-servo quadruped (MG996R or SG90), an Otto-style biped or a wheeled rover around the boards, servos and batteries I actually have: an 80-part library with datasheet sources, mounts on the real hole patterns, cable channels sized from the wire gauge, a print check on every STL (45 degree rule, no supports), an assembly clash check, a BOM and assembly notes. Details in [`docs/robot_builder.md`](docs/robot_builder.md).
+
 ## Roadmap
 
 I'm building this one phase at a time, each on its own branch, tested before it merges into main.
