@@ -1,0 +1,888 @@
+{
+ "group": "modules",
+ "parts": [
+  {
+   "key": "a4988",
+   "label": "Pololu A4988 stepper driver carrier",
+   "category": "driver",
+   "dims": {
+    "length": 20.32,
+    "width": 15.24,
+    "thickness": 1.6,
+    "height_top": null,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "breadboard-style carrier with a 16-hole 0.1 in header row; no mounting holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 1.3,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/product/1182/specs",
+     "what": "Pololu specs tab: size 0.6 x 0.8 in (fetched)"
+    },
+    {
+     "url": "https://www.pololu.com/product/1182",
+     "what": "Pololu product page (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Official size 0.6 x 0.8 in = 15.24 x 20.32 mm (length is the long edge). PCB thickness and tallest component height not given in fetched text, so null. Header pin pitch 2.54 mm. Motor supply 8 to 35 V, 1 A per phase without heatsink (2 A max). Weight 1.3 g without headers. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source."
+  },
+  {
+   "key": "drv8825",
+   "label": "Pololu DRV8825 stepper driver carrier",
+   "category": "driver",
+   "dims": {
+    "length": 20.32,
+    "width": 15.24,
+    "thickness": 1.6,
+    "height_top": null,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "breadboard-style carrier with a 16-hole 0.1 in header row; no mounting holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 1.6,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/product/2133/specs",
+     "what": "Pololu specs tab: size 0.6 x 0.8 in (fetched)"
+    },
+    {
+     "url": "https://www.pololu.com/product/2133",
+     "what": "Pololu product page (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Official size 0.6 x 0.8 in = 15.24 x 20.32 mm (length is the long edge). PCB thickness and tallest component height not given in fetched text, so null. Header pin pitch 2.54 mm. Pololu says the DRV8825 carrier matches A4988 size in most respects. Motor supply 8.2 to 45 V, 1.5 A per phase (2.2 A max). Weight 1.6 g without headers. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source."
+  },
+  {
+   "key": "tb6612fng",
+   "label": "Pololu TB6612FNG dual motor driver carrier",
+   "category": "driver",
+   "dims": {
+    "length": 20.32,
+    "width": 15.24,
+    "thickness": 1.6,
+    "height_top": null,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "breadboard-style carrier with a 16-hole 0.1 in header row; no mounting holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 1.5,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/product/713/specs",
+     "what": "Pololu specs tab: size 0.6 x 0.8 in (fetched)"
+    },
+    {
+     "url": "https://www.pololu.com/product/713",
+     "what": "Pololu product page (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Official size 0.6 x 0.8 in = 15.24 x 20.32 mm (length is the long edge). PCB thickness and tallest component height not given in fetched text, so null. Header rows 0.5 in apart, 0.1 in pitch (from Pololu text). SparkFun carrier is a different board and was not measured. 4.5 to 13.5 V, 1 A continuous per channel (3 A peak). Weight 1.5 g. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source."
+  },
+  {
+   "key": "pca9685",
+   "label": "Adafruit PCA9685 16-channel PWM/servo driver",
+   "category": "driver",
+   "dims": {
+    "length": 62.23,
+    "width": 25.4,
+    "thickness": 1.6,
+    "height_top": null,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": 2.5,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.175,
+      3.175
+     ],
+     [
+      3.175,
+      22.225
+     ],
+     [
+      59.055,
+      3.175
+     ],
+     [
+      59.055,
+      22.225
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://raw.githubusercontent.com/adafruit/Adafruit-16-Channel-PWM-Servo-Driver-PCB/master/Adafruit%20PCA9685.brd",
+     "what": "Adafruit official Eagle board file: outline layer 20 and mounting hole elements (fetched, parsed)"
+    },
+    {
+     "url": "https://learn.adafruit.com/16-channel-pwm-servo-driver/downloads",
+     "what": "Adafruit fab print note: holes 2.5 mm (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Outline and holes computed from the official Eagle .brd: outline 62.23 x 25.4 mm with 3.175 mm corner radius, four 2.5 mm plated holes (3.2 pad) at 3.175 mm inset from each edge. PCB thickness and component heights not in fetched sources, so null; Adafruit 815 product page was not read. Cheap clones may differ. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source."
+  },
+  {
+   "key": "l298n_module",
+   "label": "L298N dual H-bridge module (common red board)",
+   "category": "driver",
+   "dims": {
+    "length": 43.0,
+    "width": 43.0,
+    "thickness": 1.6,
+    "height_top": 27.0,
+    "height_bottom": 2.0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      3,
+      3
+     ],
+     [
+      40,
+      3
+     ],
+     [
+      3,
+      40
+     ],
+     [
+      40,
+      40
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://store-usa.arduino.cc/products/l298-driver-for-dc-stepper-motors",
+     "what": "Arduino module listing 54 x 43 x 30 (different board; page returned 429 when fetched, figure from search)"
+    },
+    {
+     "url": "https://vetco.net/products/arduino-or-raspberry-pi-l298n-motor-driver-module-d83",
+     "what": "Vetco listing 1.70 in square x 1.16 in tall (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://vetco.net/products/arduino-or-raspberry-pi-l298n-motor-driver-module-d83",
+     "what": "Vetco 1.70 in square x 1.16 in tall, corner holes take 1/8 in screws (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Two listings agree the common red module is about 43 x 43 mm with four corner holes (Vetco screw size 1/8 in, about 3.2 mm, not a stated hole diameter); height 27 (listing, with heatsink) vs 29.5 (Vetco). Hole spacing (37 mm is folklore) not found, so positions stay empty. Arduino's own 54 x 43 x 30 board is a different design. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "hc_sr04",
+   "label": "HC-SR04 ultrasonic ranging module",
+   "category": "sensor",
+   "dims": {
+    "length": 45.0,
+    "width": 20.0,
+    "thickness": 1.6,
+    "height_top": 15.0,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "board has no mounting holes; the two transducers fill most of the PCB (not dimensioned in the datasheet)"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf",
+     "what": "ElecFreaks HC-SR04 datasheet: dimension 45*20*15 mm (fetched)"
+    },
+    {
+     "url": "https://www.sparkfun.com/products/15569",
+     "what": "SparkFun page, electrical specs (fetched)"
+    },
+    {
+     "url": "https://www.ultralibrarian.com/?p=27035",
+     "what": "third-party analysis lists 45 x 20 x 15 (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": true,
+   "notes": "45 x 20 x 15 mm overall including transducers. Datasheet gives 5 V, 15 mA, 15 degree angle. Header is 4 pin at 2.54 mm. Transducer centres and PCB thickness not dimensioned. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Second pass: no additional hole or dimension data found."
+  },
+  {
+   "key": "mpu6050",
+   "label": "GY-521 MPU-6050 breakout (generic)",
+   "category": "sensor",
+   "dims": {
+    "length": 20.5,
+    "width": 15.5,
+    "thickness": 1.6,
+    "height_top": null,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": 3.2,
+    "screw": null,
+    "positions": [],
+    "none_reason": "two holes of about 3.2 mm per the listing, but positions are not given"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 1.8,
+   "sources": [
+    {
+     "url": "https://openelab.io/products/wheeltec-gy-521-mpu-6050",
+     "what": "Wheeltec GY-521 listing: about 20.5 x 15.5 mm, two 3.2 mm holes (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Single vendor. Other GY-521 clones are quoted at about 21 x 16 mm. Hole positions unknown. Adafruit's own MPU6050 board is a different design, see mpu6050_adafruit. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Second pass: no additional hole or dimension data found."
+  },
+  {
+   "key": "mpu6050_adafruit",
+   "label": "Adafruit MPU-6050 breakout",
+   "category": "sensor",
+   "dims": {
+    "length": 26.0,
+    "width": 17.8,
+    "thickness": 1.6,
+    "height_top": 4.6,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": 2.5,
+    "screw": null,
+    "positions": [],
+    "none_reason": "four 2.5 mm holes per Adafruit text, positions not given"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 1.8,
+   "sources": [
+    {
+     "url": "https://www.adafruit.com/product/3886",
+     "what": "Adafruit product page: 26.0 x 17.8 x 4.6 mm, 1.8 g, four 2.5 mm holes (fetched)"
+    }
+   ],
+   "verified": false,
+   "notes": "Extra entry beyond the requested list. Single page; thickness vs component height not separated. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source."
+  },
+  {
+   "key": "lm2596_module",
+   "label": "LM2596 buck module (blue 43 x 21 board)",
+   "category": "driver",
+   "dims": {
+    "length": 43.0,
+    "width": 21.0,
+    "thickness": 1.6,
+    "height_top": 14.0,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": null,
+    "positions": [],
+    "none_reason": "hole positions: only '6 mm from the end' stated by one vendor, spacing and y not given"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://wiki.kamamilabs.com/extensions/JZPDFGen/pdf/KAmod LM2596-2052.pdf",
+     "what": "KAmod LM2596 module sheet: 43 x 21 x 14, holes 3 mm (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://surplustronics.co.nz/products/6943-dc-dc-adjustable-step-down-module-lm2596",
+     "what": "Surplustronics: 43 x 21 x 14, holes 6 mm from end (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Two sources agree on 43 x 21 x 14 but hole spacing is unconfirmed, so left unverified. Clones vary. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Second pass: no additional hole or dimension data found."
+  },
+  {
+   "key": "mp1584_module",
+   "label": "MP1584 mini buck module (22 x 17)",
+   "category": "driver",
+   "dims": {
+    "length": 22.0,
+    "width": 17.0,
+    "thickness": 1.6,
+    "height_top": 4.0,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "no source mentions mounting holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://45-in-1-sensor-kit.readthedocs.io/en/latest/41.mp1854en.html",
+     "what": "sensor-kit docs: 22 x 17 x 4 mm (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://sigmanortec.ro/en/step-down-module-mp1584-45-20v-to-08-20v-adjustable-3a",
+     "what": "retailer (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Listings agree on 22 x 17 x 4; one seller says 22.5 x 17.2 x 4.3. Whether holes exist is not stated, so unverified. PCB thickness 1.6 mm is the typical value, assumed, not from a fetched source. Second pass: no additional hole or dimension data found."
+  },
+  {
+   "key": "cell_18650",
+   "label": "18650 Li-ion cell (Panasonic NCR18650B)",
+   "category": "battery",
+   "dims": {
+    "length": 65.3,
+    "width": 18.5,
+    "thickness": 18.5,
+    "height_top": 18.5,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "bare cell"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 1,
+    "cell": "18650",
+    "voltage_nominal": 3.6,
+    "capacity_mah": 3250,
+    "connector": null
+   },
+   "weight_g": 48.5,
+   "sources": [
+    {
+     "url": "https://www.batteryspace.com/prod-specs/NCR18650B.pdf",
+     "what": "Panasonic NCR18650B datasheet: max 18.5 mm dia, max 65.3 mm length, max 48.5 g (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet values are maxima for this cell. The commonly quoted 18.6 x 65.2 was not confirmed. Protected cells and flat-top vs button-top differ by up to a few mm in length. Capacity is typical 3250 (min 3200)."
+  },
+  {
+   "key": "battery_18650_1s_holder",
+   "label": "Single 18650 holder (Keystone 1042P class)",
+   "category": "battery",
+   "dims": {
+    "length": 77.05,
+    "width": 20.65,
+    "thickness": null,
+    "height_top": 14.86,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "not given"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 1,
+    "cell": "18650",
+    "voltage_nominal": 3.6,
+    "capacity_mah": null,
+    "connector": "solder tabs / wire"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.futureelectronics.com/es/p/electromechanical--battery-holders-accessories/1042p-keystone-6068466",
+     "what": "Future Electronics 1042P: H 14.86, L 77.05, W 20.65 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://www.digikey.com/en/products/detail/keystone-electronics/1042/2745668",
+     "what": "DigiKey Keystone 1042 height 0.585 in (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Keystone 1042P is an SMD/tab part; wire-lead 1S holders from other makers differ. Capacity depends on the cell fitted."
+  },
+  {
+   "key": "battery_18650_2s_holder",
+   "label": "2 x 18650 holder with wire leads",
+   "category": "battery",
+   "dims": {
+    "length": 74.5,
+    "width": 40.8,
+    "thickness": null,
+    "height_top": 17.7,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "not given"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 2,
+    "cell": "18650",
+    "voltage_nominal": 7.2,
+    "capacity_mah": null,
+    "connector": "bare wire leads"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.sparkfun.com/battery-holder-2x18650-wire-leads.html",
+     "what": "SparkFun PRT-12900: 74.5 x 40.8 x 17.7 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://nkon.nl/en/2x-18650-batterijhouder-met-klemmen-en-losse-draden.html",
+     "what": "nkon: 77.5 x 40.5 x 21.5 (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Makers differ by 3 to 4 mm in length and 4 mm in height (DFRobot 77.9 x 40.1 x 21.4). Series 2S wiring assumed for the voltage; check the board. Values from search listings."
+  },
+  {
+   "key": "battery_9v",
+   "label": "9 V battery PP3 / 6LR61 (Energizer 522)",
+   "category": "battery",
+   "dims": {
+    "length": 48.5,
+    "width": 26.5,
+    "thickness": 17.5,
+    "height_top": 17.5,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "bare battery"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 6,
+    "cell": "9V",
+    "voltage_nominal": 9.0,
+    "capacity_mah": null,
+    "connector": "snap terminals"
+   },
+   "weight_g": 45.0,
+   "sources": [
+    {
+     "url": "https://data.energizer.com/pdfs/522.pdf",
+     "what": "Energizer 522 datasheet: max 48.5 x 26.5 x 17.5, terminals, 45 g typical (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet gives max/min pairs: height 46.5 to 48.5, width 24.5 to 26.5, depth 15.5 to 17.5; maxima used. Capacity depends on chemistry (alkaline vs lithium) so null."
+  },
+  {
+   "key": "battery_4aa_holder",
+   "label": "4 x AA battery holder box",
+   "category": "battery",
+   "dims": {
+    "length": 69.85,
+    "width": 63.5,
+    "thickness": null,
+    "height_top": 19.05,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "not given"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 4,
+    "cell": "AA",
+    "voltage_nominal": 6.0,
+    "capacity_mah": null,
+    "connector": "wire leads"
+   },
+   "weight_g": 34.9,
+   "sources": [
+    {
+     "url": "https://www.adafruit.com/product/830",
+     "what": "Adafruit 4xAA holder: about 2.5 x 2.75 x 0.75 in +/-0.1 in, 34.9 g (fetched)"
+    }
+   ],
+   "verified": false,
+   "notes": "Adafruit gives 2.5 x 2.75 x 0.75 in; which edge is length is assumed (2.75 in = 69.85 along the cells). Single vendor. Nominal 6 V with alkaline cells (1.5 V each)."
+  },
+  {
+   "key": "lipo_2s_1000",
+   "label": "2S LiPo 1000 mAh (typical)",
+   "category": "battery",
+   "dims": {
+    "length": 56.0,
+    "width": 30.0,
+    "thickness": 19.0,
+    "height_top": 19.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "bare pack"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 2,
+    "cell": "LiPo",
+    "voltage_nominal": 7.4,
+    "capacity_mah": 1000,
+    "connector": "JST-XH balance + vendor-dependent main (often JST-RCY, XT30 or Deans)"
+   },
+   "weight_g": 57.0,
+   "sources": [
+    {
+     "url": "https://overlander.co.uk/lipo-batteries/lipo-batteries-1000mah-7-4v-2s-30c.html",
+     "what": "Overlander 30C pack 56 x 30 x 19, 57 g (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://st.robu.in/product-tag/1000-mah-2s-lipo",
+     "what": "Robu 1000 mAh 2S 102 x 20 x 10, 51 g (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Typical only: shape varies a lot (56 x 30 x 19 vs 102 x 20 x 10). Main connector is a guess of common types, not sourced. Always measure the actual pack."
+  },
+  {
+   "key": "lipo_2s_2200",
+   "label": "2S LiPo 2200 mAh (typical)",
+   "category": "battery",
+   "dims": {
+    "length": 104.0,
+    "width": 34.0,
+    "thickness": 16.0,
+    "height_top": 16.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "bare pack"
+   },
+   "keepouts": [],
+   "mech": {
+    "cells": 2,
+    "cell": "LiPo",
+    "voltage_nominal": 7.4,
+    "capacity_mah": 2200,
+    "connector": "JST-XH balance + vendor-dependent main"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://makerselectronics.com/product/lithium-polymer-battery-7-4-v-2200-mah-25c/",
+     "what": "Makers Electronics 104 x 34 x 16 mm excl. cables (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://www.superdroidrobots.com/product=1918",
+     "what": "SuperDroid 105 x 33 x 17, 134 g (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Typical only. Listed range 86 to 105 mm long, 33 to 35 wide, 13 to 20 thick, weights 101 to 134 g, so weight is null. Measure the actual pack."
+  },
+  {
+   "key": "dc_barrel_jack_panel",
+   "label": "DC barrel jack 5.5 x 2.1 mm, panel mount",
+   "category": "power",
+   "dims": {
+    "length": 20.0,
+    "width": 11.0,
+    "thickness": 20.0,
+    "height_top": 11.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 8.0,
+    "screw": "M8 panel nut",
+    "positions": [],
+    "none_reason": "panel mount: one 8 mm hole in a wall up to 4 mm thick"
+   },
+   "keepouts": [],
+   "mech": {
+    "panel_hole_d": 8.0,
+    "max_panel": 4.0,
+    "plug": "5.5 x 2.1 mm"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.adafruit.com/product/610",
+     "what": "Adafruit panel jack: fits 2.1 mm plugs, panels up to 8 mm thick (fetched)"
+    },
+    {
+     "url": "https://www.amplifiedparts.com/node/4200",
+     "what": "vendor listings: threaded 0.5 in hole or snap-in 10.8 x 9.8 mm flatted (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Body size and hole diameter vary by series (threaded 0.5 in / 12.7 mm hole on many, Lumberg snap-in 10.8 x 9.8 mm flatted). The Kaweei datasheet linked by Adafruit was not read. All dims null. Second pass: no additional hole or dimension data found. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "switch_ss12d00",
+   "label": "SS12D00 slide switch (1P2T, through hole)",
+   "category": "switch",
+   "dims": {
+    "length": 8.6,
+    "width": 3.6,
+    "thickness": 3.5,
+    "height_top": 3.5,
+    "height_bottom": 3.5
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "PCB pins only; mount in a printed slot 8.8 x 3.8 with a 4 x 2.2 window for the lever"
+   },
+   "keepouts": [],
+   "mech": {
+    "lever_len": 4.0,
+    "pin_pitch": 2.0
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://zappee.odoo.com/shop/slide-switch-ss12d00g3-3mm-35",
+     "what": "SS12D00G3 listing: 1P2T, 0.5 A 50 V (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://www.adafruit.com/product/805",
+     "what": "Adafruit slide switch with 0.1 in pin spacing (fetched; different part)"
+    }
+   ],
+   "verified": false,
+   "notes": "No datasheet with body size found. Related SS-12D07 is 8.6 x 4.5 mm and SS-12D01 is 8.5 x 3.8 mm; the SS12D00 is not confirmed to share those. Handle height varies 2 to 7 mm by variant. Dims null. Second pass: no additional hole or dimension data found. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "switch_kcd1_rocker",
+   "label": "KCD1 rocker switch (21 x 15 mm)",
+   "category": "switch",
+   "dims": {
+    "length": 21.0,
+    "width": 15.0,
+    "thickness": null,
+    "height_top": null,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "snap-in panel cut-out, not screw holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.lcsc.com/blog/kcd1-switches-rocker-switches-guide/",
+     "what": "LCSC guide: standard cut-out 21.2 x 15.0 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://www.we-online.com/catalog/datasheet/471016264142.pdf",
+     "what": "Wurth WS-RSTV 21 x 15 body, cut-out 19.2 wide (different part) (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Cut-out sources conflict: 21.2 x 15.0 (LCSC) versus 19.2 wide for a Wurth part of the same footprint. Measure the actual switch. Height above and below panel not sourced. Second pass: no additional hole or dimension data found."
+  },
+  {
+   "key": "switch_tact_6x6",
+   "label": "6 x 6 mm tactile switch",
+   "category": "switch",
+   "dims": {
+    "length": 6.0,
+    "width": 6.0,
+    "thickness": null,
+    "height_top": 5.0,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "through-hole pins, no mounting holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.adafruit.com/product/367",
+     "what": "Adafruit tactile switch 6.0 x 6.0 x 5.0 mm (fetched)"
+    }
+   ],
+   "verified": false,
+   "notes": "Adafruit gives 6 x 6 x 5 mm without labelling which is height; the Omron datasheet it links was not read. Plunger height and pin pitch (commonly 4.5 x 6.5 mm) not confirmed. Height variants 4.3 to 12 mm exist."
+  },
+  {
+   "key": "jst_xh",
+   "label": "JST XH, 2.5 mm pitch",
+   "category": "connector",
+   "dims": {
+    "length": 12.3,
+    "width": 5.7,
+    "thickness": null,
+    "height_top": 7.75,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "crimp housing, no holes"
+   },
+   "keepouts": [],
+   "mech": {
+    "pitch": 2.5,
+    "housing": {
+     "length_formula": "(n-1)*2.5+4.8",
+     "width": 5.7,
+     "height": 7.75,
+     "plug": "XHP-n"
+    },
+    "current_a": 3.0,
+    "wire_awg": "22 (30 to 22 accepted)"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/file/0J372/JST_eXH.pdf",
+     "what": "JST XH catalog (eXH) via Pololu: housing XHP table and header table (fetched)"
+    },
+    {
+     "url": "https://pcb.mit.edu/labs/lab_01_KiCAD/eXH.pdf",
+     "what": "JST eXH second copy (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Plug housing XHP-n: A=(n-1)*2.5 contact span, C=A+4.8 overall length, 5.7 wide, 7.75 tall. Example 4 pin: 12.3 x 5.7 x 7.75. Header B?B-XH-A top entry: 5.75 deep, 9.8 mounting height, overall B=(n-1)*2.5+4.9, holes 0.9 mm. 250 V, 3 A at AWG22. Dims below are the 4 pin plug."
+  },
+  {
+   "key": "jst_ph",
+   "label": "JST PH, 2.0 mm pitch",
+   "category": "connector",
+   "dims": {
+    "length": 9.8,
+    "width": 4.5,
+    "thickness": null,
+    "height_top": 6.35,
+    "height_bottom": null
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "crimp housing, no holes"
+   },
+   "keepouts": [],
+   "mech": {
+    "pitch": 2.0,
+    "housing": {
+     "length_formula": "(n-1)*2.0+3.8",
+     "width": 4.5,
+     "height": 6.35,
+     "plug": "PHR-n"
+    },
+    "current_a": 2.0,
+    "wire_awg": "24 (32 to 24 accepted)"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/file/0J373/JST_ePH.pdf",
+     "what": "JST PH catalog (ePH) via Pololu: PHR housing and header tables (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Plug housing PHR-n: A=(n-1)*2.0, overall B=A+3.8, 4.5 wide, about 6.35 tall (read off drawing label). Example 4 pin: 9.8 x 4.5 x 6.35. Header B?B-PH-K: 6.0 deep, 8.0 mounted height, overall (n-1)*2+3.9, holes 0.7 mm. 100 V, 2 A at AWG24. Only one datasheet copy fetched, so verified from official source alone."
+  },
+  {
+   "key": "dupont_254",
+   "label": "Dupont / 2.54 mm header and housing",
+   "category": "connector",
+   "dims": {
+    "length": 2.54,
+    "width": 2.54,
+    "thickness": 14.0,
+    "height_top": 14.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "wire connector, no mount"
+   },
+   "keepouts": [],
+   "mech": {
+    "pitch": 2.54,
+    "housing": [
+     2.54,
+     2.54,
+     14.0
+    ],
+    "current_a": null,
+    "wire_awg": [
+     22,
+     28
+    ]
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/product/2982",
+     "what": "Pololu: 0.1 in (2.54 mm) pitch headers (fetched)"
+    }
+   ],
+   "verified": false,
+   "notes": "Pitch is standard 0.1 in. Housing length n*2.54 is pitch-derived (n pins per row); width 2.54 for a single row is an assumption of one pitch. Height and current rating vary by maker and no datasheet fetched, so null. Second pass: no additional hole or dimension data found. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  }
+ ]
+}

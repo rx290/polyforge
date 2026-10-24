@@ -1,0 +1,1228 @@
+{
+ "group": "actuators",
+ "parts": [
+  {
+   "key": "sg90",
+   "label": "TowerPro SG90 micro servo",
+   "category": "servo",
+   "dims": {
+    "length": 22.2,
+    "width": 11.8,
+    "thickness": 22.7,
+    "height_top": 22.7,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 2.0,
+    "screw": null,
+    "positions": [
+     [
+      -2.3,
+      5.9
+     ],
+     [
+      24.8,
+      5.9
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": 32.2,
+    "tab_thickness": 2.5,
+    "tab_z": 16.0,
+    "shaft_x": 5.9,
+    "shaft_y": 5.9,
+    "shaft_top": 29.9,
+    "spline_teeth": null,
+    "spline_od": 4.6,
+    "horn_screw": null,
+    "torque_kgcm": {
+     "4.8V": 1.8
+    },
+    "voltage": [
+     4.8,
+     null
+    ],
+    "stall_current_a": null,
+    "rotation_deg": null,
+    "gear": "plastic (not stated in sheet)"
+   },
+   "weight_g": 9.0,
+   "sources": [
+    {
+     "url": "https://static.rapidonline.com/pdf/37-1330t.pdf",
+     "what": "Rapid Online TowerPro SG90 sheet with dimensioned drawing (fetched, pdftotext + rendered)"
+    },
+    {
+     "url": "https://www.adafruit.com/product/169",
+     "what": "Adafruit SG92R page, same micro class, for context only (fetched)"
+    },
+    {
+     "url": "https://raw.githubusercontent.com/openscad/MCAD/master/servos.scad",
+     "what": "MCAD towerprosg90 module (open measured model, not official; fetched)"
+    }
+   ],
+   "verified": false,
+   "notes": "Frame: x=0 at the body end nearest the shaft, y across (0 to 11.8), z up from body bottom. Body 22.2 x 11.8 (drawing; MCAD uses 22.5). Case height 22.7 without spline (MCAD only). Tab holes d2.0 at x=-2.3 and 24.8 (spacing 27.1), y=5.9, each with an outward slot about 1.3 wide (MCAD only; drawing does not dimension holes). Tab thickness 2.5, tab underside 16.0 (drawing) vs 15.9 (MCAD), tab span 31.9 MCAD vs 32.2 drawing. Shaft 5.9 from the shaft-side end, centred across. shaft_top 29.9 (MCAD) vs sheet text 29. spline_od 4.6 is MCAD's top cylinder. Spline tooth count (21T commonly reported) and horn screw not found in any fetched source, left null. Hole data is a single open model, so unverified."
+  },
+  {
+   "key": "mg90s",
+   "label": "TowerPro MG90S micro servo (metal gear)",
+   "category": "servo",
+   "dims": {
+    "length": 22.8,
+    "width": 12.2,
+    "thickness": null,
+    "height_top": null,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 1.7,
+    "screw": "M2 self-tap",
+    "positions": [
+     [
+      -3.4,
+      6.1
+     ],
+     [
+      26.2,
+      6.1
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": 31.3,
+    "tab_thickness": null,
+    "tab_z": null,
+    "shaft_x": null,
+    "shaft_y": null,
+    "shaft_top": 30.7,
+    "spline_teeth": null,
+    "spline_od": 4.5,
+    "horn_screw": null,
+    "torque_kgcm": null,
+    "voltage": [
+     4.8,
+     6.0
+    ],
+    "stall_current_a": null,
+    "rotation_deg": null,
+    "gear": "metal"
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://waveshare.com/MG90S-Servo.htm",
+     "what": "Waveshare listing 22.8 x 12.2 x 28.5 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://blog.kpower.com/servo/630.html",
+     "what": "kpower blog listing (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://github.com/adafruit/Adafruit_CAD_Parts/tree/main/1143%20Micro%20Servo%20-%20High%20Torque%20Metal%20Gear",
+     "what": "Adafruit official CAD for product 1143 (MG90D metal gear micro servo, same case class): measured tab hole d1.7 at 29.6 spacing, overall 12 x 31.3 x 30.7 incl. tabs and spline, spline d4.5"
+    }
+   ],
+   "verified": false,
+   "notes": "No TowerPro datasheet found. Vendors list 22.8 x 12.2 x 28.5 mm but disagree on weight (12.2 vs 13.4 g) and torque (2.0 vs 1.8 kg.cm at 4.8 V, 2.2 to 2.8 at 6 V), so those are null. Mechanically close to SG90 but tab span, tab_z and spline not sourced; do not assume SG90 values. Spline teeth not found. shaft_x/shaft_y left null: the drawings do not dimension the shaft position and it was not scaled off a raster. 28.5 is the vendor overall height (taken as spline top), so height_top is null. Tab holes, tab_z and shaft position not found; SG90 values were not copied because MG90S is not documented to match. Third pass: Adafruit 1143 (MG90D) STEP shows the micro metal-gear case: tab holes 29.6 apart (d1.7), overall tab span 31.3, spline top 30.7 above the case bottom. Used as reference geometry, still unverified for the TowerPro MG90S."
+  },
+  {
+   "key": "towerpro_micro",
+   "label": "TowerPro SG92R micro servo",
+   "category": "servo",
+   "dims": {
+    "length": 23.0,
+    "width": 11.0,
+    "thickness": 29.0,
+    "height_top": 29.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "Tab hole centres and diameter are not dimensioned in any fetched drawing; left empty rather than guessed"
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": null,
+    "tab_thickness": null,
+    "tab_z": null,
+    "shaft_x": null,
+    "shaft_y": null,
+    "shaft_top": null,
+    "spline_teeth": null,
+    "spline_od": null,
+    "horn_screw": null,
+    "torque_kgcm": {
+     "4.8V": 2.5
+    },
+    "voltage": [
+     3.0,
+     6.0
+    ],
+    "stall_current_a": null,
+    "rotation_deg": 180,
+    "gear": "POM with carbon fiber"
+   },
+   "weight_g": 9.0,
+   "sources": [
+    {
+     "url": "https://www.adafruit.com/product/169",
+     "what": "Adafruit TowerPro SG92R page (fetched)"
+    },
+    {
+     "url": "https://www.rccorner.ae/towerpro-sg92r-micro-servo",
+     "what": "retailer listing 23 x 12.2 x 27 (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Chosen over MG92B because only SG92R had retail data. Vendors disagree: Adafruit 23 x 11 x 29, others 23 x 12.2 x 27 or 29; width and height uncertain. No manufacturer datasheet or drawing found; tab span, tab_z, spline not sourced. shaft_x/shaft_y left null: the drawings do not dimension the shaft position and it was not scaled off a raster."
+  },
+  {
+   "key": "mg995",
+   "label": "TowerPro MG995 standard servo",
+   "category": "servo",
+   "dims": {
+    "length": 40.0,
+    "width": 20.0,
+    "thickness": 38.0,
+    "height_top": 38.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 4.0,
+    "screw": null,
+    "positions": [
+     [
+      -4.75,
+      5.0
+     ],
+     [
+      -4.75,
+      15.0
+     ],
+     [
+      44.75,
+      5.0
+     ],
+     [
+      44.75,
+      15.0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": 54.0,
+    "tab_thickness": 2.5,
+    "tab_z": 28.0,
+    "shaft_x": null,
+    "shaft_y": 10.0,
+    "shaft_top": 42.9,
+    "spline_teeth": 25,
+    "spline_od": 6.0,
+    "horn_screw": "M3",
+    "torque_kgcm": {
+     "4.8V": 8.5,
+     "6V": 10.0
+    },
+    "voltage": [
+     4.8,
+     7.2
+    ],
+    "stall_current_a": null,
+    "rotation_deg": 120,
+    "gear": "metal, dual ball bearing"
+   },
+   "weight_g": 55.0,
+   "sources": [
+    {
+     "url": "https://www.electronicoscaldas.com/datasheet/MG995_Tower-Pro.pdf",
+     "what": "MG995 datasheet copy with dimensioned drawing (fetched)"
+    },
+    {
+     "url": "https://probots.co.in/25t-circular-metal-servo-horn-mg996r-mg995.html",
+     "what": "25T horn listing for MG996R/MG995 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://raw.githubusercontent.com/openscad/MCAD/master/servos.scad",
+     "what": "MCAD futabas3003 module: tabs 2.5 thick, 4 mm holes, 10 mm apart across, shaft 10 across and 4.9 spline height (Futaba S3003, a different servo; fetched)"
+    },
+    {
+     "url": "https://forum.pololu.com/t/power-hd-high-torque-servo-1501mg-dimensions/4148",
+     "what": "Pololu forum: standard-size servo mounting holes 49.5 mm and 10 mm apart (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Drawing: body 40 x 20, tab span 54, tab underside 28 above bottom, body top 38, overall 47.2 including horn. Sheet text says 40.7 x 19.7 x 42.9 (42.9 probably bottom to spline top, not confirmed so shaft_top is null). Tab hole positions not dimensioned. 25T from horn listings only. shaft_x/shaft_y left null: the drawings do not dimension the shaft position and it was not scaled off a raster. Frame: x=0 at the body end nearest the shaft, y across (0 to 20). Tab holes: four 4.0 mm holes on a 49.5 x 10 pattern (secondhand Pololu forum figure, diameter and 2.5 mm tab thickness from the S3003 model), centred on the body, so x = -4.75 and 44.75, y = 5 and 15. shaft_x not measurable from the drawing; S3003 model has the shaft 9.9 from the end, left null. shaft_top 42.9 = sheet height, equals case 38 + 4.9 spline (S3003 model). horn_screw M3 and spline_od 6.0 are horn-listing values (25T horns for these servos use M3, bore listed as 6 mm), not drawing values. Unverified: no official drawing dimensions the holes."
+  },
+  {
+   "key": "mg996r",
+   "label": "TowerPro MG996R standard servo",
+   "category": "servo",
+   "dims": {
+    "length": 40.3,
+    "width": 20.0,
+    "thickness": 36.6,
+    "height_top": 36.6,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 4.0,
+    "screw": null,
+    "positions": [
+     [
+      -4.6,
+      5.0
+     ],
+     [
+      -4.6,
+      15.0
+     ],
+     [
+      44.9,
+      5.0
+     ],
+     [
+      44.9,
+      15.0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": 53.6,
+    "tab_thickness": 2.5,
+    "tab_z": 26.6,
+    "shaft_x": 11.4,
+    "shaft_y": 10.0,
+    "shaft_top": 42.9,
+    "spline_teeth": 25,
+    "spline_od": 6.0,
+    "horn_screw": "M3",
+    "torque_kgcm": {
+     "4.8V": 9.4,
+     "6V": 11.0
+    },
+    "voltage": [
+     4.8,
+     7.2
+    ],
+    "stall_current_a": 2.5,
+    "rotation_deg": 120,
+    "gear": "metal, dual ball bearing"
+   },
+   "weight_g": 55.0,
+   "sources": [
+    {
+     "url": "https://courses.ece.cornell.edu/ece5990/ECE5725_Spring2020_Projects/May_15_Demo/Smart%20Lock/W_pp445_yl656/datasheet/MG996R_Tower-Pro.pdf",
+     "what": "MG996R datasheet copy with dimensioned drawing (fetched)"
+    },
+    {
+     "url": "https://makerselectronics.com/product/mg996r-servo-motor-tower-pro/",
+     "what": "retailer listing 40.7 x 19.7 x 42.9 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://raw.githubusercontent.com/openscad/MCAD/master/servos.scad",
+     "what": "MCAD futabas3003 module: tabs 2.5 thick, 4 mm holes, 10 mm apart across, shaft 10 across and 4.9 spline height (Futaba S3003, a different servo; fetched)"
+    },
+    {
+     "url": "https://forum.pololu.com/t/power-hd-high-torque-servo-1501mg-dimensions/4148",
+     "what": "Pololu forum: standard-size servo mounting holes 49.5 mm and 10 mm apart (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Drawing: body 40.3 x 20, tab span 53.6, tab underside 26.6, body top 36.6, overall 47.6 with horn. Sheet text says 40.7 x 19.7 x 42.9 so the body length differs by 0.4 between text and drawing. Stall current is at 6 V. Many clones are sold as MG996R with 13 kg.cm claims; trust only 9.4/11. 25T from horn listings, not the sheet. Tab holes not dimensioned. shaft_x/shaft_y left null: the drawings do not dimension the shaft position and it was not scaled off a raster. Frame: x=0 at the body end nearest the shaft, y across (0 to 20). Tab holes: four 4.0 mm holes on a 49.5 x 10 pattern (secondhand Pololu forum figure, diameter and 2.5 mm tab thickness from the S3003 model), centred on the body, so x = -4.6 and 44.9, y = 5 and 15. shaft_x 11.4 is scaled off the datasheet plan view (about +/-0.6) and the S3003 model has about 10. shaft_top 42.9 is the sheet height (6.3 above the 36.6 case top; horn drawn to 47.6). horn_screw M3 and spline_od 6.0 are horn-listing values (25T horns for these servos use M3, bore listed as 6 mm), not drawing values. Unverified: no official drawing dimensions the holes."
+  },
+  {
+   "key": "ds3218",
+   "label": "DSServo DS3218 digital servo (20 kg)",
+   "category": "servo",
+   "dims": {
+    "length": 40.0,
+    "width": 20.0,
+    "thickness": null,
+    "height_top": null,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 4.0,
+    "screw": null,
+    "positions": [
+     [
+      -4.75,
+      5.0
+     ],
+     [
+      -4.75,
+      15.0
+     ],
+     [
+      44.75,
+      5.0
+     ],
+     [
+      44.75,
+      15.0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": null,
+    "tab_thickness": 2.5,
+    "tab_z": null,
+    "shaft_x": null,
+    "shaft_y": 10.0,
+    "shaft_top": 40.5,
+    "spline_teeth": 25,
+    "spline_od": 6.0,
+    "horn_screw": "M3",
+    "torque_kgcm": {
+     "5V": 19.0,
+     "6.8V": 21.5
+    },
+    "voltage": [
+     4.8,
+     6.8
+    ],
+    "stall_current_a": null,
+    "rotation_deg": null,
+    "gear": "metal"
+   },
+   "weight_g": 60.0,
+   "sources": [
+    {
+     "url": "https://rcdrone.top/de/products/dsservo-ds3218-digital-servo-de",
+     "what": "retailer listing (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://thinkrobotics.com/products/ds3218-servo",
+     "what": "retailer listing (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://raw.githubusercontent.com/openscad/MCAD/master/servos.scad",
+     "what": "MCAD futabas3003 module: tabs 2.5 thick, 4 mm holes, 10 mm apart across, shaft 10 across and 4.9 spline height (Futaba S3003, a different servo; fetched)"
+    },
+    {
+     "url": "https://forum.pololu.com/t/power-hd-high-torque-servo-1501mg-dimensions/4148",
+     "what": "Pololu forum: standard-size servo mounting holes 49.5 mm and 10 mm apart (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "No official DSServo datasheet found (servodatabase.com returned 403). Retail data: 40 x 20 x 40.5, 60 g, 25T metal horn supplied. Rotation range varies by variant (180 or 270 deg). Tab span, tab_z and tab holes not sourced; 40.5 height likely includes the spline. shaft_x/shaft_y left null: the drawings do not dimension the shaft position and it was not scaled off a raster. Frame: x=0 at the body end nearest the shaft, y across (0 to 20). Tab holes: four 4.0 mm holes on a 49.5 x 10 pattern (secondhand Pololu forum figure, diameter and 2.5 mm tab thickness from the S3003 model), centred on the body, so x = -4.75 and 44.75, y = 5 and 15. DS3218 tab span 54.5 was claimed by the requester but not found in any source, so the pattern is assumed centred on a 54.5 span; 40.5 is retail overall height (likely spline top), so height_top is null. shaft_x unknown. horn_screw M3 and spline_od 6.0 are horn-listing values (25T horns for these servos use M3, bore listed as 6 mm), not drawing values. Unverified: no official drawing dimensions the holes."
+  },
+  {
+   "key": "standard_servo_size_class",
+   "label": "Standard servo size class (Futaba S3003 / MG995 size)",
+   "category": "servo",
+   "dims": {
+    "length": 40.0,
+    "width": 20.0,
+    "thickness": 38.0,
+    "height_top": 38.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "Tab hole centres and diameter are not dimensioned in any fetched drawing; left empty rather than guessed"
+   },
+   "keepouts": [],
+   "mech": {
+    "tab_span": 54.0,
+    "tab_thickness": null,
+    "tab_z": 28.0,
+    "shaft_x": null,
+    "shaft_y": null,
+    "shaft_top": null,
+    "spline_teeth": null,
+    "spline_od": null,
+    "horn_screw": null,
+    "torque_kgcm": null,
+    "voltage": null,
+    "stall_current_a": null,
+    "rotation_deg": null,
+    "gear": null
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.electronicoscaldas.com/datasheet/MG995_Tower-Pro.pdf",
+     "what": "MG995 datasheet copy with dimensioned drawing (fetched)"
+    },
+    {
+     "url": "https://courses.ece.cornell.edu/ece5990/ECE5725_Spring2020_Projects/May_15_Demo/Smart%20Lock/W_pp445_yl656/datasheet/MG996R_Tower-Pro.pdf",
+     "what": "MG996R datasheet copy with dimensioned drawing (fetched)"
+    }
+   ],
+   "verified": false,
+   "notes": "A class, not a product. Body values follow the MG995 drawing (40 x 20 x 38, tab span 54, tab_z 28); MG996R drawing is 40.3 / 53.6 / 26.6. Real units vary by about 1 mm. Use the specific part key where known. Tab holes not set for the class entry; use mg995 or mg996r."
+  },
+  {
+   "key": "horn_micro_single_arm",
+   "label": "Micro servo single arm horn (SG90/MG90S class)",
+   "category": "horn",
+   "dims": {
+    "length": 19.5,
+    "width": 7.0,
+    "thickness": 1.6,
+    "height_top": 4.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 1.0,
+    "screw": "M1.6 self-tap",
+    "positions": [],
+    "none_reason": "horn holes are given in mech.hole_pitch along the arm"
+   },
+   "keepouts": [],
+   "mech": {
+    "spline_teeth": null,
+    "spline_od": 4.6,
+    "hub_d": 7.0,
+    "hub_h": 4.0,
+    "arm_len": 15.5,
+    "hole_pitch": 2.0,
+    "hole_d": 1.0
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://static.rapidonline.com/pdf/37-1330t.pdf",
+     "what": "Rapid Online TowerPro SG90 sheet with dimensioned drawing (fetched, pdftotext + rendered)"
+    }
+   ],
+   "verified": false,
+   "notes": "Rapid SG90 drawing shows the horn but gives no horn dimensions. Entry is a placeholder so robot specs can reference the key; every number is null. Second pass: no hub OD, arm length or hole pitch found in fetched sources (MCAD sg90 model has only a spline stub). Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "horn_25t_aluminium_single_arm",
+   "label": "25T aluminium single arm horn (MG995/MG996R/DS3218 class)",
+   "category": "horn",
+   "dims": {
+    "length": 28.0,
+    "width": 10.0,
+    "thickness": 2.5,
+    "height_top": 6.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [],
+    "none_reason": "holes listed in mech along the arm"
+   },
+   "keepouts": [],
+   "mech": {
+    "spline_teeth": 25,
+    "spline_od": 6.0,
+    "hub_d": 10.0,
+    "hub_h": 6.0,
+    "arm_len": 22.0,
+    "hole_pitch": 4.0,
+    "hole_d": 3.0
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.flyingtech.co.uk/product/25t-aluminium-servo-horn-m3-28mm-single-arm-3-hole-6mm-spline/",
+     "what": "Flyingtech listing: 28 mm arm, holes 12/17.5/20 mm from centre, 6 mm spline (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://pololu.com/product/3433",
+     "what": "Pololu Power HD SR8 25T alu horn: M3 holes 15 and 19 mm from axis, 1.8 g (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Hole positions are radial distances from the shaft axis along the arm: [d,0]. Spline OD 6.0 is the listing's 'shaft size', not a measured tooth OD. Pololu SR8 variant has holes at 15 and 19 mm. Hub and hole diameter not sourced. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "horn_25t_aluminium_round",
+   "label": "25T aluminium round disc horn (MG996R class)",
+   "category": "horn",
+   "dims": {
+    "length": 20.0,
+    "width": 20.0,
+    "thickness": 4.5,
+    "height_top": 4.5,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      7.0,
+      0
+     ],
+     [
+      0,
+      7.0
+     ],
+     [
+      -7.0,
+      0
+     ],
+     [
+      0,
+      -7.0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "spline_teeth": 25,
+    "spline_od": null,
+    "hub_d": null,
+    "hub_h": null,
+    "arm_len": null,
+    "hole_pitch": 14.0,
+    "hole_d": null
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://probots.co.in/25t-circular-metal-servo-horn-mg996r-mg995.html",
+     "what": "25T circular horn listing: 20 mm OD, 4 x M3 on 14 mm pitch circle, 4.5 mm thick (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "hole_pitch is the 14 mm pitch circle diameter (holes at radius 7). Single retail listing; spline OD and hub not given."
+  },
+  {
+   "key": "28byj_48",
+   "label": "28BYJ-48 geared stepper (5 V)",
+   "category": "stepper",
+   "dims": {
+    "length": 42.0,
+    "width": 28.0,
+    "thickness": 19.0,
+    "height_top": 19.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 4.2,
+    "screw": "M4",
+    "positions": [
+     [
+      -17.5,
+      0
+     ],
+     [
+      17.5,
+      0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "body_d": 28.0,
+    "body_h": 19.0,
+    "ear_hole_spacing": 35.0,
+    "ear_hole_d": 4.2,
+    "shaft_offset": 8.0,
+    "shaft_d": 5.0,
+    "shaft_flats": 3.0,
+    "shaft_len": 6.0,
+    "boss_d": null,
+    "boss_h": 1.5
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://wiki.52pi.com/images/3/3a/Stepper-Motor-28BJY-48-Datasheet.pdf",
+     "what": "Changzhou Fulling 28BYJ48 drawing (12 V variant, same mechanics) (fetched)"
+    },
+    {
+     "url": "https://microcontroller-course.web.cern.ch/Project_Material/resources/stepd-01-data-sheet-1143075.pdf",
+     "what": "Kiatronics 28BYJ-48 5 V sheet, electrical only (fetched)"
+    },
+    {
+     "url": "https://components101.com/motors/28byj-48-stepper-motor",
+     "what": "vendor page: 28 mm dia, 19 mm tall, 35 mm hole distance (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": true,
+   "notes": "Hole positions are in a frame centred on the body axis, ears along x; shaft sits 8 mm off the body centre toward the shaft side of the ear line. length 42 = 35 + 2 x ear radius 3.5 (derived, ear radius from drawing). Drawing has an unlabelled 10 +/-0.5 dimension that was not mapped, so boss_d is null. Shaft flats 3.0 across, 5 dia, 6 long. Fulling sheet is the 12 V model; 5 V Kiatronics gives no mechanical numbers."
+  },
+  {
+   "key": "uln2003_board",
+   "label": "ULN2003 driver module for 28BYJ-48",
+   "category": "driver",
+   "dims": {
+    "length": 35.0,
+    "width": 32.0,
+    "thickness": 1.6,
+    "height_top": 12.0,
+    "height_bottom": 2.5
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      2.5,
+      2.5
+     ],
+     [
+      32.5,
+      2.5
+     ],
+     [
+      2.5,
+      29.5
+     ],
+     [
+      32.5,
+      29.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://ifuturetech.org/product/28byj-48-stepper-motor-and-uln2003-stepper-motor-driver/",
+     "what": "listing for the motor + driver kit (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "No fetched source gives module size or hole positions; clones vary. Every number null until measured. Second pass: no additional hole or dimension data found. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "nema17",
+   "label": "NEMA 17 stepper, 40 mm body (17HS4401 class)",
+   "category": "stepper",
+   "dims": {
+    "length": 42.0,
+    "width": 42.0,
+    "thickness": 40.0,
+    "height_top": 40.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      -15.5,
+      -15.5
+     ],
+     [
+      15.5,
+      -15.5
+     ],
+     [
+      -15.5,
+      15.5
+     ],
+     [
+      15.5,
+      15.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "face": 42.0,
+    "body_length": 40.0,
+    "hole_spacing": 31.0,
+    "hole_thread": "M3",
+    "hole_depth": 3.5,
+    "pilot_d": 22.0,
+    "pilot_h": 2.0,
+    "shaft_d": 5.0,
+    "shaft_len": 24.0,
+    "shaft_flat": null,
+    "face_holes": 4
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://shop.evilmadscientist.com/187",
+     "what": "Evil Mad Scientist NEMA-17: 42 mm square, 31 mm holes, M3 min 3.5 deep, 24 mm shaft (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://robocraze.com/products/nema-17-stepper-motor-3-8kg-cm-high-torque-hybrid-for-cnc-3d-printers",
+     "what": "17HS4401 listing: 40 mm body, 5 mm shaft (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://github.com/adafruit/Adafruit_CAD_Parts/tree/main/324%20NEMA-17%20Stepper%20Motor",
+     "what": "Adafruit official CAD (STEP) for product 324, measured: holes 31.0 x 31.0 (r 1.54 = M3 tap), pilot d22.0, shaft d5.0"
+    }
+   ],
+   "verified": true,
+   "notes": "Hole positions relative to shaft centre on the mounting face. hole_depth 3.5 is the minimum thread depth. Pilot (NEMA 22 mm) was not confirmed in a fetched source so it is null. 17HS4401 StepperOnline PDFs returned HTML, so no official drawing was read. Shaft length varies by maker (24 mm common, 21 mm on some 17HS4401 listings). Third pass: Adafruit's STEP model gives 31 mm M3 pattern, 22 mm pilot and 5 mm shaft, agreeing with Evil Mad Scientist; NEMA ICS 16 pilot is 22 mm (0.866 in). Body length differs by maker."
+  },
+  {
+   "key": "nema17_pancake",
+   "label": "NEMA 17 pancake stepper, 22 mm body",
+   "category": "stepper",
+   "dims": {
+    "length": 42.0,
+    "width": 42.0,
+    "thickness": 22.0,
+    "height_top": 22.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      -15.5,
+      -15.5
+     ],
+     [
+      15.5,
+      -15.5
+     ],
+     [
+      -15.5,
+      15.5
+     ],
+     [
+      15.5,
+      15.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "face": 42.0,
+    "body_length": 22.0,
+    "hole_spacing": 31.0,
+    "hole_thread": "M3",
+    "hole_depth": null,
+    "pilot_d": 22.0,
+    "pilot_h": null,
+    "shaft_d": 5.0,
+    "shaft_len": null,
+    "shaft_flat": null,
+    "face_holes": 4
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.bondtech.se/en/product/nema17-pancake-stepper-22mm/",
+     "what": "Bondtech 22 mm pancake: 31 mm M3 pattern, 22 mm body, 5 mm D shaft (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Single vendor. Body length 20 to 23 mm in the market. Shaft length not sourced (Bondtech lists an 18 mm D-shaft section only for its own model). Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "nema14",
+   "label": "NEMA 14 stepper, 34 mm body (14HS13 class)",
+   "category": "stepper",
+   "dims": {
+    "length": 35.0,
+    "width": 35.0,
+    "thickness": 34.0,
+    "height_top": 34.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      -13,
+      -13
+     ],
+     [
+      13,
+      -13
+     ],
+     [
+      -13,
+      13
+     ],
+     [
+      13,
+      13
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "face": 35.0,
+    "body_length": 34.0,
+    "hole_spacing": 26.0,
+    "hole_thread": "M3",
+    "hole_depth": null,
+    "pilot_d": 22.0,
+    "pilot_h": null,
+    "shaft_d": 5.0,
+    "shaft_len": 24.0,
+    "shaft_flat": 16.5,
+    "face_holes": 4
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://vxb.com/products/nema-14-bipolar-stepper-motor-08a-255ozin18ncm-3d",
+     "what": "14HS13-0804S: 35 mm frame, 34 mm body, 5 mm shaft, 24 mm long, D cut 16.5 (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://novanta.com/robotics-automation/wp-content/uploads/sites/3/2026/01/Nema14_motors_2022.pdf",
+     "what": "Novanta NEMA 14 catalog: 26 mm square mounting, 22 mm centring (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Body length varies (28 to 34+ mm). Hole thread assumed M3 is not stated in the sources, so treat 'M3' as unconfirmed. shaft_flat is the D-cut length. Neither source is a drawing I read. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  },
+  {
+   "key": "n20",
+   "label": "N20 micro metal gearmotor (Pololu 10x12 mm)",
+   "category": "gear_motor",
+   "dims": {
+    "length": 25.6,
+    "width": 12.0,
+    "thickness": 10.0,
+    "height_top": 10.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 1.6,
+    "screw": "M1.6",
+    "positions": [
+     [
+      -4.5,
+      0.0
+     ],
+     [
+      4.5,
+      0.0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "shaft_d": 3.0,
+    "shaft_flat": 2.5,
+    "shaft_len": 10.0,
+    "shaft_pos": [
+     0.0,
+     6.0,
+     5.0
+    ],
+    "shaft_axis": "x",
+    "face_holes": [
+     [
+      -4.5,
+      0.0
+     ],
+     [
+      4.5,
+      0.0
+     ]
+    ],
+    "face_hole_thread": "M1.6",
+    "can_d": null,
+    "can_flats": "10 x 12 mm obround case",
+    "gearbox_len": 9.0,
+    "voltage": [
+     null,
+     6.0
+    ],
+    "rpm": 45,
+    "stall_current_a": 0.36
+   },
+   "weight_g": 9.5,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/file/0J1487/micro-metal-gearmotor-dimension-diagram.pdf",
+     "what": "Pololu Micro Metal Gearmotors datasheet incl. dimension drawings, rev 6.2 (fetched, rendered)"
+    },
+    {
+     "url": "https://www.pololu.com/product/1094",
+     "what": "Pololu 298:1 Micro Metal Gearmotor LP 6V (fetched)"
+    },
+    {
+     "url": "https://www.pololu.com/product/1094/specs",
+     "what": "Pololu specs tab (fetched)"
+    }
+   ],
+   "verified": true,
+   "notes": "Official Pololu drawing (precious-metal-brush, no encoder): face 12 x 10, gearbox L=9 (12.5 for 1000:1), motor 15 long, OL max 25.6 (29.1 for 1000:1), 3.0 D-shaft 2.5 across flat, 10 long from gearbox plate, shaft centred on the face. Two M1.6 holes at +/-4.5 from the shaft centre along the 12 mm width, at shaft height. Body frame: x along the axis from the gearbox face, y across 12, z across 10; shaft_pos [0,6,5]. Carbon-brush HPCB variants are slightly different (terminals). Electrical figures belong to the 298:1 LP 6 V variant."
+  },
+  {
+   "key": "tt_motor",
+   "label": "TT gearbox motor yellow 1:48",
+   "category": "gear_motor",
+   "dims": {
+    "length": 70.0,
+    "width": 22.0,
+    "thickness": 18.0,
+    "height_top": 18.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [],
+    "none_reason": "through holes are given as mech.face_holes in the shaft frame"
+   },
+   "keepouts": [],
+   "mech": {
+    "shaft_d": 5.4,
+    "shaft_flat": 3.7,
+    "shaft_len": 36.6,
+    "shaft_pos": [
+     0,
+     0,
+     0
+    ],
+    "shaft_axis": "y",
+    "face_holes": [
+     [
+      -8.8,
+      -20.6
+     ],
+     [
+      8.8,
+      -20.6
+     ],
+     [
+      0.0,
+      14.0
+     ]
+    ],
+    "face_hole_thread": "M3 through bolt (3.0 hole)",
+    "can_d": null,
+    "can_flats": null,
+    "gearbox_len": null,
+    "voltage": [
+     3.0,
+     6.0
+    ],
+    "rpm": 250,
+    "stall_current_a": 1.5,
+    "nub": {
+     "d": 4.0,
+     "pos": [
+      0.0,
+      -11.2
+     ],
+     "side": "-y"
+    },
+    "body_from_shaft": [
+     -54.6,
+     16.0
+    ],
+    "body_width": 22.4
+   },
+   "weight_g": 30.6,
+   "sources": [
+    {
+     "url": "https://www.adafruit.com/product/3777",
+     "what": "Adafruit DC Gearbox TT Motor 1:48 (fetched)"
+    },
+    {
+     "url": "https://github.com/adafruit/Adafruit_CAD_Parts/tree/main/3777%20TT%20Motor",
+     "what": "Adafruit official CAD (STEP) for product 3777, measured with build123d: shaft axis to body ends -54.6/+16.0, through holes d3.0 at (+/-8.8, -20.6) and (0, +14.0), 4 mm locating nub at (0, -11.2)"
+    }
+   ],
+   "verified": false,
+   "notes": "Adafruit: 70 x 22 x 18 mm, 30.6 g, 250 rpm no load at 6 V, 1.5 A stall at 6 V, 0.8 kg.cm stall at 6 V (0.4 at 3 V). Dual output axle. Shaft size and holes need the Adafruit diagram, not read. Second pass: no spacing found; teardown says two through holes beside the gearbox screws, shaft is double-D on both sides. Adafruit diagram PDF not retrievable. Third pass: hole pattern and shaft measured from Adafruit's own STEP model (face_holes are [x across the body, z along the body] from the output shaft axis; the long gearbox/motor end is -z). Spacing 17.6 matches the 17.5 commonly quoted by sellers. Double-D shaft 5.4 x 3.7 is the common value; the STEP shows a 5.4 cylinder."
+  },
+  {
+   "key": "motor_130",
+   "label": "130-size brushed DC motor (FA/RF-130 class)",
+   "category": "dc_motor",
+   "dims": {
+    "length": 25.0,
+    "width": 15.0,
+    "thickness": 20.0,
+    "height_top": 20.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "no mechanical drawing found (Mabuchi PDFs returned errors)"
+   },
+   "keepouts": [],
+   "mech": {
+    "shaft_d": 2.0,
+    "shaft_flat": null,
+    "shaft_len": null,
+    "shaft_pos": [
+     null,
+     null,
+     null
+    ],
+    "shaft_axis": "z",
+    "face_holes": null,
+    "face_hole_thread": null,
+    "can_d": 20.0,
+    "can_flats": 15.0,
+    "gearbox_len": null,
+    "voltage": [
+     3.0,
+     12.0
+    ],
+    "rpm": 11500,
+    "stall_current_a": 0.8
+   },
+   "weight_g": 18.0,
+   "sources": [
+    {
+     "url": "https://www.pololu.com/product/1117/specs",
+     "what": "Pololu 130-size motor: 25 x 15 x 20, 2 mm shaft (fetched)"
+    },
+    {
+     "url": "https://pololu.com/product/77/specs",
+     "what": "Pololu Tamiya FA-130 listing (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://github.com/adafruit/Adafruit_CAD_Parts/tree/main/711%20DC%20Toy%20Motor",
+     "what": "Adafruit official CAD (STEP) for product 711 DC toy motor (130 size): can 20 across round, 15 across flats, 2 mm shaft, 38 mm including shaft"
+    }
+   ],
+   "verified": true,
+   "notes": "Numbers are Pololu #1117 (rpm and stall at 6 V). Genuine Mabuchi FA-130 is different: about 12300 rpm and 2.1 A stall at 3 V. No Mabuchi drawing obtained so boss, can flats, hole pattern are null. Third pass: Adafruit STEP agrees with Pololu on 20 x 15 can and 2 mm shaft."
+  },
+  {
+   "key": "motor_180",
+   "label": "180-size brushed DC motor (FK/FF-180 class)",
+   "category": "dc_motor",
+   "dims": {
+    "length": 20.2,
+    "width": 15.4,
+    "thickness": null,
+    "height_top": null,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": null,
+    "positions": [],
+    "none_reason": "no drawing found"
+   },
+   "keepouts": [],
+   "mech": {
+    "shaft_d": 2.0,
+    "shaft_flat": null,
+    "shaft_len": 7.0,
+    "shaft_pos": [
+     null,
+     null,
+     null
+    ],
+    "shaft_axis": null,
+    "face_holes": null,
+    "face_hole_thread": null,
+    "can_d": null,
+    "can_flats": null,
+    "gearbox_len": null,
+    "voltage": null,
+    "rpm": null,
+    "stall_current_a": null
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.ebay.de/itm/263434660670",
+     "what": "seller listing 20.25 x 15.35 x 32 mm, 2 mm shaft (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "Seller data only; 32 mm overall probably includes shaft and terminals, so body length is null. Shaft length is 7 to 9 mm depending on model. No Mabuchi RF-180 data found."
+  },
+  {
+   "key": "jga25_370",
+   "label": "JGA25-370 gear motor",
+   "category": "gear_motor",
+   "dims": {
+    "length": 55.0,
+    "width": 25.0,
+    "thickness": 25.0,
+    "height_top": 25.0,
+    "height_bottom": 0
+   },
+   "holes": {
+    "diameter": 3.0,
+    "screw": "M3",
+    "positions": [
+     [
+      -8.5,
+      0.0
+     ],
+     [
+      8.5,
+      0.0
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [],
+   "mech": {
+    "shaft_d": 4.0,
+    "shaft_flat": 3.5,
+    "shaft_len": 12.1,
+    "shaft_pos": [
+     null,
+     null,
+     null
+    ],
+    "shaft_axis": null,
+    "face_holes": [
+     [
+      -8.5,
+      0.0
+     ],
+     [
+      8.5,
+      0.0
+     ]
+    ],
+    "face_hole_thread": "M3",
+    "can_d": 24.4,
+    "can_flats": null,
+    "gearbox_len": null,
+    "voltage": null,
+    "rpm": null,
+    "stall_current_a": null
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://rcdrone.top/products/jga25-370-dc-gear-motor",
+     "what": "listing with drawing values (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://zbotic.in/?p=450659",
+     "what": "second listing (found via web search listing, page not fetched directly)"
+    },
+    {
+     "url": "https://makerselectronics.com/product/jga25-370-dc-gear-motor-12v-210rpm/",
+     "what": "reseller listing: 2 x M3, 4.5 deep, 17 mm centres, 7 mm x 2.5 locating boss (found via web search listing, page not fetched directly)"
+    }
+   ],
+   "verified": false,
+   "notes": "4 mm D shaft, 3.5 across flat, flat 8 mm long; shaft projects 12.1 mm from gearbox face including a 2.5 mm boss. Gearbox 25 dia, length 17 to 27 mm by ratio (null). Motor can 24.4 x 30.8 (24 +/-0.5 x 31 on another listing). Mounting holes assumed M3 by sellers, unconfirmed here. Second pass: front face two M3 holes 4.5 deep on 17 mm centres (three resellers agree, no drawing PDF found), placed symmetric about the shaft. Locating boss 7 mm dia x 2.5 mm. Rear face may have a 6.4 mm boss. Still reseller data only. Third pass: Typical value from common community measurements and seller listings, NOT an official drawing (generic clone part). Measure yours and override."
+  }
+ ]
+}

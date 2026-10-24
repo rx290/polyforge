@@ -17,3 +17,6 @@ polyforge = "polyforge.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"polyforge.robot" = ["parts/*.json", "parts/*.md"]

@@ -1,0 +1,3063 @@
+{
+ "group": "boards",
+ "parts": [
+  {
+   "key": "rpi3b",
+   "label": "Raspberry Pi 3 Model B",
+   "category": "sbc",
+   "aliases": [
+    "rpi3"
+   ],
+   "dims": {
+    "length": 85.0,
+    "width": 56.0,
+    "thickness": 1.4,
+    "height_top": 16.0,
+    "height_bottom": 1.5
+   },
+   "holes": {
+    "diameter": 2.7,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      52.5
+     ],
+     [
+      61.5,
+      52.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "GPIO 2x20 header",
+     "face": "top",
+     "box": [
+      7.1,
+      49.96,
+      0,
+      57.9,
+      55.04,
+      8.5
+     ]
+    },
+    {
+     "name": "Ethernet RJ45",
+     "face": "+x",
+     "box": [
+      66.0,
+      2.25,
+      0,
+      88.0,
+      18.25,
+      13.5
+     ]
+    },
+    {
+     "name": "USB-A stack 1",
+     "face": "+x",
+     "box": [
+      70.4,
+      22.45,
+      0,
+      88.0,
+      35.55,
+      16.0
+     ]
+    },
+    {
+     "name": "USB-A stack 2",
+     "face": "+x",
+     "box": [
+      70.4,
+      40.45,
+      0,
+      88.0,
+      53.55,
+      16.0
+     ]
+    },
+    {
+     "name": "HDMI",
+     "face": "-y",
+     "box": [
+      24.5,
+      -1.5,
+      0,
+      39.5,
+      11.0,
+      6.5
+     ]
+    },
+    {
+     "name": "micro-USB power",
+     "face": "-y",
+     "box": [
+      6.6,
+      -1.5,
+      0,
+      14.6,
+      5.6,
+      2.5
+     ]
+    },
+    {
+     "name": "3.5mm AV jack",
+     "face": "-y",
+     "box": [
+      50.0,
+      -2.0,
+      0,
+      57.0,
+      12.0,
+      6.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      43.2,
+      7.0,
+      0,
+      46.5,
+      22.5,
+      5.5
+     ]
+    },
+    {
+     "name": "DSI display FPC",
+     "face": "top",
+     "box": [
+      1.7,
+      17.5,
+      0,
+      5.2,
+      36.0,
+      5.5
+     ]
+    },
+    {
+     "name": "microSD slot (underside, position estimated)",
+     "face": "-x",
+     "box": [
+      -3.0,
+      22.0,
+      -3.0,
+      12.0,
+      34.0,
+      0.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 41.2,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi3/raspberry-pi-3-b-mechanical-drawing.pdf",
+     "what": "official mechanical drawing (Z heights; outline identical to 3B+ drawing)"
+    },
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi3/raspberry-pi-3-b-plus-mechanical-drawing.pdf",
+     "what": "official 3B+ drawing, same outline and holes"
+    },
+    {
+     "url": "https://www.adafruit.com/product/3055",
+     "what": "Adafruit weight 41.2 g"
+    }
+   ],
+   "verified": true,
+   "notes": "Connector boxes measured off the official drawing (1:1 scale pixels), heights from the drawing Z labels (USB 16.0, Ethernet 13.5, HDMI 6.5, audio 6.0, FPC 5.5, GPIO 8.5); micro-USB power height 2.5 and microSD slot box are estimates (not dimensioned). height_bottom 1.5 is an estimate for solder tails and the SD slot. Official outline 85 x 56, corner radius 3.0, holes on 58 x 49 pattern. GPIO along the +y edge, USB/Ethernet on +x. The 3B drawing PDF only contains Z-height labels as text; XY dimensions taken from the 3B+ drawing since the board layout is identical."
+  },
+  {
+   "key": "rpi3b_plus",
+   "label": "Raspberry Pi 3 Model B+",
+   "category": "sbc",
+   "dims": {
+    "length": 85.0,
+    "width": 56.0,
+    "thickness": 1.4,
+    "height_top": 16.0,
+    "height_bottom": 1.5
+   },
+   "holes": {
+    "diameter": 2.7,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      52.5
+     ],
+     [
+      61.5,
+      52.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "GPIO 2x20 header",
+     "face": "top",
+     "box": [
+      7.1,
+      49.96,
+      0,
+      57.9,
+      55.04,
+      8.5
+     ]
+    },
+    {
+     "name": "Ethernet RJ45",
+     "face": "+x",
+     "box": [
+      66.0,
+      2.25,
+      0,
+      88.0,
+      18.25,
+      13.5
+     ]
+    },
+    {
+     "name": "USB-A stack 1",
+     "face": "+x",
+     "box": [
+      70.4,
+      22.45,
+      0,
+      88.0,
+      35.55,
+      16.0
+     ]
+    },
+    {
+     "name": "USB-A stack 2",
+     "face": "+x",
+     "box": [
+      70.4,
+      40.45,
+      0,
+      88.0,
+      53.55,
+      16.0
+     ]
+    },
+    {
+     "name": "HDMI",
+     "face": "-y",
+     "box": [
+      24.5,
+      -1.5,
+      0,
+      39.5,
+      11.0,
+      6.5
+     ]
+    },
+    {
+     "name": "micro-USB power",
+     "face": "-y",
+     "box": [
+      6.6,
+      -1.5,
+      0,
+      14.6,
+      5.6,
+      2.5
+     ]
+    },
+    {
+     "name": "3.5mm AV jack",
+     "face": "-y",
+     "box": [
+      50.0,
+      -2.0,
+      0,
+      57.0,
+      12.0,
+      6.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      43.2,
+      7.0,
+      0,
+      46.5,
+      22.5,
+      5.5
+     ]
+    },
+    {
+     "name": "DSI display FPC",
+     "face": "top",
+     "box": [
+      1.7,
+      17.5,
+      0,
+      5.2,
+      36.0,
+      5.5
+     ]
+    },
+    {
+     "name": "microSD slot (underside, position estimated)",
+     "face": "-x",
+     "box": [
+      -3.0,
+      22.0,
+      -3.0,
+      12.0,
+      34.0,
+      0.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 49.7,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi3/raspberry-pi-3-b-plus-mechanical-drawing.pdf",
+     "what": "official mechanical drawing"
+    },
+    {
+     "url": "https://www.adafruit.com/product/3775",
+     "what": "Adafruit weight 49.7 g (listed 87 x 58.5 x 18 mm overall)"
+    }
+   ],
+   "verified": true,
+   "notes": "Connector boxes measured off the official drawing (1:1 scale pixels), heights from the drawing Z labels (USB 16.0, Ethernet 13.5, HDMI 6.5, audio 6.0, FPC 5.5, GPIO 8.5); micro-USB power height 2.5 and microSD slot box are estimates (not dimensioned). height_bottom 1.5 is an estimate for solder tails and the SD slot. Official outline 85 x 56, corner radius 3.0, holes on 58 x 49 pattern. GPIO along the +y edge, USB/Ethernet on +x."
+  },
+  {
+   "key": "rpi4b",
+   "label": "Raspberry Pi 4 Model B",
+   "category": "sbc",
+   "aliases": [
+    "rpi4"
+   ],
+   "dims": {
+    "length": 85.0,
+    "width": 56.0,
+    "thickness": 1.4,
+    "height_top": 16.0,
+    "height_bottom": 1.5
+   },
+   "holes": {
+    "diameter": 2.7,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      52.5
+     ],
+     [
+      61.5,
+      52.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "GPIO 2x20 header",
+     "face": "top",
+     "box": [
+      7.1,
+      49.96,
+      0,
+      57.9,
+      55.04,
+      8.5
+     ]
+    },
+    {
+     "name": "Ethernet RJ45",
+     "face": "+x",
+     "box": [
+      66.4,
+      37.75,
+      0,
+      88.1,
+      53.75,
+      13.5
+     ]
+    },
+    {
+     "name": "USB-A stack (USB 3.0 pair)",
+     "face": "+x",
+     "box": [
+      70.2,
+      20.4,
+      0,
+      88.1,
+      33.6,
+      16.0
+     ]
+    },
+    {
+     "name": "USB-A stack 2",
+     "face": "+x",
+     "box": [
+      70.2,
+      2.4,
+      0,
+      88.1,
+      15.6,
+      16.0
+     ]
+    },
+    {
+     "name": "USB-C power",
+     "face": "-y",
+     "box": [
+      6.7,
+      -1.5,
+      0,
+      15.7,
+      7.0,
+      3.2
+     ]
+    },
+    {
+     "name": "micro-HDMI 0",
+     "face": "-y",
+     "box": [
+      22.75,
+      -1.0,
+      0,
+      29.25,
+      6.5,
+      3.0
+     ]
+    },
+    {
+     "name": "micro-HDMI 1",
+     "face": "-y",
+     "box": [
+      36.25,
+      -1.0,
+      0,
+      42.75,
+      6.5,
+      3.0
+     ]
+    },
+    {
+     "name": "3.5mm AV jack",
+     "face": "-y",
+     "box": [
+      50.0,
+      -1.5,
+      0,
+      57.0,
+      11.5,
+      6.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      44.8,
+      7.0,
+      0,
+      47.2,
+      22.5,
+      5.5
+     ]
+    },
+    {
+     "name": "DSI display FPC",
+     "face": "top",
+     "box": [
+      2.0,
+      16.3,
+      0,
+      5.0,
+      35.0,
+      5.5
+     ]
+    },
+    {
+     "name": "microSD slot (underside, position estimated)",
+     "face": "-x",
+     "box": [
+      -3.0,
+      18.5,
+      -3.0,
+      12.0,
+      30.5,
+      0.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi4/raspberry-pi-4-mechanical-drawing.pdf",
+     "what": "official mechanical drawing"
+    },
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi3/raspberry-pi-3-b-plus-mechanical-drawing.pdf",
+     "what": "cross-check: same outline, holes and 58 x 49 pattern as 3B+"
+    }
+   ],
+   "verified": true,
+   "notes": "Connector boxes measured off the official drawing (1:1 scale pixels), heights from the drawing Z labels (USB 16.0, Ethernet 13.5, HDMI 6.5, audio 6.0, FPC 5.5, GPIO 8.5); micro-USB power height 2.5 and microSD slot box are estimates (not dimensioned). height_bottom 1.5 is an estimate for solder tails and the SD slot. Official outline 85 x 56, corner radius 3.0, holes on 58 x 49 pattern. GPIO along the +y edge, USB/Ethernet on +x. WARNING: the official Pi 4 drawing places the Ethernet jack on the +y (GPIO) side with USB stacks centred at y=9 and y=27; the 3B+ and Pi 5 drawings put Ethernet at y=10.25/10.2 and USB at 29/47. Boxes here follow the Pi 4 drawing literally; check against a physical board before cutting enclosure walls. microSD slot y centred 24.5 is read from a drawing label and is approximate."
+  },
+  {
+   "key": "rpi5",
+   "label": "Raspberry Pi 5",
+   "category": "sbc",
+   "dims": {
+    "length": 85.0,
+    "width": 56.0,
+    "thickness": 1.4,
+    "height_top": 16.0,
+    "height_bottom": 1.5
+   },
+   "holes": {
+    "diameter": 2.7,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      52.5
+     ],
+     [
+      61.5,
+      52.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "GPIO 2x20 header",
+     "face": "top",
+     "box": [
+      7.1,
+      49.96,
+      0,
+      57.9,
+      55.04,
+      8.5
+     ]
+    },
+    {
+     "name": "Ethernet RJ45",
+     "face": "+x",
+     "box": [
+      66.4,
+      2.2,
+      0,
+      88.1,
+      18.2,
+      13.5
+     ]
+    },
+    {
+     "name": "USB-A stack (USB 3.0)",
+     "face": "+x",
+     "box": [
+      70.2,
+      22.5,
+      0,
+      88.1,
+      35.7,
+      16.0
+     ]
+    },
+    {
+     "name": "USB-A stack (USB 2.0)",
+     "face": "+x",
+     "box": [
+      70.2,
+      40.4,
+      0,
+      88.1,
+      53.6,
+      16.0
+     ]
+    },
+    {
+     "name": "USB-C power",
+     "face": "-y",
+     "box": [
+      6.7,
+      -1.5,
+      0,
+      15.7,
+      7.0,
+      3.2
+     ]
+    },
+    {
+     "name": "micro-HDMI 0",
+     "face": "-y",
+     "box": [
+      22.5,
+      -1.0,
+      0,
+      29.1,
+      6.5,
+      3.4
+     ]
+    },
+    {
+     "name": "micro-HDMI 1",
+     "face": "-y",
+     "box": [
+      35.9,
+      -1.0,
+      0,
+      42.5,
+      6.5,
+      3.4
+     ]
+    },
+    {
+     "name": "CSI/DSI FPC 1",
+     "face": "top",
+     "box": [
+      47.0,
+      0.5,
+      0,
+      50.5,
+      17.5,
+      5.0
+     ]
+    },
+    {
+     "name": "CSI/DSI FPC 2",
+     "face": "top",
+     "box": [
+      53.8,
+      0.5,
+      0,
+      57.5,
+      17.5,
+      5.0
+     ]
+    },
+    {
+     "name": "PCIe FPC",
+     "face": "top",
+     "box": [
+      0.5,
+      24.0,
+      0,
+      5.0,
+      35.0,
+      5.0
+     ]
+    },
+    {
+     "name": "microSD slot (underside, position estimated)",
+     "face": "-x",
+     "box": [
+      -3.0,
+      18.5,
+      -3.0,
+      12.0,
+      30.5,
+      0.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-mechanical-drawing.pdf",
+     "what": "official mechanical drawing"
+    },
+    {
+     "url": "https://datasheets.raspberrypi.com/rpi3/raspberry-pi-3-b-plus-mechanical-drawing.pdf",
+     "what": "cross-check: same outline and 58 x 49 hole pattern"
+    }
+   ],
+   "verified": true,
+   "notes": "Official Pi 5 drawing: 85 x 56, holes 3.5 from edges on 58 x 49 pattern, dia 2.7, USB centres at y=29.1 and 47, Ethernet centre 10.2, USB-C at x=11.2, micro-HDMI at x=25.8 and 39.2. USB/Ethernet heights (16.0/13.5) assumed equal to Pi 4 (drawing side view not read to that precision); FPC and PCIe box positions read off the 1:1 drawing, heatsink/active cooler not included. SD slot box is an estimate. Without cooler height_top is the USB stack."
+  },
+  {
+   "key": "rpi_zero",
+   "label": "Raspberry Pi Zero (v1.3)",
+   "category": "sbc",
+   "aliases": [
+    "pi_zero",
+    "rpi_zero_v13"
+   ],
+   "dims": {
+    "length": 65.0,
+    "width": 30.0,
+    "thickness": 1.4,
+    "height_top": 5.0,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.75,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      26.5
+     ],
+     [
+      61.5,
+      26.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "mini-HDMI",
+     "face": "-y",
+     "box": [
+      6.8,
+      -1.5,
+      0,
+      18.0,
+      5.5,
+      3.3
+     ]
+    },
+    {
+     "name": "micro-USB data (OTG)",
+     "face": "-y",
+     "box": [
+      37.4,
+      -1.5,
+      0,
+      45.4,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "micro-USB power",
+     "face": "-y",
+     "box": [
+      50.0,
+      -1.5,
+      0,
+      58.0,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "microSD slot",
+     "face": "-x",
+     "box": [
+      -3.1,
+      10.4,
+      0,
+      7.7,
+      23.1,
+      2.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      61.5,
+      7.5,
+      0,
+      64.8,
+      22.5,
+      2.5
+     ]
+    },
+    {
+     "name": "GPIO 2x20 pad area (unpopulated)",
+     "face": "top",
+     "box": [
+      7.1,
+      23.96,
+      0,
+      57.9,
+      29.04,
+      0.5
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpizero/raspberry-pi-zero-mechanical-drawing.pdf",
+     "what": "official mechanical drawing (title block RPI-ZERO-V1_2)"
+    },
+    {
+     "url": "https://www.adafruit.com/product/3400",
+     "what": "Adafruit Zero W page, same PCB outline"
+    }
+   ],
+   "verified": true,
+   "notes": "Official drawing: 65 x 30, holes 3.5 from edges on 58 x 23 pattern, corner radius 3.0, mini-HDMI centred x=12.4, micro-USB at x=41.4 and x=54. Connector box extents are read off the drawing (HDMI width 11.2, micro-USB 8.0 wide); heights are typical documented values; CSI FPC position estimated from the drawing at the +x short edge. GPIO pad row along the +y edge. The official drawing is labelled V1_2; v1.3 added the camera connector, outline and holes unchanged. height_top 5.0 follows the Adafruit Zero W listing. Holes drilled 2.75 +/- 0.05."
+  },
+  {
+   "key": "rpi_zero_w",
+   "label": "Raspberry Pi Zero W",
+   "category": "sbc",
+   "aliases": [
+    "pi_zero_w"
+   ],
+   "dims": {
+    "length": 65.0,
+    "width": 30.0,
+    "thickness": 1.4,
+    "height_top": 5.0,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.75,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      26.5
+     ],
+     [
+      61.5,
+      26.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "mini-HDMI",
+     "face": "-y",
+     "box": [
+      6.8,
+      -1.5,
+      0,
+      18.0,
+      5.5,
+      3.3
+     ]
+    },
+    {
+     "name": "micro-USB data (OTG)",
+     "face": "-y",
+     "box": [
+      37.4,
+      -1.5,
+      0,
+      45.4,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "micro-USB power",
+     "face": "-y",
+     "box": [
+      50.0,
+      -1.5,
+      0,
+      58.0,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "microSD slot",
+     "face": "-x",
+     "box": [
+      -3.1,
+      10.4,
+      0,
+      7.7,
+      23.1,
+      2.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      61.5,
+      7.5,
+      0,
+      64.8,
+      22.5,
+      2.5
+     ]
+    },
+    {
+     "name": "GPIO 2x20 pad area (unpopulated)",
+     "face": "top",
+     "box": [
+      7.1,
+      23.96,
+      0,
+      57.9,
+      29.04,
+      0.5
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 9.3,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpizero/raspberry-pi-zero-w-mechanical-drawing.pdf",
+     "what": "official mechanical drawing"
+    },
+    {
+     "url": "https://www.adafruit.com/product/3400",
+     "what": "Adafruit weight 9.3 g, 66 x 30.5 x 5.0 mm overall"
+    }
+   ],
+   "verified": true,
+   "notes": "Official drawing: 65 x 30, holes 3.5 from edges on 58 x 23 pattern, corner radius 3.0, mini-HDMI centred x=12.4, micro-USB at x=41.4 and x=54. Connector box extents are read off the drawing (HDMI width 11.2, micro-USB 8.0 wide); heights are typical documented values; CSI FPC position estimated from the drawing at the +x short edge. GPIO pad row along the +y edge. Wi-Fi/BT antenna is the printed trace at the +y/-x corner region next to the SD slot: keep metal away. CSI FPC on the +x short edge, 15 mm from the +y edge per drawing label."
+  },
+  {
+   "key": "rpi_zero_wh",
+   "label": "Raspberry Pi Zero WH",
+   "category": "sbc",
+   "aliases": [
+    "pi_zero_wh"
+   ],
+   "dims": {
+    "length": 65.0,
+    "width": 30.0,
+    "thickness": 1.4,
+    "height_top": 8.5,
+    "height_bottom": 1.7
+   },
+   "holes": {
+    "diameter": 2.75,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      26.5
+     ],
+     [
+      61.5,
+      26.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "mini-HDMI",
+     "face": "-y",
+     "box": [
+      6.8,
+      -1.5,
+      0,
+      18.0,
+      5.5,
+      3.3
+     ]
+    },
+    {
+     "name": "micro-USB data (OTG)",
+     "face": "-y",
+     "box": [
+      37.4,
+      -1.5,
+      0,
+      45.4,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "micro-USB power",
+     "face": "-y",
+     "box": [
+      50.0,
+      -1.5,
+      0,
+      58.0,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "microSD slot",
+     "face": "-x",
+     "box": [
+      -3.1,
+      10.4,
+      0,
+      7.7,
+      23.1,
+      2.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      61.5,
+      7.5,
+      0,
+      64.8,
+      22.5,
+      2.5
+     ]
+    },
+    {
+     "name": "GPIO 2x20 header footprint",
+     "face": "top",
+     "box": [
+      7.1,
+      23.96,
+      0,
+      57.9,
+      29.04,
+      8.5
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 11.5,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpizero/raspberry-pi-zero-w-mechanical-drawing.pdf",
+     "what": "official Zero W drawing, same PCB (WH = W with 40-pin header fitted)"
+    },
+    {
+     "url": "https://www.adafruit.com/product/3708",
+     "what": "Adafruit Zero WH: 65 x 31 x 11.6 mm, 11.5 g"
+    }
+   ],
+   "verified": true,
+   "notes": "Official drawing: 65 x 30, holes 3.5 from edges on 58 x 23 pattern, corner radius 3.0, mini-HDMI centred x=12.4, micro-USB at x=41.4 and x=54. Connector box extents are read off the drawing (HDMI width 11.2, micro-USB 8.0 wide); heights are typical documented values; CSI FPC position estimated from the drawing at the +x short edge. GPIO pad row along the +y edge. Same PCB as Zero W with a 2x20 header fitted: header top 8.5 (standard Pi header height), underside 1.7 derived from the Adafruit 11.6 mm overall height (11.6 - 1.4 PCB - 8.5)."
+  },
+  {
+   "key": "rpi_zero_2w",
+   "label": "Raspberry Pi Zero 2 W",
+   "category": "sbc",
+   "aliases": [
+    "pi_zero_2w"
+   ],
+   "dims": {
+    "length": 65.0,
+    "width": 30.0,
+    "thickness": 1.4,
+    "height_top": 5.3,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.75,
+    "screw": "M2.5",
+    "positions": [
+     [
+      3.5,
+      3.5
+     ],
+     [
+      61.5,
+      3.5
+     ],
+     [
+      3.5,
+      26.5
+     ],
+     [
+      61.5,
+      26.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "mini-HDMI",
+     "face": "-y",
+     "box": [
+      6.8,
+      -1.5,
+      0,
+      18.0,
+      5.5,
+      3.3
+     ]
+    },
+    {
+     "name": "micro-USB data (OTG)",
+     "face": "-y",
+     "box": [
+      37.4,
+      -1.5,
+      0,
+      45.4,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "micro-USB power",
+     "face": "-y",
+     "box": [
+      50.0,
+      -1.5,
+      0,
+      58.0,
+      5.0,
+      2.8
+     ]
+    },
+    {
+     "name": "microSD slot",
+     "face": "-x",
+     "box": [
+      -3.1,
+      10.4,
+      0,
+      7.7,
+      23.1,
+      2.0
+     ]
+    },
+    {
+     "name": "CSI camera FPC",
+     "face": "top",
+     "box": [
+      61.5,
+      7.5,
+      0,
+      64.8,
+      22.5,
+      2.5
+     ]
+    },
+    {
+     "name": "GPIO 2x20 pad area (unpopulated)",
+     "face": "top",
+     "box": [
+      7.1,
+      23.96,
+      0,
+      57.9,
+      29.04,
+      0.5
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 10.0,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-mechanical-drawing.pdf",
+     "what": "official mechanical drawing"
+    },
+    {
+     "url": "https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-product-brief.pdf",
+     "what": "product brief: 65mm x 30mm"
+    },
+    {
+     "url": "https://www.adafruit.com/product/5291",
+     "what": "Adafruit 10.0 g, 65 x 30 x 5.3 mm"
+    }
+   ],
+   "verified": true,
+   "notes": "Official drawing: 65 x 30, holes 3.5 from edges on 58 x 23 pattern, corner radius 3.0, mini-HDMI centred x=12.4, micro-USB at x=41.4 and x=54. Connector box extents are read off the drawing (HDMI width 11.2, micro-USB 8.0 wide); heights are typical documented values; CSI FPC position estimated from the drawing at the +x short edge. GPIO pad row along the +y edge. Drawing text confirms 65, 29, 3.5, 23, 30, 12.4, 41.4, 54. The metal RF shield over the SoC is the tallest part (5.3 total per Adafruit). Hole diameter 2.75 is carried over from the Zero drawing (2.75 +/- 0.05); not restated on the Zero 2 W drawing text."
+  },
+  {
+   "key": "pico",
+   "label": "Raspberry Pi Pico",
+   "category": "mcu",
+   "dims": {
+    "length": 51.0,
+    "width": 21.0,
+    "thickness": 1.0,
+    "height_top": 3.9,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.1,
+    "screw": "M2",
+    "positions": [
+     [
+      2.0,
+      4.8
+     ],
+     [
+      2.0,
+      16.2
+     ],
+     [
+      49.0,
+      4.8
+     ],
+     [
+      49.0,
+      16.2
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "+x",
+     "box": [
+      47.0,
+      6.75,
+      0,
+      52.0,
+      14.25,
+      2.8
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 3.0,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+     "what": "official datasheet section 2 and Figure 3"
+    },
+    {
+     "url": "https://www.adafruit.com/product/4864",
+     "what": "Adafruit 3.0 g, 51.3 x 21 x 3.9 mm"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 51 x 21 x 1 mm, 4 mounting holes dia 2.1 +/- 0.05, castellated 40-pin DIP pitch 2.54. Hole centres from the datasheet Figure 3: 4.8 and 16.2 across (11.4 apart, centred on 10.5), 2.0 from each end (47 apart). In the datasheet the USB end is at the top; converted so USB is at +x. micro-USB overhang past the PCB end read as about 1.0 mm. Without fitted headers height_bottom is 0; with 2.54 headers add ~8.5 mm below. "
+  },
+  {
+   "key": "pico_w",
+   "label": "Raspberry Pi Pico W",
+   "category": "mcu",
+   "dims": {
+    "length": 51.0,
+    "width": 21.0,
+    "thickness": 1.0,
+    "height_top": 3.9,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.1,
+    "screw": "M2",
+    "positions": [
+     [
+      2.0,
+      4.8
+     ],
+     [
+      2.0,
+      16.2
+     ],
+     [
+      49.0,
+      4.8
+     ],
+     [
+      49.0,
+      16.2
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "+x",
+     "box": [
+      47.0,
+      6.75,
+      0,
+      52.0,
+      14.25,
+      2.8
+     ]
+    },
+    {
+     "name": "CYW43 antenna keep-clear 14 x 9 (position estimated, at the -x end)",
+     "face": "-x",
+     "box": [
+      0.0,
+      3.5,
+      -1.0,
+      9.0,
+      17.5,
+      2.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf",
+     "what": "official datasheet Figure 3, antenna keep-out 14 x 9 mm"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 51 x 21 x 1 mm, 4 mounting holes dia 2.1 +/- 0.05, castellated 40-pin DIP pitch 2.54. Hole centres from the datasheet Figure 3: 4.8 and 16.2 across (11.4 apart, centred on 10.5), 2.0 from each end (47 apart). In the datasheet the USB end is at the top; converted so USB is at +x. micro-USB overhang past the PCB end read as about 1.0 mm. Without fitted headers height_bottom is 0; with 2.54 headers add ~8.5 mm below. Height 3.9 carried over from Pico (not separately listed). Antenna placement estimated; the datasheet says nothing may intrude into the 14 x 9 mm cutout area and the board should sit at the edge, not enclosed in metal."
+  },
+  {
+   "key": "pico_2",
+   "label": "Raspberry Pi Pico 2",
+   "category": "mcu",
+   "dims": {
+    "length": 51.0,
+    "width": 21.0,
+    "thickness": 1.0,
+    "height_top": 3.9,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.1,
+    "screw": "M2",
+    "positions": [
+     [
+      2.0,
+      4.8
+     ],
+     [
+      2.0,
+      16.2
+     ],
+     [
+      49.0,
+      4.8
+     ],
+     [
+      49.0,
+      16.2
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "+x",
+     "box": [
+      47.0,
+      6.75,
+      0,
+      52.0,
+      14.25,
+      2.8
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/pico/pico-2-datasheet.pdf",
+     "what": "official datasheet: 51x21 mm, 1 mm PCB, 4x 2.1 mm holes"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 51 x 21 x 1 mm, 4 mounting holes dia 2.1 +/- 0.05, castellated 40-pin DIP pitch 2.54. Hole centres from the datasheet Figure 3: 4.8 and 16.2 across (11.4 apart, centred on 10.5), 2.0 from each end (47 apart). In the datasheet the USB end is at the top; converted so USB is at +x. micro-USB overhang past the PCB end read as about 1.0 mm. Without fitted headers height_bottom is 0; with 2.54 headers add ~8.5 mm below. Pico 2 datasheet gives the same outline and holes as Pico (hole positions assumed identical, same PCB layout footprint); height carried over from Pico."
+  },
+  {
+   "key": "pico_2_w",
+   "label": "Raspberry Pi Pico 2 W",
+   "category": "mcu",
+   "dims": {
+    "length": 51.0,
+    "width": 21.0,
+    "thickness": 1.0,
+    "height_top": 3.9,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.1,
+    "screw": "M2",
+    "positions": [
+     [
+      2.0,
+      4.8
+     ],
+     [
+      2.0,
+      16.2
+     ],
+     [
+      49.0,
+      4.8
+     ],
+     [
+      49.0,
+      16.2
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "+x",
+     "box": [
+      47.0,
+      6.75,
+      0,
+      52.0,
+      14.25,
+      2.8
+     ]
+    },
+    {
+     "name": "CYW43 antenna keep-clear 14 x 9 (position estimated, at the -x end)",
+     "face": "-x",
+     "box": [
+      0.0,
+      3.5,
+      -1.0,
+      9.0,
+      17.5,
+      2.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/picow/pico-2-w-datasheet.pdf",
+     "what": "official datasheet: 51x21x1 mm, 4x 2.1 mm holes, antenna keep-out"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 51 x 21 x 1 mm, 4 mounting holes dia 2.1 +/- 0.05, castellated 40-pin DIP pitch 2.54. Hole centres from the datasheet Figure 3: 4.8 and 16.2 across (11.4 apart, centred on 10.5), 2.0 from each end (47 apart). In the datasheet the USB end is at the top; converted so USB is at +x. micro-USB overhang past the PCB end read as about 1.0 mm. Without fitted headers height_bottom is 0; with 2.54 headers add ~8.5 mm below. Same footprint as Pico W; antenna keep-clear box estimated as for Pico W."
+  },
+  {
+   "key": "camera_module_v2",
+   "label": "Raspberry Pi Camera Module v2",
+   "category": "camera",
+   "dims": {
+    "length": 25.0,
+    "width": 23.862,
+    "thickness": 1.0,
+    "height_top": 9.0,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.2,
+    "screw": "M2",
+    "positions": [
+     [
+      2.0,
+      2.0
+     ],
+     [
+      2.0,
+      14.5
+     ],
+     [
+      23.0,
+      2.0
+     ],
+     [
+      23.0,
+      14.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "lens barrel",
+     "face": "top",
+     "box": [
+      7.1,
+      9.1,
+      0,
+      17.9,
+      19.9,
+      9.0
+     ]
+    },
+    {
+     "name": "FPC ribbon connector (22-pin 0.5 mm) on bottom edge",
+     "face": "-y",
+     "box": [
+      8.9,
+      -1.0,
+      0,
+      19.6,
+      4.0,
+      2.5
+     ]
+    }
+   ],
+   "mech": {
+    "lens_xy": [
+     12.5,
+     14.5
+    ],
+    "lens_size": 8.5
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/camera/camera-module-2-mechanical-drawing.pdf",
+     "what": "official mechanical drawing (4x 2.2 mm holes, 2.0 mm corner radius)"
+    },
+    {
+     "url": "https://datasheets.raspberrypi.com/camera/camera-module-3-product-brief.pdf",
+     "what": "brief: PCB size and mounting holes same as Camera Module 2"
+    }
+   ],
+   "verified": true,
+   "notes": "Board 25 x 23.862, four 2.2 mm holes 2.0 mm from edges, 21 x 12.5 mm pattern: hole centres [2,2],[2,14.5],[23,2],[23,14.5] (x along the 25 mm edge; FPC connector at y=0 edge). Lens centre taken as (12.5, 14.5) from the v3 drawing, v2 drawing is a mirrored/rotated view so lens y is approximate (+/-1). The 9.0 mm overall height is the commonly documented figure, not read from the mechanical drawing. 'lens_xy' in mech. PCB thickness 1.0 assumed (v3 side view shows 1.12 total board)."
+  },
+  {
+   "key": "camera_module_3",
+   "label": "Raspberry Pi Camera Module 3",
+   "category": "camera",
+   "dims": {
+    "length": 25.0,
+    "width": 23.862,
+    "thickness": 1.12,
+    "height_top": 11.5,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.2,
+    "screw": "M2",
+    "positions": [
+     [
+      2.0,
+      2.0
+     ],
+     [
+      2.0,
+      14.5
+     ],
+     [
+      23.0,
+      2.0
+     ],
+     [
+      23.0,
+      14.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "lens barrel",
+     "face": "top",
+     "box": [
+      7.1,
+      9.1,
+      0,
+      17.9,
+      19.9,
+      11.5
+     ]
+    },
+    {
+     "name": "FPC ribbon connector (22-pin 0.5 mm) on bottom edge",
+     "face": "-y",
+     "box": [
+      8.9,
+      -1.0,
+      0,
+      19.6,
+      4.0,
+      2.5
+     ]
+    }
+   ],
+   "mech": {
+    "lens_xy": [
+     12.5,
+     14.5
+    ],
+    "lens_size": 10.8,
+    "height_wide": 12.4
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://datasheets.raspberrypi.com/camera/camera-module-3-standard-mechanical-drawing.pdf",
+     "what": "official mechanical drawing"
+    },
+    {
+     "url": "https://datasheets.raspberrypi.com/camera/camera-module-3-product-brief.pdf",
+     "what": "brief: 25 x 24 x 11.5 mm (12.4 mm height for Wide), same PCB/holes as v2"
+    }
+   ],
+   "verified": true,
+   "notes": "Drawing: board 25 x 23.862, 2.2 mm holes 2.0 mm in from edges, 21 x 12.5 pattern, lens centre (12.5, 14.5), lens module 10.8 square with dia 5.75 aperture, PCB thickness 1.12. Total 11.3 mm per drawing side view, 11.5 per brief (12.4 for Wide and Wide NoIR variants)."
+  },
+  {
+   "key": "arduino_uno_r3",
+   "label": "Arduino Uno Rev3",
+   "category": "mcu",
+   "aliases": [
+    "uno"
+   ],
+   "dims": {
+    "length": 68.58,
+    "width": 53.34,
+    "thickness": 1.6,
+    "height_top": 11.0,
+    "height_bottom": 2.5
+   },
+   "holes": {
+    "diameter": 3.2,
+    "screw": "M3",
+    "positions": [
+     [
+      13.97,
+      2.54
+     ],
+     [
+      15.24,
+      50.8
+     ],
+     [
+      66.04,
+      7.62
+     ],
+     [
+      66.04,
+      35.56
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "USB-B",
+     "face": "-x",
+     "box": [
+      -6.5,
+      32.2,
+      0,
+      10.0,
+      44.4,
+      10.9
+     ]
+    },
+    {
+     "name": "DC barrel jack",
+     "face": "-x",
+     "box": [
+      -1.8,
+      2.5,
+      0,
+      13.8,
+      12.1,
+      11.0
+     ]
+    },
+    {
+     "name": "female headers (power/analog edge)",
+     "face": "top",
+     "box": [
+      26.0,
+      -0.5,
+      0,
+      50.0,
+      2.5,
+      8.9
+     ]
+    },
+    {
+     "name": "female headers (digital edge)",
+     "face": "top",
+     "box": [
+      17.0,
+      50.8,
+      0,
+      64.0,
+      53.3,
+      8.9
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 25.0,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/A000066-datasheet.pdf",
+     "what": "official datasheet section 5.4 board outline and mounting holes"
+    },
+    {
+     "url": "https://www.pishop.us/product/arduino-uno-rev3/",
+     "what": "reseller spec: 68.6 x 53.4 mm, 25 g"
+    }
+   ],
+   "verified": true,
+   "notes": "Arduino drawing is in mils: outline 2.7 x 2.1 in (68.58 x 53.34), holes dia 3.2 (126 mil) at 0.55/0.1, 0.6/2.0, 2.6/0.3 and 2.6/1.4 in; USB/jack boxes are read off the 1:1 datasheet drawing; jack and USB heights (11.0, 10.9) and header height 8.9 are typical documented values, not dimensioned. height_bottom 2.5 approximates solder tails and ICSP pins."
+  },
+  {
+   "key": "arduino_uno_r4_minima",
+   "label": "Arduino Uno R4 Minima",
+   "category": "mcu",
+   "dims": {
+    "length": 68.58,
+    "width": 53.34,
+    "thickness": 1.6,
+    "height_top": 11.0,
+    "height_bottom": 2.5
+   },
+   "holes": {
+    "diameter": 3.2,
+    "screw": "M3",
+    "positions": [
+     [
+      13.97,
+      2.54
+     ],
+     [
+      15.24,
+      50.8
+     ],
+     [
+      66.04,
+      7.62
+     ],
+     [
+      66.04,
+      35.56
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "USB-C",
+     "face": "-x",
+     "box": [
+      -1.0,
+      33.9,
+      0,
+      6.5,
+      43.2,
+      3.3
+     ]
+    },
+    {
+     "name": "DC barrel jack (position assumed same as Uno R3)",
+     "face": "-x",
+     "box": [
+      -1.8,
+      2.5,
+      0,
+      13.8,
+      12.1,
+      11.0
+     ]
+    },
+    {
+     "name": "female headers (power/analog edge)",
+     "face": "top",
+     "box": [
+      26.0,
+      -0.5,
+      0,
+      50.0,
+      2.5,
+      8.5
+     ]
+    },
+    {
+     "name": "female headers (digital edge)",
+     "face": "top",
+     "box": [
+      17.0,
+      50.8,
+      0,
+      64.0,
+      53.3,
+      8.5
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/ABX00080-datasheet.pdf",
+     "what": "official datasheet section 11 mounting holes and board outline"
+    },
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/A000066-datasheet.pdf",
+     "what": "cross-check: Uno R3 identical hole pattern"
+    }
+   ],
+   "verified": true,
+   "notes": "Official R4 datasheet drawing: 68.58 x 53.34, holes 13.97/2.54 and 15.24/50.8 from the lower-left corner and 66.04 columns, same pattern as Uno R3; header height 8.5 shown in side view. USB-C box read from the drawing; jack box assumed identical to Uno R3 (not drawn). Weight not stated in the datasheet. Hole diameter 3.2 carried from Uno R3 (R4 drawing has no diameter label)."
+  },
+  {
+   "key": "arduino_uno_r4_wifi",
+   "label": "Arduino Uno R4 WiFi",
+   "category": "mcu",
+   "dims": {
+    "length": 68.58,
+    "width": 53.34,
+    "thickness": 1.6,
+    "height_top": 11.0,
+    "height_bottom": 2.5
+   },
+   "holes": {
+    "diameter": 3.2,
+    "screw": "M3",
+    "positions": [
+     [
+      13.97,
+      2.54
+     ],
+     [
+      15.24,
+      50.8
+     ],
+     [
+      66.04,
+      7.62
+     ],
+     [
+      66.04,
+      35.56
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "USB-C",
+     "face": "-x",
+     "box": [
+      -1.0,
+      33.9,
+      0,
+      6.5,
+      43.2,
+      3.3
+     ]
+    },
+    {
+     "name": "DC barrel jack (position assumed same as Uno R3)",
+     "face": "-x",
+     "box": [
+      -1.8,
+      2.5,
+      0,
+      13.8,
+      12.1,
+      11.0
+     ]
+    },
+    {
+     "name": "female headers (power/analog edge)",
+     "face": "top",
+     "box": [
+      26.0,
+      -0.5,
+      0,
+      50.0,
+      2.5,
+      8.5
+     ]
+    },
+    {
+     "name": "female headers (digital edge)",
+     "face": "top",
+     "box": [
+      17.0,
+      50.8,
+      0,
+      64.0,
+      53.3,
+      8.5
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/ABX00087-datasheet.pdf",
+     "what": "official datasheet section 13 mounting holes and board outline"
+    },
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/ABX00080-datasheet.pdf",
+     "what": "Minima datasheet, same outline"
+    }
+   ],
+   "verified": true,
+   "notes": "Official R4 datasheet drawing: 68.58 x 53.34, holes 13.97/2.54 and 15.24/50.8 from the lower-left corner and 66.04 columns, same pattern as Uno R3; header height 8.5 shown in side view. USB-C box read from the drawing; jack box assumed identical to Uno R3 (not drawn). Weight not stated in the datasheet. WiFi version shares the Minima outline; the ESP32-S3 module sits near the +x end (its antenna is on the top face, avoid metal above it). The 12 x 8 LED matrix is on top, so keep the lid clear/transparent if you want to see it."
+  },
+  {
+   "key": "arduino_mega_2560",
+   "label": "Arduino Mega 2560 Rev3",
+   "category": "mcu",
+   "aliases": [
+    "mega2560"
+   ],
+   "dims": {
+    "length": 101.6,
+    "width": 53.34,
+    "thickness": 1.6,
+    "height_top": 11.0,
+    "height_bottom": 2.5
+   },
+   "holes": {
+    "diameter": 3.2,
+    "screw": "M3",
+    "positions": [
+     [
+      13.97,
+      2.54
+     ],
+     [
+      15.24,
+      50.8
+     ],
+     [
+      66.04,
+      7.62
+     ],
+     [
+      66.04,
+      35.56
+     ],
+     [
+      90.17,
+      50.8
+     ],
+     [
+      96.52,
+      2.54
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "USB-B",
+     "face": "-x",
+     "box": [
+      -6.5,
+      32.2,
+      0,
+      10.0,
+      44.4,
+      10.9
+     ]
+    },
+    {
+     "name": "DC barrel jack",
+     "face": "-x",
+     "box": [
+      -1.8,
+      2.5,
+      0,
+      13.8,
+      12.1,
+      11.0
+     ]
+    },
+    {
+     "name": "female headers (bottom edge)",
+     "face": "top",
+     "box": [
+      17.0,
+      -0.5,
+      0,
+      99.0,
+      2.5,
+      8.9
+     ]
+    },
+    {
+     "name": "female headers (top edge)",
+     "face": "top",
+     "box": [
+      17.0,
+      50.8,
+      0,
+      99.0,
+      53.3,
+      8.9
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/A000067-datasheet.pdf",
+     "what": "official datasheet section 6 outline and mount holes (shows 99 mm and 75 mm hole span)"
+    }
+   ],
+   "verified": false,
+   "notes": "Six holes dia 3.2 at the standard Arduino Mega pattern (Uno four plus 90.17/50.8 and 96.52/2.54); the datasheet confirms the 75 mm span between the two top holes and 53 mm width. The datasheet outline figure shows 99 mm length while the long-standing Arduino spec is 4.0 in (101.6); not resolved from one official source so verified=false. Hole diameter not labelled on the Mega drawing (Uno drawing gives 3.2)."
+  },
+  {
+   "key": "arduino_leonardo",
+   "label": "Arduino Leonardo",
+   "category": "mcu",
+   "dims": {
+    "length": 68.58,
+    "width": 53.34,
+    "thickness": 1.6,
+    "height_top": 11.0,
+    "height_bottom": 2.5
+   },
+   "holes": {
+    "diameter": 3.2,
+    "screw": "M3",
+    "positions": [
+     [
+      13.97,
+      2.54
+     ],
+     [
+      15.24,
+      50.8
+     ],
+     [
+      66.04,
+      7.62
+     ],
+     [
+      66.04,
+      35.56
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      33.5,
+      0,
+      6.5,
+      42.5,
+      3.0
+     ]
+    },
+    {
+     "name": "DC barrel jack",
+     "face": "-x",
+     "box": [
+      -1.8,
+      2.5,
+      0,
+      13.8,
+      12.1,
+      11.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/A000066-datasheet.pdf",
+     "what": "Uno R3 datasheet (Leonardo uses the Uno R3 outline); Leonardo datasheet URL returned HTML not a PDF"
+    }
+   ],
+   "verified": false,
+   "notes": "Leonardo is documented as sharing the Uno R3 form factor and hole pattern; no Leonardo-specific drawing could be fetched, so unverified. micro-USB position approximate."
+  },
+  {
+   "key": "arduino_micro",
+   "label": "Arduino Micro",
+   "category": "mcu",
+   "dims": {
+    "length": 48.0,
+    "width": 18.0,
+    "thickness": 1.6,
+    "height_top": 3.0,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Board has no mounting holes (DIP-style breadboard board); fix by pins or a clip/cradle"
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      5.2,
+      0,
+      5.5,
+      12.8,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/hardware/micro/",
+     "what": "official product page (breadboard form factor)"
+    }
+   ],
+   "verified": false,
+   "notes": "Nominal 48 x 18 mm (documented figure, no dimensioned drawing could be fetched). No mounting holes. Male pin headers on the underside assumed 8.5 below the PCB (standard 11.5 mm header). Unverified."
+  },
+  {
+   "key": "arduino_nano",
+   "label": "Arduino Nano (classic)",
+   "category": "mcu",
+   "dims": {
+    "length": 43.2,
+    "width": 18.0,
+    "thickness": 1.6,
+    "height_top": 8.5,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": 1.8,
+    "screw": "M1.6",
+    "positions": [
+     [
+      1.27,
+      1.38
+     ],
+     [
+      41.91,
+      1.38
+     ],
+     [
+      1.27,
+      16.62
+     ],
+     [
+      41.91,
+      16.62
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "mini-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      4.9,
+      0,
+      8.0,
+      13.1,
+      3.9
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 7.0,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/A000005-datasheet.pdf",
+     "what": "official datasheet section 6 mechanical drawing"
+    },
+    {
+     "url": "https://docs.arduino.cc/hardware/nano/",
+     "what": "official tech specs: 45 x 18 mm, 7 g"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 43.2 x 18, holes dia 1.8 on 40.64 x 15.24 pattern; holes placed symmetrically at the corners (x offset 1.27) as the drawing shows. Overall side height 18.6 = 8.5 above + 1.6 PCB + 8.5 below (male headers). Official specs page quotes 45 mm length (includes the USB shell overhang). mini-USB box approximate."
+  },
+  {
+   "key": "arduino_nano_every",
+   "label": "Arduino Nano Every",
+   "category": "mcu",
+   "dims": {
+    "length": 43.18,
+    "width": 17.78,
+    "thickness": 1.6,
+    "height_top": 8.5,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": 1.65,
+    "screw": "M1.6",
+    "positions": [
+     [
+      1.27,
+      1.27
+     ],
+     [
+      41.91,
+      1.27
+     ],
+     [
+      1.27,
+      16.51
+     ],
+     [
+      41.91,
+      16.51
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      5.3,
+      0,
+      5.5,
+      12.5,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/ABX00028-datasheet.pdf",
+     "what": "official datasheet section 7.1 board outline (imperial)"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 43.18 x 17.78 (1.7 x 0.7 in), holes dia 1.65 on 40.64 x 15.24, 1.27 from edges. PCB thickness 1.6 and header heights are assumed standard (not in the datasheet). micro-USB box approximate."
+  },
+  {
+   "key": "arduino_nano_33_iot",
+   "label": "Arduino Nano 33 IoT",
+   "category": "mcu",
+   "dims": {
+    "length": 43.16,
+    "width": 17.77,
+    "thickness": 1.6,
+    "height_top": 8.5,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": 1.65,
+    "screw": "M1.6",
+    "positions": [
+     [
+      1.27,
+      1.26
+     ],
+     [
+      41.91,
+      1.26
+     ],
+     [
+      1.27,
+      16.5
+     ],
+     [
+      41.91,
+      16.5
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      5.3,
+      0,
+      5.5,
+      12.5,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.arduino.cc/resources/datasheets/ABX00027-datasheet.pdf",
+     "what": "official datasheet section 6.1 board outline"
+    }
+   ],
+   "verified": true,
+   "notes": "Datasheet: 43.16 x 17.77, holes R0.83 on 40.64 x 15.24, 1.26/1.27 from edges. PCB thickness and header heights assumed. u-blox NINA module antenna at +x end: keep metal clear."
+  },
+  {
+   "key": "arduino_pro_mini",
+   "label": "Arduino Pro Mini (5V/16MHz and 3.3V/8MHz)",
+   "category": "mcu",
+   "dims": {
+    "length": 33.0,
+    "width": 18.0,
+    "thickness": 0.8,
+    "height_top": 2.5,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "No mounting holes, through-hole pad rows and a 6-pin FTDI row"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.sparkfun.com/arduino-pro-mini-328-5v-16mhz.html",
+     "what": "SparkFun: 18 x 33 mm, 0.8 mm PCB, under 2 g, no headers"
+    }
+   ],
+   "verified": false,
+   "notes": "18 x 33 mm, 0.8 mm PCB per SparkFun; weight stated only as 'under 2 grams' so weight_g is null. No official dimensioned drawing fetched. height_top 2.5 is an estimate (reset button/regulator). 5V and 3.3V variants share the PCB."
+  },
+  {
+   "key": "esp32_devkitc_v4",
+   "label": "Espressif ESP32-DevKitC V4 (ESP32-WROOM-32)",
+   "category": "mcu",
+   "aliases": [
+    "esp32_devkitc"
+   ],
+   "dims": {
+    "length": 54.3,
+    "width": 27.94,
+    "thickness": 1.6,
+    "height_top": 3.1,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Board has no mounting holes; use the two 2.54 pin rows (19 pins, 25.4 mm row spacing) in a socket/cradle"
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      10.2,
+      0,
+      5.0,
+      17.7,
+      3.0
+     ]
+    },
+    {
+     "name": "antenna keep-clear (no metal, no enclosure wall within ~10 mm)",
+     "face": "+x",
+     "box": [
+      48.26,
+      4.97,
+      -1.6,
+      54.3,
+      22.97,
+      3.1
+     ]
+    }
+   ],
+   "mech": {
+    "pin_pitch": 2.54,
+    "pin_row_spacing": 25.4,
+    "pins": [
+     [
+      1.29,
+      1.3
+     ],
+     [
+      3.83,
+      1.3
+     ],
+     [
+      6.37,
+      1.3
+     ],
+     [
+      8.91,
+      1.3
+     ],
+     [
+      11.45,
+      1.3
+     ],
+     [
+      13.99,
+      1.3
+     ],
+     [
+      16.53,
+      1.3
+     ],
+     [
+      19.07,
+      1.3
+     ],
+     [
+      21.61,
+      1.3
+     ],
+     [
+      24.15,
+      1.3
+     ],
+     [
+      26.69,
+      1.3
+     ],
+     [
+      29.23,
+      1.3
+     ],
+     [
+      31.77,
+      1.3
+     ],
+     [
+      34.31,
+      1.3
+     ],
+     [
+      36.85,
+      1.3
+     ],
+     [
+      39.39,
+      1.3
+     ],
+     [
+      41.93,
+      1.3
+     ],
+     [
+      44.47,
+      1.3
+     ],
+     [
+      47.01,
+      1.3
+     ],
+     [
+      1.29,
+      26.64
+     ],
+     [
+      3.83,
+      26.64
+     ],
+     [
+      6.37,
+      26.64
+     ],
+     [
+      8.91,
+      26.64
+     ],
+     [
+      11.45,
+      26.64
+     ],
+     [
+      13.99,
+      26.64
+     ],
+     [
+      16.53,
+      26.64
+     ],
+     [
+      19.07,
+      26.64
+     ],
+     [
+      21.61,
+      26.64
+     ],
+     [
+      24.15,
+      26.64
+     ],
+     [
+      26.69,
+      26.64
+     ],
+     [
+      29.23,
+      26.64
+     ],
+     [
+      31.77,
+      26.64
+     ],
+     [
+      34.31,
+      26.64
+     ],
+     [
+      36.85,
+      26.64
+     ],
+     [
+      39.39,
+      26.64
+     ],
+     [
+      41.93,
+      26.64
+     ],
+     [
+      44.47,
+      26.64
+     ],
+     [
+      47.01,
+      26.64
+     ]
+    ]
+   },
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://dl.espressif.com/dl/schematics/esp32_devkitc_v4_dimensions.pdf",
+     "what": "official dimension drawing (27.94 wide, 48.26 body + 6.04 antenna, 25.40 row spacing)"
+    },
+    {
+     "url": "https://documentation.espressif.com/esp32-wroom-32_datasheet_en.pdf",
+     "what": "module datasheet: 18 x 25.5 x 3.1 mm, keepout zone"
+    }
+   ],
+   "verified": true,
+   "notes": "Official drawing: width 27.94, body 48.26 plus 6.04 antenna overhang (54.3 total, summed), 2.54 pitch, pin rows 25.40 apart, 1.30 from the long edges, first pin 1.29 from the USB end. Pin centres: x = 1.29 + 2.54*i, y = 1.30 or 26.64 (19 pins each side); mech has them. USB end at x=0. Header heights assumed: 11.5 mm headers soldered long-pin down (8.5 below PCB); module is 3.1 mm tall; micro-USB 3.0 and its box are approximate."
+  },
+  {
+   "key": "esp32_devkit_v1_30pin",
+   "label": "ESP32 DevKit V1 30-pin (generic DOIT)",
+   "category": "mcu",
+   "dims": {
+    "length": 51.8,
+    "width": 28.2,
+    "thickness": 1.6,
+    "height_top": 3.1,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Clone boards have no standard mounting holes; one measured board has 2.8 mm holes but vendors differ"
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      10.5,
+      0,
+      5.0,
+      17.7,
+      3.0
+     ]
+    },
+    {
+     "name": "antenna keep-clear (no metal)",
+     "face": "+x",
+     "box": [
+      44.0,
+      5.0,
+      -1.6,
+      51.8,
+      23.0,
+      3.1
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://forum.fritzing.org/t/doit-esp32-devkit-v1/6158",
+     "what": "user-measured board 28.2 x 51.8 mm, 2.8 mm holes (forum post)"
+    }
+   ],
+   "verified": false,
+   "notes": "Generic clone, no maker drawing. A forum user measured 28.2 x 51.8 mm, hole dia 2.8 and 43.9 between hole pairs, rows about 1 inch (25.4) apart; other listings say 51 x 25.4. Hole coordinates not given so none recorded. Antenna box estimated from the WROOM-32 module size (18 x 25.5)."
+  },
+  {
+   "key": "esp32_cam",
+   "label": "ESP32-CAM (AI-Thinker)",
+   "category": "mcu",
+   "dims": {
+    "length": 40.5,
+    "width": 27.0,
+    "thickness": 1.6,
+    "height_top": 4.5,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "No mounting holes; 2x8 pin rows on the underside carry it, fix via the pins or a cradle"
+   },
+   "keepouts": [
+    {
+     "name": "camera lens (OV2640) top face",
+     "face": "top",
+     "box": [
+      34.0,
+      7.0,
+      0,
+      40.5,
+      20.0,
+      4.5
+     ]
+    },
+    {
+     "name": "microSD slot (underside)",
+     "face": "-x",
+     "box": [
+      8.0,
+      7.0,
+      -3.0,
+      22.0,
+      20.0,
+      0.0
+     ]
+    },
+    {
+     "name": "PCB antenna / IPEX keep-clear",
+     "face": "+x",
+     "box": [
+      0.0,
+      0.0,
+      0.0,
+      6.0,
+      27.0,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://docs.sunfounder.com/projects/zeus-car-dev/en/latest/hardware/cpn_esp_32_cam.html",
+     "what": "spec table: 27 x 40.5 x 4.5 (+/-0.2) mm, on-board PCB antenna 2 dBi"
+    }
+   ],
+   "verified": false,
+   "notes": "Only size from a reseller-style spec table (27 x 40.5 x 4.5 mm, which includes the module and camera); no official AI-Thinker drawing could be fetched. Box positions (lens, SD, antenna) are rough estimates; the USB-less board is programmed via an FTDI adapter on the 2x8 header. height_top 4.5 is the quoted overall thickness."
+  },
+  {
+   "key": "nodemcu_v2_amica",
+   "label": "NodeMCU ESP8266 v2 (Amica, ESP-12E)",
+   "category": "mcu",
+   "dims": {
+    "length": 49.0,
+    "width": 26.0,
+    "thickness": 1.6,
+    "height_top": 3.5,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "No mounting holes; pins on 22.86 mm (0.9 in) row spacing"
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      9.0,
+      0,
+      5.0,
+      17.0,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://www.etechnophiles.com/nodemcu-esp8266-pinout-specs-board-layout",
+     "what": "spec comparison via web search result: Amica 49 x 26, 0.9 in row spacing"
+    }
+   ],
+   "verified": false,
+   "notes": "49 x 26 mm per a third-party comparison (not fetched in full); 0.1 in pin pitch, 0.9 in row spacing. No official dimensioned drawing, unverified. Header height 8.5 assumed standard."
+  },
+  {
+   "key": "nodemcu_v3_lolin",
+   "label": "NodeMCU ESP8266 v3 (LoLin, ESP-12E)",
+   "category": "mcu",
+   "dims": {
+    "length": 58.0,
+    "width": 32.0,
+    "thickness": 1.6,
+    "height_top": 3.5,
+    "height_bottom": 8.5
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "No mounting holes; pins on 27.94 mm (1.1 in) row spacing"
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      11.0,
+      0,
+      5.0,
+      21.0,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://frightanic.com/iot/comparison-of-esp8266-nodemcu-development-boards",
+     "what": "states LoLin V3 is significantly larger than Amica/DOIT V2 (no numbers)"
+    }
+   ],
+   "verified": false,
+   "notes": "58 x 32 mm and 1.1 in row spacing come from a web-search summary of a spec comparison, not an official drawing; another listing says 31 mm width. Treat as approximate, unverified."
+  },
+  {
+   "key": "wemos_d1_mini",
+   "label": "Wemos/LOLIN D1 mini (v4.0.0)",
+   "category": "mcu",
+   "dims": {
+    "length": 34.3,
+    "width": 25.4,
+    "thickness": 1.0,
+    "height_top": 3.5,
+    "height_bottom": 0.0
+   },
+   "holes": {
+    "diameter": 2.0,
+    "screw": "M2",
+    "positions": [
+     [
+      31.0,
+      2.5
+     ],
+     [
+      31.0,
+      22.9
+     ]
+    ],
+    "none_reason": ""
+   },
+   "keepouts": [
+    {
+     "name": "micro-USB",
+     "face": "-x",
+     "box": [
+      -1.0,
+      9.5,
+      0,
+      5.0,
+      16.0,
+      3.0
+     ]
+    },
+    {
+     "name": "ESP-8266EX shield antenna keep-clear",
+     "face": "+x",
+     "box": [
+      26.0,
+      3.0,
+      0,
+      34.3,
+      22.0,
+      3.0
+     ]
+    }
+   ],
+   "mech": {},
+   "weight_g": 3.0,
+   "sources": [
+    {
+     "url": "https://www.wemos.cc/en/latest/_static/files/dim_d1_mini_v4.0.0.pdf",
+     "what": "official dimension drawing"
+    },
+    {
+     "url": "https://www.wemos.cc/en/latest/d1/d1_mini.html",
+     "what": "official page: 34.2 x 25.6 mm, 3 g"
+    }
+   ],
+   "verified": true,
+   "notes": "Drawing: 34.3 long x 25.4 wide, two holes 2.5 and 22.9 from the left edge (20.4 apart), centred 3.3 from the +x short edge, dia 2.0 per the drawing label; pin row spacing 22.86. Converted so x is the long edge. The page quotes 34.2 x 25.6. PCB thickness 1.0 assumed. USB end box approximate; the PCB-antenna end at +x was assumed (module placement not shown in the drawing). V4 hole pattern; older clones may lack holes."
+  },
+  {
+   "key": "bpi_m2_zero",
+   "label": "Banana Pi BPI-M2 Zero",
+   "category": "sbc",
+   "dims": {
+    "length": 60.0,
+    "width": 30.0,
+    "thickness": 1.2,
+    "height_top": 5.0,
+    "height_bottom": 1.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Hole positions not found in any fetched source; listings state no mounting holes (size said to match Pi Zero W)"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://hackerboards.com/board/sinovoip-banana-pi-zero",
+     "what": "60 x 30 x 4 mm, mounting holes: No"
+    }
+   ],
+   "verified": false,
+   "notes": "Size 60 x 30 per hackerboards and the Banana Pi user guide; CNX Software and a retailer say 65 x 30 (Pi Zero W size). Conflict unresolved; no keepouts recorded because no drawing was reachable (wiki.banana-pi.org returned 404). Thickness and heights estimated."
+  },
+  {
+   "key": "bpi_m5",
+   "label": "Banana Pi BPI-M5",
+   "category": "sbc",
+   "dims": {
+    "length": 92.0,
+    "width": 60.0,
+    "thickness": 1.6,
+    "height_top": 16.0,
+    "height_bottom": 2.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Hole positions not found in any fetched source (listing says no mounting holes, another claims Pi-4 compatible)"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 48.0,
+   "sources": [
+    {
+     "url": "https://hackerboards.com/board/sinovoip-banana-pi-bpi-m5",
+     "what": "92 x 60 mm, mounting holes: No"
+    },
+    {
+     "url": "https://www.cnx-software.com/2020/09/14/banana-pi-bpi-m5-amlogic-s905x3-sbc/",
+     "what": "92 x 60 mm, 48 g (via search result)"
+    }
+   ],
+   "verified": false,
+   "notes": "92 x 60 mm per Banana Pi spec and CNX (an Openelab listing says 85 x 56 / Pi 4 hole pattern; unresolved). Weight 48 g from the search result. Heights/thickness estimated; no keepouts because no drawing was reachable."
+  },
+  {
+   "key": "orange_pi_zero_2",
+   "label": "Orange Pi Zero 2 (H616)",
+   "category": "sbc",
+   "dims": {
+    "length": 60.0,
+    "width": 53.0,
+    "thickness": 1.6,
+    "height_top": 14.0,
+    "height_bottom": 2.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Hole positions not found (orangepi.org wiki unreachable)"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": 26.0,
+   "sources": [
+    {
+     "url": "https://hackerboards.com/board/xunlong-software-orange-pi-zero2",
+     "what": "60 x 53 mm (via search result)"
+    },
+    {
+     "url": "https://linux-sunxi.org/Orange_Pi_Zero_2",
+     "what": "53 x 60 mm (via search result)"
+    }
+   ],
+   "verified": false,
+   "notes": "Outline 60 x 53 from three sources (CNX weight 26 g). Official user manual drawing with hole positions could not be fetched (orangepi.org connection refused), so no holes or keepouts recorded. Heights estimated (RJ45 about 14)."
+  },
+  {
+   "key": "orange_pi_zero_3",
+   "label": "Orange Pi Zero 3",
+   "category": "sbc",
+   "dims": {
+    "length": 55.0,
+    "width": 50.0,
+    "thickness": 1.6,
+    "height_top": 14.0,
+    "height_bottom": 2.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Hole positions not found (orangepi.org wiki unreachable)"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://linux-sunxi.org/Xunlong_Orange_Pi_Zero3",
+     "what": "50 x 55 mm (via search result; page itself returned 403)"
+    }
+   ],
+   "verified": false,
+   "notes": "50 x 55 mm per linux-sunxi and a retailer; two other sites quote 48 x 48. Not verified against a maker drawing; holes and keepouts not recorded."
+  },
+  {
+   "key": "orange_pi_5",
+   "label": "Orange Pi 5 (RK3588S)",
+   "category": "sbc",
+   "dims": {
+    "length": 100.0,
+    "width": 62.0,
+    "thickness": 1.6,
+    "height_top": 16.0,
+    "height_bottom": 2.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Hole positions not found (orangepi.org wiki unreachable); hackerboards says it has mounting holes"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://hackerboards.com/board/xunlong-software-orange-pi-5",
+     "what": "100 x 62 mm, mounting holes: Yes"
+    }
+   ],
+   "verified": false,
+   "notes": "100 x 62 per hackerboards only. The official manual with the dimension drawing could not be fetched, so hole positions, connector keepouts and weight are missing. Heights estimated."
+  },
+  {
+   "key": "jetson_nano_devkit",
+   "label": "NVIDIA Jetson Nano Developer Kit (B01 carrier)",
+   "category": "sbc",
+   "dims": {
+    "length": 100.0,
+    "width": 80.0,
+    "thickness": 1.6,
+    "height_top": 29.0,
+    "height_bottom": 2.0
+   },
+   "holes": {
+    "diameter": null,
+    "screw": "",
+    "positions": [],
+    "none_reason": "Dev kit has holes (module P3450 on P3449 carrier) but coordinates could not be obtained; NVIDIA forum only links an image; hackerboards lists 'No'"
+   },
+   "keepouts": [],
+   "mech": {},
+   "weight_g": null,
+   "sources": [
+    {
+     "url": "https://hackerboards.com/board/nvidia-jetson-nano-developer-kit",
+     "what": "100 x 80 x 29 mm"
+    },
+    {
+     "url": "https://forums.developer.nvidia.com/t/jetson-nano-mounting-holes-pattern-schematic/75437",
+     "what": "NVIDIA forum: hole diagram is an image, no numbers"
+    }
+   ],
+   "verified": false,
+   "notes": "Overall 100 x 80 x 29 mm (29 = height including module and heatsink) from hackerboards; the official carrier-board spec/PCB/STEP files were not reachable here, so hole pattern, connector keepouts and weight are missing. Use the NVIDIA B01 STEP model to add them."
+  }
+ ]
+}
