@@ -70,6 +70,14 @@ def vhole(d, depth, x=0.0, y=0.0, z=0.0):
     return b.Pos(x, y, z) * b.Cylinder(d / 2.0, depth, align=(b.Align.CENTER, b.Align.CENTER, b.Align.MIN))
 
 
+def vslot(d, travel, depth, x=0.0, y=0.0, z=0.0):
+    """Vertical slot (oblong hole) along x: holes that forgive the 1 to 2 mm spread between servo clones."""
+    b = _b3d()
+    if travel <= 0.01:
+        return vhole(d, depth, x, y, z)
+    return b.Pos(x, y, z) * b.extrude(b.SlotCenterToCenter(travel, d), amount=depth)
+
+
 def box(lx, ly, lz, x=0.0, y=0.0, z=0.0, center_xy=True):
     b = _b3d()
     al = (b.Align.CENTER, b.Align.CENTER, b.Align.MIN) if center_xy else (b.Align.MIN, b.Align.MIN, b.Align.MIN)
@@ -337,8 +345,8 @@ def servo_cradle(servo, floor=3.0, wall=2.4, hollow_axis=False, channel_d=None, 
     H = floor + s.tab_z
     body = box(outer_x, outer_y, H)
     body -= box(s.L + 2 * CLEAR, s.W + 2 * CLEAR, s.tab_z + 1, 0, 0, floor)
-    for hx, hy in s.holes:     # tab screws (self-tap into the end blocks)
-        body -= vhole(max(s.hole_d * 0.8, 1.6), 10.0, ox + hx, oy + hy, H - 10.0)
+    for hx, hy in s.holes:     # tab screws (self-tap into the end blocks), slotted: clones differ by 1 to 2 mm
+        body -= vslot(max(s.hole_d * 0.8, 1.6), 0.0 if s.verified else 2.0, 10.0, ox + hx, oy + hy, H - 10.0)
     sx = ox + s.shaft_x
     body -= joint_holes(cls, floor, 0, kind="insert") if not hollow_axis else joint_holes(cls, floor, 0, kind="clear")
     if wire_slot:      # cable exit at the end opposite the shaft, open from the top
@@ -449,16 +457,18 @@ def horn_coupler(servo, thickness=4.0, horn=None, length=None):
     s = _as_servo(servo)
     cls = size_class(s)
     dx, dy, _ = JOINT_PATTERN[cls]
-    pocket_r = (20.6 if cls == "standard" else 15.5 * 2) / 2 + 3
-    length = length or pocket_r + dx + 10
+    pocket_r = (20.6 / 2 if cls == "standard" else 7.0 / 2) + 3
+    length = length or pocket_r + dx + 10 + (15.5 if cls == "micro" else 0)
     width = max(dy + 9, s.spline_od + 14, 2 * pocket_r if horn == "disc" else 0)
     plate = rounded_plate(length + pocket_r, width, thickness, r=width / 2 - 0.2)
     b = _b3d()
     hx = -(length + pocket_r) / 2 + pocket_r
+    horn = horn or ("arm" if cls == "micro" else "disc")     # micro single arm points along the coupler
     plate -= b.Pos(hx, 0, thickness - 1.6) * _horn_pocket(s, 1.7, horn)
     plate -= vhole(SCREWS[s.horn_screw]["head"] + 1.0, thickness, hx, 0, 0)
     plate -= b.Pos(hx, 0, 0) * _horn_screw_holes(s, thickness, horn)
-    plate -= b.Pos(hx + pocket_r + dx / 2 + 3, 0, 0) * joint_holes(cls, thickness, 0, kind="insert")
+    jx = hx + max(pocket_r, 15.5 + 3.0 if horn == "arm" else 0) + dx / 2 + 4
+    plate -= b.Pos(jx, 0, 0) * joint_holes(cls, thickness, 0, kind="insert")
     return plate, {"servo": s.key, "length": round(length + pocket_r, 1)}
 
 
@@ -557,18 +567,23 @@ def gear_motor_mount(key, thickness=3.0):
             blk -= vhole(SCREWS["M2"]["clear"], gh + thickness, sx * (gw / 2 + thickness + 2.5), 0, 0)
         return blk, {"motor": k, "style": "tunnel clamp"}
     if "tt" in k:
-        fh = m.get("face_holes") or [[0, 0], [20.0, 0]]
-        pts = [tuple(map(float, h)) for h in fh]
-        xs = [x for x, _ in pts]; zs = [y for _, y in pts]
-        span = max(xs) - min(xs)
-        w, h = span + 16, 22.0 + thickness
-        plate = box(w, thickness, h, 0, 0, 0) + box(w, 18.0, thickness, 0, 9.0 - thickness / 2, 0)
-        cx = (max(xs) + min(xs)) / 2
-        for x, z in pts:
-            plate -= b.Pos(x - cx, 0, thickness + 9.0 + (z - sum(zs) / len(zs))) * teardrop(SCREWS["M3"]["clear"], thickness + 2)
+        # TT gearbox: two M3 bolts pass through the gearbox parallel to the shaft, a 4 mm nub locates it.
+        # Plate sits against the nub side, below the shaft; face_holes are [x, z] from the shaft axis.
+        fh = [tuple(map(float, h)) for h in (m.get("face_holes") or [[-8.8, -20.6], [8.8, -20.6]])]
+        low = [h for h in fh if h[1] < 0] or fh
+        nub = (m.get("nub") or {}).get("pos", [0.0, -11.2])
+        zmin = min(z for _, z in low) - 6.0
+        ztop = float(nub[1]) + 4.5
+        w = max(x for x, _ in low) - min(x for x, _ in low) + 14
+        h = ztop - zmin
+        plate = box(w, thickness, h, 0, 0, 0) + box(w, 16.0, thickness, 0, 8.0 - thickness / 2, 0)
+        for x, z in low:
+            plate -= b.Pos(x, 0, z - zmin) * teardrop(SCREWS["M3"]["clear"], thickness + 2)
+        plate -= b.Pos(float(nub[0]), 0, float(nub[1]) - zmin) * teardrop(4.4, thickness + 2)
         for sx in (-1, 1):
-            plate -= vhole(SCREWS["M3"]["clear"], thickness, sx * (w / 2 - 4), 10, 0)
-        return plate, {"motor": k, "style": "upright plate", "screws": {"M3 x 30 through the motor": len(pts), "M3 (base)": 2}}
+            plate -= vhole(SCREWS["M3"]["clear"], thickness, sx * (w / 2 - 3.5), 10, 0)
+        return plate, {"motor": k, "style": "upright plate", "shaft_above_base": round(-zmin, 1),
+                       "screws": {"M3 x 30 through the gearbox": len(low), "M3 (base)": 2}}
     if "jga25" in k:
         fh = [tuple(map(float, h)) for h in (m.get("face_holes") or [[-8.5, 0], [8.5, 0]])]
         dia = float(m.get("can_d") or 25.0)
