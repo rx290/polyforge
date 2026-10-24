@@ -44,7 +44,13 @@ WHEELS = {"tt_motor": 65.0, "n20_motor": 34.0}   # common wheel diameters for ea
 
 
 def part(key, overrides=None):
-    if key not in PARTS:
-        raise KeyError(f"unknown part {key!r}; known: {', '.join(sorted(PARTS))}")
-    p = dict(PARTS[key]); p.update((overrides or {}).get(key, {}))
+    """Hand-tuned entries above first, then the JSON parts library (robot/parts/*.json) for everything else."""
+    if key in PARTS:
+        p = dict(PARTS[key])
+    else:
+        from . import catalog
+        if not catalog.has(key):
+            raise KeyError(f"unknown part {key!r}; known: {', '.join(sorted(set(PARTS) | set(catalog.keys())))}")
+        p = catalog.legacy(key, overrides)
+    p.update((overrides or {}).get(key, {}))
     return p

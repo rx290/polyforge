@@ -96,8 +96,13 @@ def hexagon(across_flats, depth, x=0.0, y=0.0, z=0.0):
 
 
 def screw_hole(screw, kind, depth, x, y, z=0.0):
-    """kind: 'clear' (bolt passes), 'tap' (self-tapping into plastic), 'insert' (heat-set insert + tap below)."""
+    """kind: 'clear' (bolt passes), 'tap' (self-tapping into plastic), 'insert' (heat-set insert from the top,
+    tap hole below), 'insert_low' (insert pressed in from the bottom face, for bolts that come from below)."""
     s = SCREWS[screw]
+    if kind == "insert_low":
+        d, ins = s["insert"]
+        ins = min(ins, depth - 0.8)
+        return vhole(d, ins, x, y, z) + vhole(s["tap"], depth, x, y, z)
     if kind == "insert":
         d, ins = s["insert"]
         cut = vhole(d, ins + 0.5, x, y, z + depth - ins)
@@ -348,7 +353,7 @@ def servo_cradle(servo, floor=3.0, wall=2.4, hollow_axis=False, channel_d=None, 
     for hx, hy in s.holes:     # tab screws (self-tap into the end blocks), slotted: clones differ by 1 to 2 mm
         body -= vslot(max(s.hole_d * 0.8, 1.6), 0.0 if s.verified else 2.0, 10.0, ox + hx, oy + hy, H - 10.0)
     sx = ox + s.shaft_x
-    body -= joint_holes(cls, floor, 0, kind="insert") if not hollow_axis else joint_holes(cls, floor, 0, kind="clear")
+    body -= joint_holes(cls, floor, 0, kind="insert_low") if not hollow_axis else joint_holes(cls, floor, 0, kind="clear")
     if wire_slot:      # cable exit at the end opposite the shaft, open from the top
         far = ox + s.L if s.shaft_x < s.L / 2 else ox
         body -= box(wall + 3, 6.0 if cls == "micro" else 8.0, s.tab_z + 1, far + math.copysign(wall / 2 + 1, far), 0, floor + 2.0)
@@ -363,7 +368,7 @@ def servo_cradle(servo, floor=3.0, wall=2.4, hollow_axis=False, channel_d=None, 
         meta["hollow_axis"] = {"bore_d": bore, "channel_d": ch}
         meta["screws"].pop("M3 x 4 heat-set inserts"); meta["screws"]["M3 bolts through floor"] = 4
     else:
-        body -= screw_hole("M3", "insert", floor, sx, oy + s.shaft_y, 0)
+        body -= screw_hole("M3", "insert_low", floor, sx, oy + s.shaft_y, 0)
         meta["idler"] = "M3 heat-set insert on the shaft axis under the servo (shoulder screw or M3 bolt as axle)"
     return body, meta
 
@@ -468,27 +473,28 @@ def horn_coupler(servo, thickness=4.0, horn=None, length=None):
     plate -= vhole(SCREWS[s.horn_screw]["head"] + 1.0, thickness, hx, 0, 0)
     plate -= b.Pos(hx, 0, 0) * _horn_screw_holes(s, thickness, horn)
     jx = hx + max(pocket_r, 15.5 + 3.0 if horn == "arm" else 0) + dx / 2 + 4
-    plate -= b.Pos(jx, 0, 0) * joint_holes(cls, thickness, 0, kind="insert")
+    plate -= b.Pos(jx, 0, 0) * joint_holes(cls, thickness, 0, kind="insert_low")    # bolts come from the back
     return plate, {"servo": s.key, "length": round(length + pocket_r, 1)}
 
 
 def servo_l_joint(servo, thickness=4.0):
     """90 degree L plate with the joint pattern on both legs (servo-to-servo cross joints, pan-tilt).
-    Print pose: one leg on the bed, the other standing up with teardrop holes; a 45 degree fillet block joins them."""
+    The long pattern spacing runs across the legs (y) on both legs. Print pose: one leg on the bed, the other
+    standing up with teardrop holes; a 45 degree gusset joins them."""
     b = _b3d()
     s = _as_servo(servo)
     cls = size_class(s)
     dx, dy, _ = JOINT_PATTERN[cls]
-    leg = dx + 10.0
-    width = dy + 10.0
+    leg = dy + 14.0
+    width = dx + 10.0
     plate = box(leg, width, thickness, leg / 2 - thickness, 0, 0)
     wall = box(thickness, width, leg, -thickness / 2, 0, 0)
-    gusset = b.extrude(b.Polygon((0, 0), (8, 0), (0, 8), align=None), amount=width / 2, both=True)
+    gusset = b.extrude(b.Polygon((0, 0), (6, 0), (0, 6), align=None), amount=width / 2 - 1, both=True)
     gusset = b.Pos(0, 0, thickness) * b.Rot(90, 0, 0) * gusset
     lj = plate + wall + gusset
-    lj -= b.Pos(leg / 2 - thickness + 2, 0, 0) * joint_holes(cls, thickness, 0, kind="clear")
+    lj -= b.Pos(leg / 2 - thickness + 2, 0, 0) * b.Rot(0, 0, 90) * joint_holes(cls, thickness, 0, kind="clear")
     lj -= _wall_joint(cls, thickness, leg)
-    return lj, {"servo": s.key, "leg": leg}
+    return lj, {"servo": s.key, "leg": leg, "width": width}
 
 
 def _wall_joint(cls, thickness, leg):
@@ -497,7 +503,7 @@ def _wall_joint(cls, thickness, leg):
     cut = None
     for sy in (-1, 1):
         for sz in (-1, 1):
-            h = b.Pos(-thickness / 2, sy * dy / 2, leg / 2 + 2 + sz * dx / 2) * teardrop(SCREWS[sc]["clear"], thickness + 2, axis="x")
+            h = b.Pos(-thickness / 2, sy * dx / 2, leg / 2 + 2 + sz * dy / 2) * teardrop(SCREWS[sc]["clear"], thickness + 2, axis="x")
             cut = h if cut is None else cut + h
     return cut
 
